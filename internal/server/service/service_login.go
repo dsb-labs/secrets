@@ -10,16 +10,16 @@ import (
 )
 
 type (
-	PasswordService struct {
-		passwords RepositoryProvider[PasswordRepository]
+	LoginService struct {
+		logins RepositoryProvider[LoginRepository]
 	}
 
-	PasswordRepository interface {
-		Create(database.Password) error
-		List() ([]database.Password, error)
+	LoginRepository interface {
+		Create(database.Login) error
+		List() ([]database.Login, error)
 	}
 
-	Password struct {
+	Login struct {
 		UserID   uuid.UUID
 		Username string
 		Password string
@@ -27,14 +27,14 @@ type (
 	}
 )
 
-func NewPasswordService(passwords RepositoryProvider[PasswordRepository]) *PasswordService {
-	return &PasswordService{
-		passwords: passwords,
+func NewLoginService(passwords RepositoryProvider[LoginRepository]) *LoginService {
+	return &LoginService{
+		logins: passwords,
 	}
 }
 
-func (svc *PasswordService) Create(password Password) error {
-	repo, err := svc.passwords.For(password.UserID)
+func (svc *LoginService) Create(login Login) error {
+	repo, err := svc.logins.For(login.UserID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
 		return ErrReauthenticate
@@ -42,11 +42,11 @@ func (svc *PasswordService) Create(password Password) error {
 		return fmt.Errorf("failed to get database for user: %w", err)
 	}
 
-	record := database.Password{
+	record := database.Login{
 		ID:       uuid.New(),
-		Username: password.Username,
-		Password: password.Password,
-		Domains:  password.Domains,
+		Username: login.Username,
+		Password: login.Password,
+		Domains:  login.Domains,
 	}
 
 	err = repo.Create(record)
@@ -54,14 +54,14 @@ func (svc *PasswordService) Create(password Password) error {
 	case errors.Is(err, database.ErrClosed):
 		return ErrReauthenticate
 	case err != nil:
-		return fmt.Errorf("failed to create password record: %w", err)
+		return fmt.Errorf("failed to create login record: %w", err)
 	default:
 		return nil
 	}
 }
 
-func (svc *PasswordService) List(userID uuid.UUID) ([]Password, error) {
-	repo, err := svc.passwords.For(userID)
+func (svc *LoginService) List(userID uuid.UUID) ([]Login, error) {
+	repo, err := svc.logins.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
 		return nil, ErrReauthenticate
@@ -74,12 +74,12 @@ func (svc *PasswordService) List(userID uuid.UUID) ([]Password, error) {
 	case errors.Is(err, database.ErrClosed):
 		return nil, ErrReauthenticate
 	case err != nil:
-		return nil, fmt.Errorf("failed to list password records: %w", err)
+		return nil, fmt.Errorf("failed to list login records: %w", err)
 	}
 
-	passwords := make([]Password, len(results))
+	logins := make([]Login, len(results))
 	for i, result := range results {
-		passwords[i] = Password{
+		logins[i] = Login{
 			UserID:   userID,
 			Username: result.Username,
 			Password: result.Password,
@@ -87,5 +87,5 @@ func (svc *PasswordService) List(userID uuid.UUID) ([]Password, error) {
 		}
 	}
 
-	return passwords, nil
+	return logins, nil
 }

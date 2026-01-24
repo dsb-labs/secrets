@@ -12,21 +12,21 @@ import (
 )
 
 type (
-	// The PasswordAPI exposes HTTP endpoints for managing individual user passwords.
-	PasswordAPI struct {
-		passwords PasswordService
+	// The LoginAPI exposes HTTP endpoints for managing individual user passwords.
+	LoginAPI struct {
+		logins LoginService
 	}
 
-	// The PasswordService interface describes types that manage user passwords.
-	PasswordService interface {
+	// The LoginService interface describes types that manage user passwords.
+	LoginService interface {
 		// Create should create a new password record.
-		Create(service.Password) error
+		Create(service.Login) error
 		// List should return all passwords associated with the given user id.
-		List(uuid.UUID) ([]service.Password, error)
+		List(uuid.UUID) ([]service.Login, error)
 	}
 
-	// The Password type represents a single password.
-	Password struct {
+	// The Login type represents a single password.
+	Login struct {
 		// The username.
 		Username string `json:"username"`
 		// The password.
@@ -36,21 +36,21 @@ type (
 	}
 )
 
-// NewPasswordAPI returns a new instance of the PasswordAPI type that manages user passwords via the
-// given PasswordService implementation.
-func NewPasswordAPI(passwords PasswordService) *PasswordAPI {
-	return &PasswordAPI{passwords: passwords}
+// NewLoginAPI returns a new instance of the LoginAPI type that manages user passwords via the
+// given LoginService implementation.
+func NewLoginAPI(logins LoginService) *LoginAPI {
+	return &LoginAPI{logins: logins}
 }
 
 // Register the HTTP endpoints onto the given http.ServeMux.
-func (api *PasswordAPI) Register(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/v1/password", api.Create)
-	mux.HandleFunc("GET /api/v1/password", api.List)
+func (api *LoginAPI) Register(mux *http.ServeMux) {
+	mux.HandleFunc("POST /api/v1/login", api.Create)
+	mux.HandleFunc("GET /api/v1/login", api.List)
 }
 
 type (
-	// The CreatePasswordRequest type represents the request body given when calling PasswordAPI.Create
-	CreatePasswordRequest struct {
+	// The CreateLoginRequest type represents the request body given when calling LoginAPI.Create
+	CreateLoginRequest struct {
 		// The username.
 		Username string `json:"username"`
 		// The password.
@@ -59,12 +59,12 @@ type (
 		Domains []string `json:"domains"`
 	}
 
-	// The CreatePasswordResponse type represents the response body returned when calling PasswordAPI.Create
-	CreatePasswordResponse struct{}
+	// The CreateLoginResponse type represents the response body returned when calling LoginAPI.Create
+	CreateLoginResponse struct{}
 )
 
 // Validate the request.
-func (r CreatePasswordRequest) Validate() error {
+func (r CreateLoginRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Username, validation.Required),
 		validation.Field(&r.Password, validation.Required),
@@ -72,75 +72,75 @@ func (r CreatePasswordRequest) Validate() error {
 }
 
 // Create handles an inbound HTTP request to store a new password record for a user. On success, it responds with
-// an http.StatusCreated code and a JSON-encoded CreatePasswordResponse.
-func (api *PasswordAPI) Create(w http.ResponseWriter, r *http.Request) {
+// an http.StatusCreated code and a JSON-encoded CreateLoginResponse.
+func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
 	if !tkn.Valid() {
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	}
 
-	request, err := decode[CreatePasswordRequest](r.Body)
+	request, err := decode[CreateLoginRequest](r.Body)
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)
 		return
 	}
 
-	password := service.Password{
+	login := service.Login{
 		UserID:   tkn.ID(),
 		Username: request.Username,
 		Password: request.Password,
 		Domains:  request.Domains,
 	}
 
-	err = api.passwords.Create(password)
+	err = api.logins.Create(login)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	case err != nil:
-		writeErrorf(w, http.StatusInternalServerError, "failed to create password: %v", err)
+		writeErrorf(w, http.StatusInternalServerError, "failed to create login: %v", err)
 		return
 	}
 
-	write(w, http.StatusCreated, CreatePasswordResponse{})
+	write(w, http.StatusCreated, CreateLoginResponse{})
 }
 
 type (
-	// The ListPasswordsResponse type represents the response body returned when calling PasswordAPI.List
-	ListPasswordsResponse struct {
-		// The passwords stored for the account.
-		Passwords []Password `json:"passwords"`
+	// The ListLoginsResponse type represents the response body returned when calling LoginAPI.List
+	ListLoginsResponse struct {
+		// The logins stored for the account.
+		Logins []Login `json:"logins"`
 	}
 )
 
 // List handles an inbound HTTP request to list all password records for a user. On success, it responds with
-// an http.StatusOK code and a JSON-encoded ListPasswordsResponse.
-func (api *PasswordAPI) List(w http.ResponseWriter, r *http.Request) {
+// an http.StatusOK code and a JSON-encoded ListLoginsResponse.
+func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
 	if !tkn.Valid() {
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	}
 
-	results, err := api.passwords.List(tkn.ID())
+	results, err := api.logins.List(tkn.ID())
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
 		return
 	case err != nil:
-		writeErrorf(w, http.StatusInternalServerError, "failed to list passwords: %v", err)
+		writeErrorf(w, http.StatusInternalServerError, "failed to list logins: %v", err)
 		return
 	}
 
-	passwords := make([]Password, len(results))
+	logins := make([]Login, len(results))
 	for i, result := range results {
-		passwords[i] = Password{
+		logins[i] = Login{
 			Username: result.Username,
 			Password: result.Password,
 			Domains:  result.Domains,
 		}
 	}
 
-	write(w, http.StatusOK, ListPasswordsResponse{Passwords: passwords})
+	write(w, http.StatusOK, ListLoginsResponse{Logins: logins})
 }

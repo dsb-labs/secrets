@@ -14,24 +14,24 @@ import (
 	"github.com/davidsbond/passwords/internal/server/token"
 )
 
-func TestPasswordAPI_Create(t *testing.T) {
+func TestLoginAPI_Create(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
 		Name         string
-		Request      api.CreatePasswordRequest
-		Expected     api.CreatePasswordResponse
+		Request      api.CreateLoginRequest
+		Expected     api.CreateLoginResponse
 		Token        token.Token
 		ExpectedCode int
 		ExpectsError bool
-		Setup        func(svc *MockPasswordService)
+		Setup        func(svc *MockLoginService)
 	}{
 		{
 			Name:         "error if no token",
 			Token:        token.Token{},
 			ExpectsError: true,
 			ExpectedCode: http.StatusUnauthorized,
-			Request: api.CreatePasswordRequest{
+			Request: api.CreateLoginRequest{
 				Username: "test",
 				Password: "test",
 			},
@@ -39,7 +39,7 @@ func TestPasswordAPI_Create(t *testing.T) {
 		{
 			Name:  "error if missing username",
 			Token: token.TestToken(t, "test"),
-			Request: api.CreatePasswordRequest{
+			Request: api.CreateLoginRequest{
 				Username: "",
 				Password: "password",
 			},
@@ -49,7 +49,7 @@ func TestPasswordAPI_Create(t *testing.T) {
 		{
 			Name:  "error if missing password",
 			Token: token.TestToken(t, "test"),
-			Request: api.CreatePasswordRequest{
+			Request: api.CreateLoginRequest{
 				Username: "test@test.com",
 				Password: "",
 			},
@@ -59,39 +59,39 @@ func TestPasswordAPI_Create(t *testing.T) {
 		{
 			Name:  "error if lifetime has expired",
 			Token: token.TestToken(t, "test"),
-			Request: api.CreatePasswordRequest{
+			Request: api.CreateLoginRequest{
 				Username: "test",
 				Password: "test",
 			},
 			ExpectsError: true,
 			ExpectedCode: http.StatusUnauthorized,
-			Setup: func(svc *MockPasswordService) {
+			Setup: func(svc *MockLoginService) {
 				svc.EXPECT().Create(mock.Anything).Return(service.ErrReauthenticate).Once()
 			},
 		},
 		{
 			Name:  "error if creation fails",
 			Token: token.TestToken(t, "test"),
-			Request: api.CreatePasswordRequest{
+			Request: api.CreateLoginRequest{
 				Username: "test",
 				Password: "test",
 			},
 			ExpectsError: true,
 			ExpectedCode: http.StatusInternalServerError,
-			Setup: func(svc *MockPasswordService) {
+			Setup: func(svc *MockLoginService) {
 				svc.EXPECT().Create(mock.Anything).Return(io.EOF).Once()
 			},
 		},
 		{
 			Name:  "success",
 			Token: token.TestToken(t, "test"),
-			Request: api.CreatePasswordRequest{
+			Request: api.CreateLoginRequest{
 				Username: "test",
 				Password: "test",
 			},
-			Expected:     api.CreatePasswordResponse{},
+			Expected:     api.CreateLoginResponse{},
 			ExpectedCode: http.StatusCreated,
-			Setup: func(svc *MockPasswordService) {
+			Setup: func(svc *MockLoginService) {
 				svc.EXPECT().Create(mock.Anything).Return(nil).Once()
 			},
 		},
@@ -99,16 +99,16 @@ func TestPasswordAPI_Create(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			svc := NewMockPasswordService(t)
+			svc := NewMockLoginService(t)
 			if tc.Setup != nil {
 				tc.Setup(svc)
 			}
 
 			w := httptest.NewRecorder()
-			r := request(t, http.MethodPost, "/api/v1/password", tc.Request).
+			r := request(t, http.MethodPost, "/api/v1/login", tc.Request).
 				WithContext(token.ToContext(t.Context(), tc.Token))
 
-			api.NewPasswordAPI(svc).Create(w, r)
+			api.NewLoginAPI(svc).Create(w, r)
 
 			require.Equal(t, tc.ExpectedCode, w.Code)
 			if tc.ExpectsError {
@@ -121,16 +121,16 @@ func TestPasswordAPI_Create(t *testing.T) {
 	}
 }
 
-func TestPasswordAPI_List(t *testing.T) {
+func TestLoginAPI_List(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
 		Name         string
-		Expected     api.ListPasswordsResponse
+		Expected     api.ListLoginsResponse
 		Token        token.Token
 		ExpectedCode int
 		ExpectsError bool
-		Setup        func(svc *MockPasswordService)
+		Setup        func(svc *MockLoginService)
 	}{
 		{
 			Name:         "error if no token",
@@ -143,7 +143,7 @@ func TestPasswordAPI_List(t *testing.T) {
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,
 			ExpectedCode: http.StatusUnauthorized,
-			Setup: func(svc *MockPasswordService) {
+			Setup: func(svc *MockLoginService) {
 				svc.EXPECT().List(mock.Anything).Return(nil, service.ErrReauthenticate).Once()
 			},
 		},
@@ -152,15 +152,15 @@ func TestPasswordAPI_List(t *testing.T) {
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,
 			ExpectedCode: http.StatusInternalServerError,
-			Setup: func(svc *MockPasswordService) {
+			Setup: func(svc *MockLoginService) {
 				svc.EXPECT().List(mock.Anything).Return(nil, io.EOF).Once()
 			},
 		},
 		{
 			Name:  "success",
 			Token: token.TestToken(t, "test"),
-			Expected: api.ListPasswordsResponse{
-				Passwords: []api.Password{
+			Expected: api.ListLoginsResponse{
+				Logins: []api.Login{
 					{
 						Username: "test",
 						Password: "test",
@@ -169,8 +169,8 @@ func TestPasswordAPI_List(t *testing.T) {
 				},
 			},
 			ExpectedCode: http.StatusOK,
-			Setup: func(svc *MockPasswordService) {
-				expected := []service.Password{
+			Setup: func(svc *MockLoginService) {
+				expected := []service.Login{
 					{
 						Username: "test",
 						Password: "test",
@@ -185,16 +185,16 @@ func TestPasswordAPI_List(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			svc := NewMockPasswordService(t)
+			svc := NewMockLoginService(t)
 			if tc.Setup != nil {
 				tc.Setup(svc)
 			}
 
 			w := httptest.NewRecorder()
-			r := request(t, http.MethodGet, "/api/v1/password", nil).
+			r := request(t, http.MethodGet, "/api/v1/login", nil).
 				WithContext(token.ToContext(t.Context(), tc.Token))
 
-			api.NewPasswordAPI(svc).List(w, r)
+			api.NewLoginAPI(svc).List(w, r)
 
 			require.Equal(t, tc.ExpectedCode, w.Code)
 			if tc.ExpectsError {

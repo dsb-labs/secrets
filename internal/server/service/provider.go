@@ -21,8 +21,8 @@ type (
 	}
 )
 
-// PasswordRepositoryProvider is a RepositoryProvider implementation that returns a PasswordRepository implementation
+// LoginRepositoryProvider is a RepositoryProvider implementation that returns a LoginRepository implementation
 // backed by a badger database.
-func PasswordRepositoryProvider(db *badger.DB) PasswordRepository {
-	return database.NewPasswordRepository(db)
+func LoginRepositoryProvider(db *badger.DB) LoginRepository {
+	return database.NewLoginRepository(db)
 }

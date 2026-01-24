@@ -10,13 +10,20 @@ import (
 )
 
 type (
+	// The AccountRepository type is responsible for managing the persistence of individual user accounts. This should
+	// be instantiated against the master database, as that is where metadata for accounts is stored. Actual account
+	// data, such as passwords etc should be stored within their respective, encrypted user databases.
 	AccountRepository struct {
 		db *badger.DB
 	}
 
+	// The Account type represents a user account as stored in the master database.
 	Account struct {
-		ID           uuid.UUID
-		Email        string
+		// The user's unique identifier.
+		ID uuid.UUID
+		// The user's email address.
+		Email string
+		// The user's hashed password.
 		PasswordHash []byte
 	}
 )
@@ -30,14 +37,20 @@ func (a Account) key() []byte {
 }
 
 var (
-	ErrAccountExists   = errors.New("account exists")
+	// ErrAccountExists is the error given when performing an operation for an account that conflicts with an existing
+	// account record.
+	ErrAccountExists = errors.New("account exists")
+	// ErrAccountNotFound is the error given when querying an account that does not exist.
 	ErrAccountNotFound = errors.New("account not found")
 )
 
+// NewAccountRepository returns a new instance of the AccountRepository type that will persist account records using
+// the provided badger.DB database.
 func NewAccountRepository(db *badger.DB) *AccountRepository {
 	return &AccountRepository{db: db}
 }
 
+// Create a new account record. Returns ErrAccountExists if an account already exists with the same email address.
 func (r *AccountRepository) Create(account Account) error {
 	return update(r.db, func(txn *badger.Txn) error {
 		exists, err := accountExists(txn, account.Email)
@@ -52,6 +65,8 @@ func (r *AccountRepository) Create(account Account) error {
 	})
 }
 
+// FindByEmail attempts to return the account record associated with the given email address. Returns ErrAccountNotFound
+// if the specified account does not exist.
 func (r *AccountRepository) FindByEmail(email string) (Account, error) {
 	return view(r.db, func(txn *badger.Txn) (Account, error) {
 		opts := badger.DefaultIteratorOptions
@@ -60,7 +75,10 @@ func (r *AccountRepository) FindByEmail(email string) (Account, error) {
 		iter := txn.NewIterator(opts)
 		defer iter.Close()
 
-		var account Account
+		var (
+			account Account
+			found   bool
+		)
 		for iter.Rewind(); iter.Valid(); iter.Next() {
 			err := iter.Item().Value(func(value []byte) error {
 				if err := json.Unmarshal(value, &account); err != nil {
@@ -69,6 +87,7 @@ func (r *AccountRepository) FindByEmail(email string) (Account, error) {
 
 				if account.Email == email {
 					iter.Close()
+					found = true
 					return nil
 				}
 
@@ -79,7 +98,7 @@ func (r *AccountRepository) FindByEmail(email string) (Account, error) {
 			}
 		}
 
-		if account.ID == uuid.Nil {
+		if !found {
 			return Account{}, ErrAccountNotFound
 		}
 
