@@ -36,25 +36,34 @@ type (
 	}
 )
 
+// NewPasswordAPI returns a new instance of the PasswordAPI type that manages user passwords via the
+// given PasswordService implementation.
 func NewPasswordAPI(passwords PasswordService) *PasswordAPI {
 	return &PasswordAPI{passwords: passwords}
 }
 
+// Register the HTTP endpoints onto the given http.ServeMux.
 func (api *PasswordAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/password", api.Create)
 	mux.HandleFunc("GET /api/v1/password", api.List)
 }
 
 type (
+	// The CreatePasswordRequest type represents the request body given when calling PasswordAPI.Create
 	CreatePasswordRequest struct {
-		Username string   `json:"username"`
-		Password string   `json:"password"`
-		Domains  []string `json:"domains"`
+		// The username.
+		Username string `json:"username"`
+		// The password.
+		Password string `json:"password"`
+		// The domains where this username/password combination can be used.
+		Domains []string `json:"domains"`
 	}
 
+	// The CreatePasswordResponse type represents the response body returned when calling PasswordAPI.Create
 	CreatePasswordResponse struct{}
 )
 
+// Validate the request.
 func (r CreatePasswordRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Username, validation.Required),
@@ -62,6 +71,8 @@ func (r CreatePasswordRequest) Validate() error {
 	)
 }
 
+// Create handles an inbound HTTP request to store a new password record for a user. On success, it responds with
+// an http.StatusCreated code and a JSON-encoded CreatePasswordResponse.
 func (api *PasswordAPI) Create(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
 	if !tkn.Valid() {
@@ -96,11 +107,15 @@ func (api *PasswordAPI) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 type (
+	// The ListPasswordsResponse type represents the response body returned when calling PasswordAPI.List
 	ListPasswordsResponse struct {
+		// The passwords stored for the account.
 		Passwords []Password `json:"passwords"`
 	}
 )
 
+// List handles an inbound HTTP request to list all password records for a user. On success, it responds with
+// an http.StatusOK code and a JSON-encoded ListPasswordsResponse.
 func (api *PasswordAPI) List(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
 	if !tkn.Valid() {

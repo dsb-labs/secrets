@@ -6,7 +6,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -106,14 +105,11 @@ func TestAccountAPI_Create(t *testing.T) {
 
 			require.Equal(t, tc.ExpectedCode, w.Code)
 			if tc.ExpectsError {
-				err := decode[api.Error](t, w.Body)
-				assert.EqualValues(t, w.Code, err.Code)
-				assert.NotEmpty(t, err.Message)
+				assertAPIError(t, w)
 				return
 			}
 
-			actual := decode[api.CreateAccountResponse](t, w.Body)
-			assert.EqualValues(t, tc.Expected, actual)
+			assertResponse(t, w, tc.Expected)
 		})
 	}
 }
