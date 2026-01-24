@@ -1,0 +1,12 @@
+[http]
+bind = "0.0.0.0:8080"
+
+[database]
+path = ".data"
+ttl = "1h"
+
+[jwt]
+issuer = "dev"
+audience = "dev"
+ttl = "30m"
+signing-key = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]

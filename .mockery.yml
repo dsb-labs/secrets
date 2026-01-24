@@ -1,0 +1,10 @@
+filename: mocks_test.go
+log-level: error
+pkgname: '{{.SrcPackageName}}_test'
+packages:
+  github.com/davidsbond/passwords/internal/server/api:
+    config:
+      all: true
+  github.com/davidsbond/passwords/internal/server/service:
+    config:
+      all: true
