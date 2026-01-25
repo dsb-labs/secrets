@@ -12,6 +12,7 @@ import (
 )
 
 //go:generate go tool mockery
+//go:generate ./scripts/refresh_licenses.sh
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()

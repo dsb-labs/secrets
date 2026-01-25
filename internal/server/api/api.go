@@ -49,5 +49,6 @@ func write(w http.ResponseWriter, code int, body any) {
 	w.WriteHeader(code)
 	if err := json.NewEncoder(w).Encode(body); err != nil {
 		// TODO(davidsbond): something
+		fmt.Println(err)
 	}
 }
