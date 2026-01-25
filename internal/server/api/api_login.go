@@ -19,8 +19,8 @@ type (
 
 	// The LoginService interface describes types that manage user passwords.
 	LoginService interface {
-		// Create should create a new password record.
-		Create(service.Login) error
+		// Create should create a new password record for the given user id.
+		Create(uuid.UUID, service.Login) error
 		// List should return all passwords associated with the given user id.
 		List(uuid.UUID) ([]service.Login, error)
 	}
@@ -87,13 +87,12 @@ func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	login := service.Login{
-		UserID:   tkn.ID(),
 		Username: request.Username,
 		Password: request.Password,
 		Domains:  request.Domains,
 	}
 
-	err = api.logins.Create(login)
+	err = api.logins.Create(tkn.ID(), login)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))

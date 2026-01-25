@@ -12,21 +12,28 @@ import (
 )
 
 type (
+	// The AuthService type is responsible for managing user authentication.
 	AuthService struct {
 		accounts  AccountRepository
 		databases DatabaseManager
 		tokens    TokenGenerator
 	}
 
+	// The TokenGenerator interface describes types that can generate authentication tokens.
 	TokenGenerator interface {
+		// Generate should return a new token.Token for the given user identifier.
 		Generate(uuid.UUID) (token.Token, error)
 	}
 )
 
 var (
+	// ErrInvalidPassword is the error returned when a user attempts to authenticate with an incorrect password.
 	ErrInvalidPassword = errors.New("invalid password")
 )
 
+// NewAuthService returns a new instance of the AuthService type that queries account data via the given AccountRepository
+// implementation, manages individual user databases via the given DatabaseManager implementation and generates
+// authentication tokens using the given TokenGenerator implementation.
 func NewAuthService(accounts AccountRepository, databases DatabaseManager, tokens TokenGenerator) *AuthService {
 	return &AuthService{
 		accounts:  accounts,
@@ -35,6 +42,9 @@ func NewAuthService(accounts AccountRepository, databases DatabaseManager, token
 	}
 }
 
+// Login attempts to generate a new token.Token for the user matching the given email and password combination. Returns
+// ErrAccountNotFound if the given email address does not match an existing account, or ErrInvalidPassword if the
+// provided password does not match that of the specified user.
 func (svc *AuthService) Login(email, password string) (token.Token, error) {
 	account, err := svc.accounts.FindByEmail(email)
 	switch {
@@ -64,6 +74,7 @@ func (svc *AuthService) Login(email, password string) (token.Token, error) {
 	return tkn, nil
 }
 
+// Logout locks the specified user's database.
 func (svc *AuthService) Logout(userID uuid.UUID) error {
 	if err := svc.databases.Lock(userID); err != nil {
 		return fmt.Errorf("failed to lock database for user: %w", err)

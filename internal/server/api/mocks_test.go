@@ -343,16 +343,16 @@ func (_m *MockLoginService) EXPECT() *MockLoginService_Expecter {
 }
 
 // Create provides a mock function for the type MockLoginService
-func (_mock *MockLoginService) Create(login service.Login) error {
-	ret := _mock.Called(login)
+func (_mock *MockLoginService) Create(uUID uuid.UUID, login service.Login) error {
+	ret := _mock.Called(uUID, login)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
 	}
 
 	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(service.Login) error); ok {
-		r0 = returnFunc(login)
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, service.Login) error); ok {
+		r0 = returnFunc(uUID, login)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -365,19 +365,25 @@ type MockLoginService_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
+//   - uUID uuid.UUID
 //   - login service.Login
-func (_e *MockLoginService_Expecter) Create(login interface{}) *MockLoginService_Create_Call {
-	return &MockLoginService_Create_Call{Call: _e.mock.On("Create", login)}
+func (_e *MockLoginService_Expecter) Create(uUID interface{}, login interface{}) *MockLoginService_Create_Call {
+	return &MockLoginService_Create_Call{Call: _e.mock.On("Create", uUID, login)}
 }
 
-func (_c *MockLoginService_Create_Call) Run(run func(login service.Login)) *MockLoginService_Create_Call {
+func (_c *MockLoginService_Create_Call) Run(run func(uUID uuid.UUID, login service.Login)) *MockLoginService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		var arg0 service.Login
+		var arg0 uuid.UUID
 		if args[0] != nil {
-			arg0 = args[0].(service.Login)
+			arg0 = args[0].(uuid.UUID)
+		}
+		var arg1 service.Login
+		if args[1] != nil {
+			arg1 = args[1].(service.Login)
 		}
 		run(
 			arg0,
+			arg1,
 		)
 	})
 	return _c
@@ -388,7 +394,7 @@ func (_c *MockLoginService_Create_Call) Return(err error) *MockLoginService_Crea
 	return _c
 }
 
-func (_c *MockLoginService_Create_Call) RunAndReturn(run func(login service.Login) error) *MockLoginService_Create_Call {
+func (_c *MockLoginService_Create_Call) RunAndReturn(run func(uUID uuid.UUID, login service.Login) error) *MockLoginService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }

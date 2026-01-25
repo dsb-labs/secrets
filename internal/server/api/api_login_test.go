@@ -66,7 +66,7 @@ func TestLoginAPI_Create(t *testing.T) {
 			ExpectsError: true,
 			ExpectedCode: http.StatusUnauthorized,
 			Setup: func(svc *MockLoginService) {
-				svc.EXPECT().Create(mock.Anything).Return(service.ErrReauthenticate).Once()
+				svc.EXPECT().Create(mock.Anything, mock.Anything).Return(service.ErrReauthenticate).Once()
 			},
 		},
 		{
@@ -79,7 +79,7 @@ func TestLoginAPI_Create(t *testing.T) {
 			ExpectsError: true,
 			ExpectedCode: http.StatusInternalServerError,
 			Setup: func(svc *MockLoginService) {
-				svc.EXPECT().Create(mock.Anything).Return(io.EOF).Once()
+				svc.EXPECT().Create(mock.Anything, mock.Anything).Return(io.EOF).Once()
 			},
 		},
 		{
@@ -92,7 +92,7 @@ func TestLoginAPI_Create(t *testing.T) {
 			Expected:     api.CreateLoginResponse{},
 			ExpectedCode: http.StatusCreated,
 			Setup: func(svc *MockLoginService) {
-				svc.EXPECT().Create(mock.Anything).Return(nil).Once()
+				svc.EXPECT().Create(mock.Anything, mock.Anything).Return(nil).Once()
 			},
 		},
 	}

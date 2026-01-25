@@ -10,31 +10,42 @@ import (
 )
 
 type (
+	// The LoginService type responsible for managing individual user login records.
 	LoginService struct {
 		logins RepositoryProvider[LoginRepository]
 	}
 
+	// The LoginRepository interface describes types that persist login records.
 	LoginRepository interface {
+		// Create should store a new login record.
 		Create(database.Login) error
+		// List should return all login records.
 		List() ([]database.Login, error)
 	}
 
+	// The Login type represents a single user login record.
 	Login struct {
-		UserID   uuid.UUID
+		// The username for the login.
 		Username string
+		// The password for the login.
 		Password string
-		Domains  []string
+		// The domains this username/password combination can be used.
+		Domains []string
 	}
 )
 
-func NewLoginService(passwords RepositoryProvider[LoginRepository]) *LoginService {
+// NewLoginService returns a new instance of the LoginService type that will manage individual user logins using
+// LoginRepository implementations provided by the given RepositoryProvider implementation.
+func NewLoginService(logins RepositoryProvider[LoginRepository]) *LoginService {
 	return &LoginService{
-		logins: passwords,
+		logins: logins,
 	}
 }
 
-func (svc *LoginService) Create(login Login) error {
-	repo, err := svc.logins.For(login.UserID)
+// Create a new login record for the specified user. Returns ErrReauthenticate if the underlying individual user
+// database's lifetime has expired and the caller must reauthenticate.
+func (svc *LoginService) Create(userID uuid.UUID, login Login) error {
+	repo, err := svc.logins.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
 		return ErrReauthenticate
@@ -60,6 +71,8 @@ func (svc *LoginService) Create(login Login) error {
 	}
 }
 
+// List all login records for the specified user. Returns ErrReauthenticate if the underlying individual user
+// // database's lifetime has expired and the caller must reauthenticate.
 func (svc *LoginService) List(userID uuid.UUID) ([]Login, error) {
 	repo, err := svc.logins.For(userID)
 	switch {
@@ -80,7 +93,6 @@ func (svc *LoginService) List(userID uuid.UUID) ([]Login, error) {
 	logins := make([]Login, len(results))
 	for i, result := range results {
 		logins[i] = Login{
-			UserID:   userID,
 			Username: result.Username,
 			Password: result.Password,
 			Domains:  result.Domains,

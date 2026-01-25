@@ -10,13 +10,18 @@ import (
 )
 
 type (
+	// The DatabaseManager interface describes types that manage individual user databases.
 	DatabaseManager interface {
+		// Unlock should open and decrypt the user database associated with the given user identifier.
 		Unlock(uuid.UUID, []byte) error
+		// Lock should close the user database associated with the given user identifier.
 		Lock(uuid.UUID) error
 	}
 )
 
 var (
+	// ErrReauthenticate is the error given when attempting to perform an operation on a user database that has
+	// expired. The user will need to reauthenticate to unlock it again and continue.
 	ErrReauthenticate = errors.New("reauthenticate")
 )
 

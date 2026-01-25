@@ -137,8 +137,11 @@ func defaultDatabasePath() string {
 	if err != nil {
 		switch runtime.GOOS {
 		case "windows":
+			// TODO(davidsbond): where
 		case "darwin":
+			// TODO(davidsbond): where
 		case "linux":
+			// TODO(davidsbond): where
 		}
 	}
 
