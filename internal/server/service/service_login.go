@@ -3,10 +3,14 @@ package service
 import (
 	"errors"
 	"fmt"
+	"slices"
+	"strings"
 
+	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 
 	"github.com/davidsbond/passwords/internal/server/database"
+	"github.com/davidsbond/passwords/internal/server/urlcmp"
 )
 
 type (
@@ -75,7 +79,7 @@ func (svc *LoginService) Create(userID uuid.UUID, login Login) error {
 
 // List all login records for the specified user. Returns ErrReauthenticate if the underlying individual user
 // // database's lifetime has expired and the caller must reauthenticate.
-func (svc *LoginService) List(userID uuid.UUID) ([]Login, error) {
+func (svc *LoginService) List(userID uuid.UUID, filters ...filter.Filter[Login]) ([]Login, error) {
 	repo, err := svc.logins.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
@@ -102,5 +106,31 @@ func (svc *LoginService) List(userID uuid.UUID) ([]Login, error) {
 		}
 	}
 
-	return logins, nil
+	if len(filters) == 0 {
+		return logins, nil
+	}
+
+	return filter.All(logins, filters...), nil
+}
+
+// LoginByDomain returns a filter.Filter implementation that checks if a given Login contains a domain that matches
+// the one specified. Domains are compared by generating stable host/site keys which allows for flexibility such as
+// accounts.google.com matching a domain of google.com.
+func LoginByDomain(domain string) filter.Filter[Login] {
+	want, ok := urlcmp.SiteKey(domain)
+
+	return func(login Login) bool {
+		if strings.TrimSpace(domain) == "" {
+			return true
+		}
+
+		if !ok {
+			return false
+		}
+
+		return slices.ContainsFunc(login.Domains, func(s string) bool {
+			have, ok := urlcmp.SiteKey(s)
+			return ok && have == want
+		})
+	}
 }

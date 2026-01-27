@@ -145,7 +145,7 @@ func TestLoginAPI_List(t *testing.T) {
 			ExpectsError: true,
 			ExpectedCode: http.StatusUnauthorized,
 			Setup: func(svc *MockLoginService) {
-				svc.EXPECT().List(mock.Anything).Return(nil, service.ErrReauthenticate).Once()
+				svc.EXPECT().List(mock.Anything, mock.Anything).Return(nil, service.ErrReauthenticate).Once()
 			},
 		},
 		{
@@ -154,7 +154,7 @@ func TestLoginAPI_List(t *testing.T) {
 			ExpectsError: true,
 			ExpectedCode: http.StatusInternalServerError,
 			Setup: func(svc *MockLoginService) {
-				svc.EXPECT().List(mock.Anything).Return(nil, io.EOF).Once()
+				svc.EXPECT().List(mock.Anything, mock.Anything).Return(nil, io.EOF).Once()
 			},
 		},
 		{
@@ -181,7 +181,7 @@ func TestLoginAPI_List(t *testing.T) {
 					},
 				}
 
-				svc.EXPECT().List(mock.Anything).Return(expected, nil).Once()
+				svc.EXPECT().List(mock.Anything, mock.Anything).Return(expected, nil).Once()
 			},
 		},
 	}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/davidsbond/x/filter"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
@@ -22,7 +23,7 @@ type (
 		// Create should create a new password record for the given user id.
 		Create(uuid.UUID, service.Login) error
 		// List should return all passwords associated with the given user id.
-		List(uuid.UUID) ([]service.Login, error)
+		List(uuid.UUID, ...filter.Filter[service.Login]) ([]service.Login, error)
 	}
 
 	// The Login type represents a single password.
@@ -124,7 +125,12 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := api.logins.List(tkn.ID())
+	filters := make([]filter.Filter[service.Login], 0)
+	if domain := r.URL.Query().Get("domain"); domain != "" {
+		filters = append(filters, service.LoginByDomain(domain))
+	}
+
+	results, err := api.logins.List(tkn.ID(), filters...)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))

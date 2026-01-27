@@ -7,6 +7,7 @@ package api_test
 import (
 	"github.com/davidsbond/passwords/internal/server/service"
 	"github.com/davidsbond/passwords/internal/server/token"
+	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )
@@ -400,8 +401,14 @@ func (_c *MockLoginService_Create_Call) RunAndReturn(run func(uUID uuid.UUID, lo
 }
 
 // List provides a mock function for the type MockLoginService
-func (_mock *MockLoginService) List(uUID uuid.UUID) ([]service.Login, error) {
-	ret := _mock.Called(uUID)
+func (_mock *MockLoginService) List(uUID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error) {
+	var tmpRet mock.Arguments
+	if len(filters) > 0 {
+		tmpRet = _mock.Called(uUID, filters)
+	} else {
+		tmpRet = _mock.Called(uUID)
+	}
+	ret := tmpRet
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
@@ -409,18 +416,18 @@ func (_mock *MockLoginService) List(uUID uuid.UUID) ([]service.Login, error) {
 
 	var r0 []service.Login
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) ([]service.Login, error)); ok {
-		return returnFunc(uUID)
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Login]) ([]service.Login, error)); ok {
+		return returnFunc(uUID, filters...)
 	}
-	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) []service.Login); ok {
-		r0 = returnFunc(uUID)
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Login]) []service.Login); ok {
+		r0 = returnFunc(uUID, filters...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]service.Login)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(uuid.UUID) error); ok {
-		r1 = returnFunc(uUID)
+	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, ...filter.Filter[service.Login]) error); ok {
+		r1 = returnFunc(uUID, filters...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -434,18 +441,27 @@ type MockLoginService_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - uUID uuid.UUID
-func (_e *MockLoginService_Expecter) List(uUID interface{}) *MockLoginService_List_Call {
-	return &MockLoginService_List_Call{Call: _e.mock.On("List", uUID)}
+//   - filters ...filter.Filter[service.Login]
+func (_e *MockLoginService_Expecter) List(uUID interface{}, filters ...interface{}) *MockLoginService_List_Call {
+	return &MockLoginService_List_Call{Call: _e.mock.On("List",
+		append([]interface{}{uUID}, filters...)...)}
 }
 
-func (_c *MockLoginService_List_Call) Run(run func(uUID uuid.UUID)) *MockLoginService_List_Call {
+func (_c *MockLoginService_List_Call) Run(run func(uUID uuid.UUID, filters ...filter.Filter[service.Login])) *MockLoginService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
 			arg0 = args[0].(uuid.UUID)
 		}
+		var arg1 []filter.Filter[service.Login]
+		var variadicArgs []filter.Filter[service.Login]
+		if len(args) > 1 {
+			variadicArgs = args[1].([]filter.Filter[service.Login])
+		}
+		arg1 = variadicArgs
 		run(
 			arg0,
+			arg1...,
 		)
 	})
 	return _c
@@ -456,7 +472,7 @@ func (_c *MockLoginService_List_Call) Return(logins []service.Login, err error) 
 	return _c
 }
 
-func (_c *MockLoginService_List_Call) RunAndReturn(run func(uUID uuid.UUID) ([]service.Login, error)) *MockLoginService_List_Call {
+func (_c *MockLoginService_List_Call) RunAndReturn(run func(uUID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)) *MockLoginService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

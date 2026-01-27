@@ -39,9 +39,15 @@ func (c *Client) CreateLogin(ctx context.Context, login Login) error {
 	return nil
 }
 
-// ListLogins attempts to return all login records stored for the authenticated user.
-func (c *Client) ListLogins(ctx context.Context) ([]Login, error) {
-	request, err := c.buildRequest(ctx, http.MethodGet, "/api/v1/login", nil)
+// ListLogins attempts to return all login records stored for the authenticated user. If the "domain" parameter is set,
+// the server will filter the results to credentials that may be usable on the domain.
+func (c *Client) ListLogins(ctx context.Context, domain string) ([]Login, error) {
+	path := "/api/v1/login"
+	if domain != "" {
+		path += "?domain=" + domain
+	}
+
+	request, err := c.buildRequest(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return nil, err
 	}

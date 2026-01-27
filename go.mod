@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/BurntSushi/toml v1.6.0
-	github.com/davidsbond/x v0.0.0-20260123113108-2ff6973ccfef
+	github.com/davidsbond/x v0.0.0-20260127205618-e449101aac27
 	github.com/dgraph-io/badger/v4 v4.9.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.3.0
@@ -12,6 +12,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/crypto v0.47.0
+	golang.org/x/net v0.49.0
 	golang.org/x/sync v0.19.0
 	golang.org/x/term v0.39.0
 )
@@ -67,7 +68,6 @@ require (
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/mod v0.31.0 // indirect
-	golang.org/x/net v0.49.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/text v0.33.0 // indirect
 	golang.org/x/tools v0.40.0 // indirect

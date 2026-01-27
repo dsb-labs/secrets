@@ -17,6 +17,7 @@ func list() *cobra.Command {
 	var (
 		apiURL     string
 		configPath string
+		domain     string
 	)
 
 	cmd := &cobra.Command{
@@ -38,7 +39,7 @@ func list() *cobra.Command {
 			client := passwords.NewClient(apiURL)
 			client.SetToken(cfg.Token)
 
-			logins, err := client.ListLogins(ctx)
+			logins, err := client.ListLogins(ctx, domain)
 			if err != nil {
 				return fmt.Errorf("failed to list logins: %w", err)
 			}
@@ -53,6 +54,7 @@ func list() *cobra.Command {
 	flags := cmd.Flags()
 	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the passwords api")
 	flags.StringVar(&configPath, "config", envvar.String("PASSWORDS_CONFIG", config.DefaultConfigPath()), "path to config file")
+	flags.StringVar(&domain, "domain", "", "filter results by domain")
 
 	return cmd
 }

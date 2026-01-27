@@ -4,6 +4,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -131,6 +132,7 @@ func TestLoginService_List(t *testing.T) {
 		Expected     []service.Login
 		ExpectsError bool
 		Setup        func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository])
+		Filters      []filter.Filter[service.Login]
 	}{
 		{
 			Name:         "error if database lifetime has expired",
@@ -204,6 +206,43 @@ func TestLoginService_List(t *testing.T) {
 				logins.EXPECT().List().Return(expected, nil).Once()
 			},
 		},
+		{
+			Name:   "uses filters",
+			UserID: uuid.NameSpaceDNS,
+			Expected: []service.Login{
+				{
+					ID:       uuid.NameSpaceDNS,
+					Username: "test@test.com",
+					Password: "test",
+					Domains:  []string{"https://account.google.com"},
+				},
+			},
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				expected := []database.Login{
+					{
+						ID:       uuid.NameSpaceURL,
+						Username: "test@test.com",
+						Password: "test",
+						Domains:  []string{"https://facebook.com"},
+					},
+					{
+						ID:       uuid.NameSpaceDNS,
+						Username: "test@test.com",
+						Password: "test",
+						Domains:  []string{"https://account.google.com"},
+					},
+				}
+
+				logins.EXPECT().List().Return(expected, nil).Once()
+			},
+			Filters: []filter.Filter[service.Login]{
+				service.LoginByDomain("google.com"),
+			},
+		},
 	}
 
 	for _, tc := range tt {
@@ -215,7 +254,7 @@ func TestLoginService_List(t *testing.T) {
 				tc.Setup(logins, provider)
 			}
 
-			actual, err := service.NewLoginService(provider).List(tc.UserID)
+			actual, err := service.NewLoginService(provider).List(tc.UserID, tc.Filters...)
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return
