@@ -181,6 +181,7 @@ func TestLoginService_List(t *testing.T) {
 			UserID: uuid.NameSpaceDNS,
 			Expected: []service.Login{
 				{
+					ID:       uuid.NameSpaceDNS,
 					Username: "test",
 					Password: "test",
 					Domains:  []string{"test"},

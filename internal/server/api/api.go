@@ -24,6 +24,10 @@ type (
 	}
 )
 
+func (e Error) Error() string {
+	return fmt.Sprintf("%s (%d)", e.Message, e.Code)
+}
+
 func decode[T Validatable](r io.Reader) (T, error) {
 	var out T
 	if err := json.NewDecoder(r).Decode(&out); err != nil {

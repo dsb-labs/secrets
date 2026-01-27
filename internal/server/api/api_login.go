@@ -27,6 +27,8 @@ type (
 
 	// The Login type represents a single password.
 	Login struct {
+		// The unique identifier of the login.
+		ID string `json:"id"`
 		// The username.
 		Username string `json:"username"`
 		// The password.
@@ -135,6 +137,7 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 	logins := make([]Login, len(results))
 	for i, result := range results {
 		logins[i] = Login{
+			ID:       result.ID.String(),
 			Username: result.Username,
 			Password: result.Password,
 			Domains:  result.Domains,

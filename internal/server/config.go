@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"os"
 	"path/filepath"
-	"runtime"
 	"time"
 
 	"github.com/BurntSushi/toml"
+
+	"github.com/davidsbond/passwords/internal/cli/config"
 )
 
 type (
@@ -133,17 +133,5 @@ func (c JWTConfig) validate() error {
 }
 
 func defaultDatabasePath() string {
-	dir, err := os.UserConfigDir()
-	if err != nil {
-		switch runtime.GOOS {
-		case "windows":
-			// TODO(davidsbond): where
-		case "darwin":
-			// TODO(davidsbond): where
-		case "linux":
-			// TODO(davidsbond): where
-		}
-	}
-
-	return filepath.Join(dir, "passwords", "data")
+	return filepath.Join(config.Dir(), "passwords", "data")
 }

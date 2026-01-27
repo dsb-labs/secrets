@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -162,6 +163,7 @@ func TestLoginAPI_List(t *testing.T) {
 			Expected: api.ListLoginsResponse{
 				Logins: []api.Login{
 					{
+						ID:       uuid.NameSpaceDNS.String(),
 						Username: "test",
 						Password: "test",
 						Domains:  []string{"test"},
@@ -172,6 +174,7 @@ func TestLoginAPI_List(t *testing.T) {
 			Setup: func(svc *MockLoginService) {
 				expected := []service.Login{
 					{
+						ID:       uuid.NameSpaceDNS,
 						Username: "test",
 						Password: "test",
 						Domains:  []string{"test"},

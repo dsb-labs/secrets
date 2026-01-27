@@ -25,6 +25,8 @@ type (
 
 	// The Login type represents a single user login record.
 	Login struct {
+		// The unique identifier of the login.
+		ID uuid.UUID
 		// The username for the login.
 		Username string
 		// The password for the login.
@@ -93,6 +95,7 @@ func (svc *LoginService) List(userID uuid.UUID) ([]Login, error) {
 	logins := make([]Login, len(results))
 	for i, result := range results {
 		logins[i] = Login{
+			ID:       result.ID,
 			Username: result.Username,
 			Password: result.Password,
 			Domains:  result.Domains,

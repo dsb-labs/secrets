@@ -1,0 +1,65 @@
+package passwords
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/davidsbond/passwords/internal/server/api"
+)
+
+type (
+	// The Login type represents a single username/password combination stored for a user.
+	Login struct {
+		// The login's unique identifier.
+		ID string
+		// The username for this login.
+		Username string
+		// The password for this login.
+		Password string
+		// Domains where this login can be used.
+		Domains []string
+	}
+)
+
+// CreateLogin attempts to create a new login record for the authenticated user.
+func (c *Client) CreateLogin(ctx context.Context, login Login) error {
+	request, err := c.buildRequest(ctx, http.MethodPost, "/api/v1/login", api.CreateLoginRequest{
+		Username: login.Username,
+		Password: login.Password,
+		Domains:  login.Domains,
+	})
+	if err != nil {
+		return err
+	}
+
+	if _, err = doRequest[api.CreateLoginResponse](c.client, request); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ListLogins attempts to return all login records stored for the authenticated user.
+func (c *Client) ListLogins(ctx context.Context) ([]Login, error) {
+	request, err := c.buildRequest(ctx, http.MethodGet, "/api/v1/login", nil)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := doRequest[api.ListLoginsResponse](c.client, request)
+	if err != nil {
+		return nil, err
+	}
+
+	logins := make([]Login, len(response.Logins))
+	for i, login := range response.Logins {
+		logins[i] = Login{
+			ID:       login.ID,
+			Username: login.Username,
+			Password: login.Password,
+			Domains:  login.Domains,
+		}
+	}
+
+	return logins, nil
+}

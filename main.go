@@ -8,11 +8,13 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/davidsbond/passwords/cmd/auth"
+	"github.com/davidsbond/passwords/cmd/login"
 	"github.com/davidsbond/passwords/cmd/serve"
 )
 
 //go:generate go tool mockery
-//go:generate ./scripts/refresh_licenses.sh
+//go:generate go tool go-licenses save --one_output --force --ignore "github.com/davidsbond/passwords" --save_path licenses .
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
@@ -31,6 +33,8 @@ func main() {
 
 	cmd.AddCommand(
 		serve.Command(),
+		auth.Command(),
+		login.Command(),
 	)
 
 	if err := cmd.ExecuteContext(ctx); err != nil {
