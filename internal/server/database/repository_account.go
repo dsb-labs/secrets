@@ -52,96 +52,39 @@ func NewAccountRepository(db *badger.DB) *AccountRepository {
 
 // Create a new account record. Returns ErrAccountExists if an account already exists with the same email address.
 func (r *AccountRepository) Create(account Account) error {
+	if _, err := r.FindByEmail(account.Email); err == nil {
+		return ErrAccountExists
+	}
+
+	data, err := json.Marshal(account)
+	if err != nil {
+		return err
+	}
+
 	return update(r.db, func(txn *badger.Txn) error {
-		exists, err := accountExists(txn, account.Email)
-		switch {
-		case err != nil:
-			return err
-		case exists:
-			return ErrAccountExists
-		default:
-			return saveAccount(txn, account)
-		}
+		return txn.Set(account.key(), data)
 	})
 }
 
 // FindByEmail attempts to return the account record associated with the given email address. Returns ErrAccountNotFound
 // if the specified account does not exist.
 func (r *AccountRepository) FindByEmail(email string) (Account, error) {
-	return view(r.db, func(txn *badger.Txn) (Account, error) {
-		opts := badger.DefaultIteratorOptions
-		opts.Prefix = []byte("account/")
-
-		iter := txn.NewIterator(opts)
-		defer iter.Close()
-
-		var (
-			account Account
-			found   bool
-		)
-		for iter.Rewind(); iter.Valid(); iter.Next() {
-			err := iter.Item().Value(func(value []byte) error {
-				if err := json.Unmarshal(value, &account); err != nil {
-					return err
-				}
-
-				if account.Email == email {
-					iter.Close()
-					found = true
-					return nil
-				}
-
-				return nil
-			})
-			if err != nil {
-				return Account{}, err
-			}
+	var account Account
+	err := iterate(r.db, "account/", func(acc Account) error {
+		if acc.Email == email {
+			account = acc
+			return errStop
 		}
 
-		if !found {
-			return Account{}, ErrAccountNotFound
-		}
-
-		return account, nil
+		return nil
 	})
-}
-
-func accountExists(txn *badger.Txn, email string) (bool, error) {
-	opts := badger.DefaultIteratorOptions
-	opts.Prefix = []byte("account/")
-
-	iter := txn.NewIterator(opts)
-	defer iter.Close()
-
-	var exists bool
-	for iter.Rewind(); iter.Valid(); iter.Next() {
-		err := iter.Item().Value(func(value []byte) error {
-			var existing Account
-			if err := json.Unmarshal(value, &existing); err != nil {
-				return err
-			}
-
-			if existing.Email == email {
-				exists = true
-				iter.Close()
-				return nil
-			}
-
-			return nil
-		})
-		if err != nil {
-			return false, err
-		}
-	}
-
-	return exists, nil
-}
-
-func saveAccount(txn *badger.Txn, account Account) error {
-	data, err := json.Marshal(account)
 	if err != nil {
-		return err
+		return Account{}, err
 	}
 
-	return txn.Set(account.key(), data)
+	if account.ID == uuid.Nil {
+		return Account{}, ErrAccountNotFound
+	}
+
+	return account, nil
 }

@@ -26,3 +26,9 @@ type (
 func LoginRepositoryProvider(db *badger.DB) LoginRepository {
 	return database.NewLoginRepository(db)
 }
+
+// NoteRepositoryProvider is a RepositoryProvider implementation that returns a NoteRepository implementation
+// backed by a badger database.
+func NoteRepositoryProvider(db *badger.DB) NoteRepository {
+	return database.NewNoteRepository(db)
+}

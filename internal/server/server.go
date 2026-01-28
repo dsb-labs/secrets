@@ -61,10 +61,12 @@ func Run(ctx context.Context, config Config) error {
 
 	accounts := database.NewAccountRepository(masterDB)
 	logins := database.NewRepositoryProvider(databaseState, service.LoginRepositoryProvider)
+	notes := database.NewRepositoryProvider(databaseState, service.NoteRepositoryProvider)
 
 	api.NewAuthAPI(service.NewAuthService(accounts, databaseManager, tokenGenerator)).Register(mux)
 	api.NewAccountAPI(service.NewAccountService(accounts, databaseManager)).Register(mux)
 	api.NewLoginAPI(service.NewLoginService(logins)).Register(mux)
+	api.NewNoteAPI(service.NewNoteService(notes)).Register(mux)
 
 	server := &http.Server{
 		Addr:    config.HTTP.Bind,

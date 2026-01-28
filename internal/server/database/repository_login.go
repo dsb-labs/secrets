@@ -11,7 +11,7 @@ import (
 )
 
 type (
-	// The LoginRepository type is responsible for managing the persistence of user passwords. This should
+	// The LoginRepository type is responsible for managing the persistence of user logins. This should
 	// be instantiated against a user's individual database.
 	LoginRepository struct {
 		db *badger.DB
@@ -19,13 +19,13 @@ type (
 
 	// The Login type represents a username & password combination as stored in a user's individual database.
 	Login struct {
-		// The password's unique identifier.
+		// The login's unique identifier.
 		ID uuid.UUID
-		// The username associated with the password.
+		// The username associated with the login.
 		Username string
-		// The password.
+		// The login.
 		Password string
-		// The domains where this username and password combination can be used.
+		// The domains where this username and login combination can be used.
 		Domains []string
 	}
 )
@@ -53,7 +53,7 @@ func NewLoginRepository(db *badger.DB) *LoginRepository {
 func (r *LoginRepository) Create(login Login) error {
 	data, err := json.Marshal(login)
 	if err != nil {
-		return fmt.Errorf("failed to marshal password %q: %w", login.ID, err)
+		return fmt.Errorf("failed to marshal login %q: %w", login.ID, err)
 	}
 
 	return update(r.db, func(txn *badger.Txn) error {
@@ -63,32 +63,13 @@ func (r *LoginRepository) Create(login Login) error {
 
 // List all login records.
 func (r *LoginRepository) List() ([]Login, error) {
-	return view(r.db, func(txn *badger.Txn) ([]Login, error) {
-		logins := make([]Login, 0)
-
-		opts := badger.DefaultIteratorOptions
-		opts.Prefix = []byte("login/")
-
-		iter := txn.NewIterator(opts)
-		defer iter.Close()
-
-		for iter.Rewind(); iter.Valid(); iter.Next() {
-			err := iter.Item().Value(func(value []byte) error {
-				var password Login
-				if err := json.Unmarshal(value, &password); err != nil {
-					return err
-				}
-
-				logins = append(logins, password)
-				return nil
-			})
-			if err != nil {
-				return nil, err
-			}
-		}
-
-		return logins, nil
+	logins := make([]Login, 0)
+	err := iterate(r.db, "login/", func(login Login) error {
+		logins = append(logins, login)
+		return nil
 	})
+
+	return logins, err
 }
 
 // Delete a login record, returns ErrLoginNotFound if the login record does not exist.
