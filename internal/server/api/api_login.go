@@ -13,17 +13,20 @@ import (
 )
 
 type (
-	// The LoginAPI exposes HTTP endpoints for managing individual user passwords.
+	// The LoginAPI exposes HTTP endpoints for managing individual user logins.
 	LoginAPI struct {
 		logins LoginService
 	}
 
-	// The LoginService interface describes types that manage user passwords.
+	// The LoginService interface describes types that manage user logins.
 	LoginService interface {
-		// Create should create a new password record for the given user id.
+		// Create should create a new login record for the given user id.
 		Create(uuid.UUID, service.Login) error
-		// List should return all passwords associated with the given user id.
+		// List should return all logins associated with the given user id.
 		List(uuid.UUID, ...filter.Filter[service.Login]) ([]service.Login, error)
+		// Delete should remove the login record associated with the given user and login id. Returning
+		// service.ErrLoginNotFound if it does not exist.
+		Delete(uuid.UUID, uuid.UUID) error
 	}
 
 	// The Login type represents a single password.
@@ -39,7 +42,7 @@ type (
 	}
 )
 
-// NewLoginAPI returns a new instance of the LoginAPI type that manages user passwords via the
+// NewLoginAPI returns a new instance of the LoginAPI type that manages user logins via the
 // given LoginService implementation.
 func NewLoginAPI(logins LoginService) *LoginAPI {
 	return &LoginAPI{logins: logins}
@@ -49,6 +52,7 @@ func NewLoginAPI(logins LoginService) *LoginAPI {
 func (api *LoginAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/login", api.Create)
 	mux.HandleFunc("GET /api/v1/login", api.List)
+	mux.HandleFunc("DELETE /api/v1/login/{id}", api.Delete)
 }
 
 type (
@@ -74,7 +78,7 @@ func (r CreateLoginRequest) Validate() error {
 	)
 }
 
-// Create handles an inbound HTTP request to store a new password record for a user. On success, it responds with
+// Create handles an inbound HTTP request to store a new login record for a user. On success, it responds with
 // an http.StatusCreated code and a JSON-encoded CreateLoginResponse.
 func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
@@ -116,7 +120,7 @@ type (
 	}
 )
 
-// List handles an inbound HTTP request to list all password records for a user. On success, it responds with
+// List handles an inbound HTTP request to list all login records for a user. On success, it responds with
 // an http.StatusOK code and a JSON-encoded ListLoginsResponse.
 func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
@@ -151,4 +155,40 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 	}
 
 	write(w, http.StatusOK, ListLoginsResponse{Logins: logins})
+}
+
+type (
+	// The DeleteLoginResponse type represents the response body returned when calling LoginAPI.Delete
+	DeleteLoginResponse struct{}
+)
+
+// Delete handles an inbound HTTP request to delete a login record for a user. On success, it responds with
+// an http.StatusOK code and a JSON-encoded ListLoginsResponse.
+func (api *LoginAPI) Delete(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	loginID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErrorf(w, http.StatusBadRequest, "failed to parse login id: %v", err)
+		return
+	}
+
+	err = api.logins.Delete(tkn.ID(), loginID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	case errors.Is(err, service.ErrLoginNotFound):
+		writeErrorf(w, http.StatusNotFound, "login %q does not exist", loginID)
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to delete login: %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, DeleteLoginResponse{})
 }

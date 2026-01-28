@@ -155,7 +155,7 @@ func TestLoginService_List(t *testing.T) {
 			},
 		},
 		{
-			Name:         "error if database lifetime has on list",
+			Name:         "error if database lifetime expired has on list",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
@@ -262,6 +262,109 @@ func TestLoginService_List(t *testing.T) {
 
 			require.NoError(t, err)
 			assert.EqualValues(t, tc.Expected, actual)
+		})
+	}
+}
+
+func TestLoginService_Delete(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		UserID       uuid.UUID
+		LoginID      uuid.UUID
+		ExpectsError bool
+		Setup        func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository])
+	}{
+		{
+			Name:         "error if database lifetime has expired",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "error when getting user database fails",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "error if database lifetime expired has on delete",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().Delete(uuid.NameSpaceDNS).Return(database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "error when deleting login",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().Delete(uuid.NameSpaceDNS).Return(io.EOF).Once()
+			},
+		},
+		{
+			Name:         "error if login does not exist",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().Delete(uuid.NameSpaceDNS).Return(database.ErrLoginNotFound).Once()
+			},
+		},
+		{
+			Name:    "success",
+			UserID:  uuid.NameSpaceDNS,
+			LoginID: uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().Delete(uuid.NameSpaceDNS).Return(nil).Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			logins := NewMockLoginRepository(t)
+			provider := NewMockRepositoryProvider[service.LoginRepository](t)
+
+			if tc.Setup != nil {
+				tc.Setup(logins, provider)
+			}
+
+			err := service.NewLoginService(provider).Delete(tc.UserID, tc.LoginID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
 		})
 	}
 }

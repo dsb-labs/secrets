@@ -400,6 +400,63 @@ func (_c *MockLoginService_Create_Call) RunAndReturn(run func(uUID uuid.UUID, lo
 	return _c
 }
 
+// Delete provides a mock function for the type MockLoginService
+func (_mock *MockLoginService) Delete(uUID uuid.UUID, uUID1 uuid.UUID) error {
+	ret := _mock.Called(uUID, uUID1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) error); ok {
+		r0 = returnFunc(uUID, uUID1)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockLoginService_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type MockLoginService_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - uUID uuid.UUID
+//   - uUID1 uuid.UUID
+func (_e *MockLoginService_Expecter) Delete(uUID interface{}, uUID1 interface{}) *MockLoginService_Delete_Call {
+	return &MockLoginService_Delete_Call{Call: _e.mock.On("Delete", uUID, uUID1)}
+}
+
+func (_c *MockLoginService_Delete_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockLoginService_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockLoginService_Delete_Call) Return(err error) *MockLoginService_Delete_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockLoginService_Delete_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) error) *MockLoginService_Delete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // List provides a mock function for the type MockLoginService
 func (_mock *MockLoginService) List(uUID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error) {
 	var tmpRet mock.Arguments

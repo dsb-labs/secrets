@@ -17,12 +17,12 @@ func TestLoginRepository_Create(t *testing.T) {
 
 	tt := []struct {
 		Name         string
-		Password     database.Login
+		Login        database.Login
 		ExpectsError bool
 	}{
 		{
-			Name: "creates password",
-			Password: database.Login{
+			Name: "creates login",
+			Login: database.Login{
 				ID:       uuid.New(),
 				Username: "test@test.com",
 				Password: "password",
@@ -33,7 +33,7 @@ func TestLoginRepository_Create(t *testing.T) {
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			err := database.NewLoginRepository(db).Create(tc.Password)
+			err := database.NewLoginRepository(db).Create(tc.Login)
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return
@@ -52,10 +52,10 @@ func TestLoginRepository_List(t *testing.T) {
 	tt := []struct {
 		Name     string
 		Expected []database.Login
-		Setup    func(passwords *database.LoginRepository)
+		Setup    func(logins *database.LoginRepository)
 	}{
 		{
-			Name: "lists passwords",
+			Name: "lists logins",
 			Expected: []database.Login{
 				{
 					ID:       uuid.NameSpaceDNS,
@@ -64,7 +64,7 @@ func TestLoginRepository_List(t *testing.T) {
 					Domains:  []string{"test.com"},
 				},
 			},
-			Setup: func(passwords *database.LoginRepository) {
+			Setup: func(logins *database.LoginRepository) {
 				expected := database.Login{
 					ID:       uuid.NameSpaceDNS,
 					Username: "test@test.com",
@@ -72,21 +72,71 @@ func TestLoginRepository_List(t *testing.T) {
 					Domains:  []string{"test.com"},
 				}
 
-				require.NoError(t, passwords.Create(expected))
+				require.NoError(t, logins.Create(expected))
 			},
 		},
 	}
 
 	for _, tc := range tt {
 		t.Run(tc.Name, func(t *testing.T) {
-			passwords := database.NewLoginRepository(db)
+			logins := database.NewLoginRepository(db)
 			if tc.Setup != nil {
-				tc.Setup(passwords)
+				tc.Setup(logins)
 			}
 
-			actual, err := passwords.List()
+			actual, err := logins.List()
 			require.NoError(t, err)
 			assert.EqualValues(t, tc.Expected, actual)
+		})
+	}
+}
+
+func TestLoginRepository_Delete(t *testing.T) {
+	t.Parallel()
+
+	db := testDB(t)
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		ExpectsError bool
+		Setup        func(logins *database.LoginRepository)
+	}{
+		{
+			Name: "deletes login",
+			ID:   uuid.NameSpaceDNS,
+			Setup: func(logins *database.LoginRepository) {
+				expected := database.Login{
+					ID:       uuid.NameSpaceDNS,
+					Username: "test@test.com",
+					Password: "password",
+					Domains:  []string{"test.com"},
+				}
+
+				require.NoError(t, logins.Create(expected))
+			},
+		},
+		{
+			Name:         "error if login does not exist",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			logins := database.NewLoginRepository(db)
+			if tc.Setup != nil {
+				tc.Setup(logins)
+			}
+
+			err := logins.Delete(tc.ID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
 		})
 	}
 }

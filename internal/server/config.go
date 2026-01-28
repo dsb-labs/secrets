@@ -75,12 +75,12 @@ func DefaultConfig() Config {
 
 // LoadConfig attempts to parse a TOML file at the specified path into a Config type.
 func LoadConfig(path string) (Config, error) {
-	var config Config
-	if _, err := toml.DecodeFile(path, &config); err != nil {
+	var cfg Config
+	if _, err := toml.DecodeFile(path, &cfg); err != nil {
 		return Config{}, err
 	}
 
-	return config, nil
+	return cfg, nil
 }
 
 // Validate the Config.

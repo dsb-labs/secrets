@@ -3,6 +3,7 @@ package database
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/dgraph-io/badger/v4"
@@ -27,6 +28,11 @@ type (
 		// The domains where this username and password combination can be used.
 		Domains []string
 	}
+)
+
+var (
+	// ErrLoginNotFound is the error given when performing an operation on a login record that does not exist.
+	ErrLoginNotFound = errors.New("login not found")
 )
 
 func (p Login) key() []byte {
@@ -82,5 +88,18 @@ func (r *LoginRepository) List() ([]Login, error) {
 		}
 
 		return logins, nil
+	})
+}
+
+// Delete a login record, returns ErrLoginNotFound if the login record does not exist.
+func (r *LoginRepository) Delete(id uuid.UUID) error {
+	return update(r.db, func(txn *badger.Txn) error {
+		key := Login{ID: id}.key()
+
+		if _, err := txn.Get(key); errors.Is(err, badger.ErrKeyNotFound) {
+			return ErrLoginNotFound
+		}
+
+		return txn.Delete(key)
 	})
 }

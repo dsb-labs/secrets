@@ -25,6 +25,8 @@ type (
 		Create(database.Login) error
 		// List should return all login records.
 		List() ([]database.Login, error)
+		// Delete should remove a login record, returning database.ErrLoginNotFound if it does not exist.
+		Delete(uuid.UUID) error
 	}
 
 	// The Login type represents a single user login record.
@@ -38,6 +40,12 @@ type (
 		// The domains this username/password combination can be used.
 		Domains []string
 	}
+)
+
+var (
+	// ErrLoginNotFound is the error given when trying to perform an operation against a login record that does not
+	// exist.
+	ErrLoginNotFound = errors.New("login not found")
 )
 
 // NewLoginService returns a new instance of the LoginService type that will manage individual user logins using
@@ -78,7 +86,7 @@ func (svc *LoginService) Create(userID uuid.UUID, login Login) error {
 }
 
 // List all login records for the specified user. Returns ErrReauthenticate if the underlying individual user
-// // database's lifetime has expired and the caller must reauthenticate.
+// database's lifetime has expired and the caller must reauthenticate.
 func (svc *LoginService) List(userID uuid.UUID, filters ...filter.Filter[Login]) ([]Login, error) {
 	repo, err := svc.logins.For(userID)
 	switch {
@@ -111,6 +119,31 @@ func (svc *LoginService) List(userID uuid.UUID, filters ...filter.Filter[Login])
 	}
 
 	return filter.All(logins, filters...), nil
+}
+
+// Delete a login record for the given user. Returns ErrReauthenticate if the underlying individual user database's
+// lifetime has expired and the caller must reauthenticate. Returns ErrLoginNotFound if the specified login record does
+// not exist.
+func (svc *LoginService) Delete(userID uuid.UUID, loginID uuid.UUID) error {
+	repo, err := svc.logins.For(userID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return ErrReauthenticate
+	case err != nil:
+		return fmt.Errorf("failed to get database for user: %w", err)
+	}
+
+	err = repo.Delete(loginID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return ErrReauthenticate
+	case errors.Is(err, database.ErrLoginNotFound):
+		return ErrLoginNotFound
+	case err != nil:
+		return fmt.Errorf("failed to delete login record: %w", err)
+	}
+
+	return nil
 }
 
 // LoginByDomain returns a filter.Filter implementation that checks if a given Login contains a domain that matches
