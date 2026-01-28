@@ -20,8 +20,9 @@ func main() {
 	defer cancel()
 
 	cmd := &cobra.Command{
-		Use:   "passwords",
-		Short: "A simple password manager",
+		Use:          "passwords",
+		Short:        "A simple password manager",
+		SilenceUsage: true,
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,
 		},

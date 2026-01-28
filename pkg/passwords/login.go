@@ -3,6 +3,7 @@ package passwords
 import (
 	"context"
 	"net/http"
+	"path"
 
 	"github.com/davidsbond/passwords/internal/server/api"
 )
@@ -42,12 +43,12 @@ func (c *Client) CreateLogin(ctx context.Context, login Login) error {
 // ListLogins attempts to return all login records stored for the authenticated user. If the "domain" parameter is set,
 // the server will filter the results to credentials that may be usable on the domain.
 func (c *Client) ListLogins(ctx context.Context, domain string) ([]Login, error) {
-	path := "/api/v1/login"
+	p := "/api/v1/login"
 	if domain != "" {
-		path += "?domain=" + domain
+		p += "?domain=" + domain
 	}
 
-	request, err := c.buildRequest(ctx, http.MethodGet, path, nil)
+	request, err := c.buildRequest(ctx, http.MethodGet, p, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -68,4 +69,18 @@ func (c *Client) ListLogins(ctx context.Context, domain string) ([]Login, error)
 	}
 
 	return logins, nil
+}
+
+// DeleteLogin attempts to delete the login record with the specified id for the authenticated user.
+func (c *Client) DeleteLogin(ctx context.Context, id string) error {
+	request, err := c.buildRequest(ctx, http.MethodDelete, path.Join("/api/v1/login", id), nil)
+	if err != nil {
+		return err
+	}
+
+	if _, err = doRequest[api.DeleteLoginResponse](c.client, request); err != nil {
+		return err
+	}
+
+	return nil
 }
