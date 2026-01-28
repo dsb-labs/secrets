@@ -1,14 +1,13 @@
 package login
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
 
+	"github.com/davidsbond/passwords/internal/cli"
 	"github.com/davidsbond/passwords/internal/cli/config"
-	"github.com/davidsbond/passwords/pkg/passwords"
 )
 
 func delete() *cobra.Command {
@@ -23,19 +22,9 @@ func delete() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
+			client := cli.ClientFromContext(ctx)
 
-			cfg, err := config.Load(configPath)
-			switch {
-			case errors.Is(err, config.ErrNotFound):
-				return fmt.Errorf("config file not found at %q", configPath)
-			case err != nil:
-				return fmt.Errorf("failed to load config: %w", err)
-			}
-
-			client := passwords.NewClient(apiURL)
-			client.SetToken(cfg.Token)
-
-			if err = client.DeleteLogin(ctx, args[0]); err != nil {
+			if err := client.DeleteLogin(ctx, args[0]); err != nil {
 				return fmt.Errorf("failed to delete login: %w", err)
 			}
 

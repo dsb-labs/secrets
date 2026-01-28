@@ -2,15 +2,14 @@ package login
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 
 	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
 
+	"github.com/davidsbond/passwords/internal/cli"
 	"github.com/davidsbond/passwords/internal/cli/config"
-	"github.com/davidsbond/passwords/pkg/passwords"
 )
 
 func list() *cobra.Command {
@@ -27,17 +26,7 @@ func list() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-
-			cfg, err := config.Load(configPath)
-			switch {
-			case errors.Is(err, config.ErrNotFound):
-				return fmt.Errorf("config file not found at %q", configPath)
-			case err != nil:
-				return fmt.Errorf("failed to load config: %w", err)
-			}
-
-			client := passwords.NewClient(apiURL)
-			client.SetToken(cfg.Token)
+			client := cli.ClientFromContext(ctx)
 
 			logins, err := client.ListLogins(ctx, domain)
 			if err != nil {

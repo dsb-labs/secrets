@@ -1,0 +1,63 @@
+// Package cli provides shared functionality required by commands exposed by the CLI.
+package cli
+
+import (
+	"context"
+	"errors"
+	"fmt"
+
+	"github.com/spf13/cobra"
+
+	"github.com/davidsbond/passwords/internal/cli/config"
+	"github.com/davidsbond/passwords/pkg/passwords"
+)
+
+type (
+	ctxKey struct{}
+)
+
+// CreateClient is to be used as a PersistentPreRun function for a cobra root command that adds a passwords.Client
+// instance into the command context for child commands to use.
+func CreateClient(cmd *cobra.Command, _ []string) error {
+	ctx := cmd.Context()
+
+	configPath, err := cmd.Flags().GetString("config")
+	if err != nil {
+		return err
+	}
+
+	apiURL, err := cmd.Flags().GetString("api-url")
+	if err != nil {
+		return err
+	}
+
+	cfg, err := config.Load(configPath)
+	switch {
+	case errors.Is(err, config.ErrNotFound):
+		return fmt.Errorf("config file not found at %q", configPath)
+	case err != nil:
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	client := passwords.NewClient(apiURL)
+	client.SetToken(cfg.Token)
+
+	cmd.SetContext(ClientToContext(ctx, client))
+
+	return nil
+}
+
+// ClientToContext adds the given passwords.Client to the context.Context.
+func ClientToContext(ctx context.Context, client *passwords.Client) context.Context {
+	return context.WithValue(ctx, ctxKey{}, client)
+}
+
+// ClientFromContext returns a passwords.Client from the context.Context, or nil if one is not found.
+func ClientFromContext(ctx context.Context) *passwords.Client {
+	client, ok := ctx.Value(ctxKey{}).(*passwords.Client)
+	if !ok {
+		return nil
+	}
+
+	return client
+}

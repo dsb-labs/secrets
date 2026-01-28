@@ -1,23 +1,19 @@
 package login
 
 import (
-	"errors"
 	"fmt"
 	"syscall"
 
-	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/davidsbond/passwords/internal/cli/config"
+	"github.com/davidsbond/passwords/internal/cli"
 	"github.com/davidsbond/passwords/pkg/passwords"
 )
 
 func create() *cobra.Command {
 	var (
-		apiURL     string
-		configPath string
-		domains    []string
+		domains []string
 	)
 
 	cmd := &cobra.Command{
@@ -26,17 +22,7 @@ func create() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
-
-			cfg, err := config.Load(configPath)
-			switch {
-			case errors.Is(err, config.ErrNotFound):
-				return fmt.Errorf("config file not found at %q", configPath)
-			case err != nil:
-				return fmt.Errorf("failed to load config: %w", err)
-			}
-
-			client := passwords.NewClient(apiURL)
-			client.SetToken(cfg.Token)
+			client := cli.ClientFromContext(ctx)
 
 			fmt.Print("Enter password: ")
 			password, err := term.ReadPassword(syscall.Stdin)
@@ -60,8 +46,6 @@ func create() *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the passwords api")
-	flags.StringVar(&configPath, "config", envvar.String("PASSWORDS_CONFIG", config.DefaultConfigPath()), "path to config file")
 	flags.StringSliceVar(&domains, "domains", nil, "domains where this login can be used")
 
 	return cmd
