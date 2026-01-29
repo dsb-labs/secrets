@@ -589,6 +589,66 @@ func (_c *MockLoginRepository_Delete_Call) RunAndReturn(run func(uUID uuid.UUID)
 	return _c
 }
 
+// Get provides a mock function for the type MockLoginRepository
+func (_mock *MockLoginRepository) Get(uUID uuid.UUID) (database.Login, error) {
+	ret := _mock.Called(uUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Get")
+	}
+
+	var r0 database.Login
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) (database.Login, error)); ok {
+		return returnFunc(uUID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) database.Login); ok {
+		r0 = returnFunc(uUID)
+	} else {
+		r0 = ret.Get(0).(database.Login)
+	}
+	if returnFunc, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = returnFunc(uUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockLoginRepository_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type MockLoginRepository_Get_Call struct {
+	*mock.Call
+}
+
+// Get is a helper method to define mock.On call
+//   - uUID uuid.UUID
+func (_e *MockLoginRepository_Expecter) Get(uUID interface{}) *MockLoginRepository_Get_Call {
+	return &MockLoginRepository_Get_Call{Call: _e.mock.On("Get", uUID)}
+}
+
+func (_c *MockLoginRepository_Get_Call) Run(run func(uUID uuid.UUID)) *MockLoginRepository_Get_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockLoginRepository_Get_Call) Return(login database.Login, err error) *MockLoginRepository_Get_Call {
+	_c.Call.Return(login, err)
+	return _c
+}
+
+func (_c *MockLoginRepository_Get_Call) RunAndReturn(run func(uUID uuid.UUID) (database.Login, error)) *MockLoginRepository_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // List provides a mock function for the type MockLoginRepository
 func (_mock *MockLoginRepository) List() ([]database.Login, error) {
 	ret := _mock.Called()

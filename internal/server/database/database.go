@@ -25,6 +25,26 @@ func update(db *badger.DB, fn func(txn *badger.Txn) error) error {
 	}
 }
 
+func view[T any](db *badger.DB, fn func(txn *badger.Txn) (T, error)) (T, error) {
+	var (
+		out T
+		err error
+	)
+
+	err = db.View(func(txn *badger.Txn) error {
+		out, err = fn(txn)
+		return err
+	})
+	switch {
+	case errors.Is(err, badger.ErrDBClosed):
+		return out, ErrClosed
+	case err != nil:
+		return out, err
+	default:
+		return out, nil
+	}
+}
+
 var (
 	errStop = errors.New("stop")
 )

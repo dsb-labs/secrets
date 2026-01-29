@@ -27,6 +27,9 @@ type (
 		List() ([]database.Login, error)
 		// Delete should remove a login record, returning database.ErrLoginNotFound if it does not exist.
 		Delete(uuid.UUID) error
+		// Get should return the login record associated with the given id, returning database.ErrLoginNotFound if it
+		// does not exist.
+		Get(uuid.UUID) (database.Login, error)
 	}
 
 	// The Login type represents a single user login record.
@@ -144,6 +147,36 @@ func (svc *LoginService) Delete(userID uuid.UUID, loginID uuid.UUID) error {
 	}
 
 	return nil
+}
+
+// Get a login record associated with the given user and login identifiers. Returns ErrReauthenticate if the underlying
+// individual user database's lifetime has expired and the caller must reauthenticate. Returns ErrLoginNotFound if the
+// specified login record does not exist.
+func (svc *LoginService) Get(userID uuid.UUID, loginID uuid.UUID) (Login, error) {
+	repo, err := svc.logins.For(userID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return Login{}, ErrReauthenticate
+	case err != nil:
+		return Login{}, fmt.Errorf("failed to get database for user: %w", err)
+	}
+
+	result, err := repo.Get(loginID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return Login{}, ErrReauthenticate
+	case errors.Is(err, database.ErrLoginNotFound):
+		return Login{}, ErrLoginNotFound
+	case err != nil:
+		return Login{}, fmt.Errorf("failed to get login record: %w", err)
+	}
+
+	return Login{
+		ID:       result.ID,
+		Username: result.Username,
+		Password: result.Password,
+		Domains:  result.Domains,
+	}, nil
 }
 
 // LoginByDomain returns a filter.Filter implementation that checks if a given Login contains a domain that matches

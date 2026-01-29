@@ -300,3 +300,115 @@ func TestLoginAPI_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestLoginAPI_Get(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		Expected     api.GetLoginResponse
+		Token        token.Token
+		ID           string
+		ExpectedCode int
+		ExpectsError bool
+		Setup        func(svc *MockLoginService)
+	}{
+		{
+			Name:         "error if no token",
+			Token:        token.Token{},
+			ExpectsError: true,
+			ExpectedCode: http.StatusUnauthorized,
+		},
+		{
+			Name:         "error if login id is not uuid",
+			Token:        token.TestToken(t, "test"),
+			ID:           "not-a-uuid",
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name:         "error if lifetime has expired",
+			Token:        token.TestToken(t, "test"),
+			ID:           uuid.NameSpaceDNS.String(),
+			ExpectsError: true,
+			ExpectedCode: http.StatusUnauthorized,
+			Setup: func(svc *MockLoginService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Login{}, service.ErrReauthenticate).Once()
+			},
+		},
+		{
+			Name:         "error if login does not exist",
+			Token:        token.TestToken(t, "test"),
+			ID:           uuid.NameSpaceDNS.String(),
+			ExpectsError: true,
+			ExpectedCode: http.StatusNotFound,
+			Setup: func(svc *MockLoginService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Login{}, service.ErrLoginNotFound).Once()
+			},
+		},
+		{
+			Name:         "error if get fails",
+			Token:        token.TestToken(t, "test"),
+			ID:           uuid.NameSpaceDNS.String(),
+			ExpectsError: true,
+			ExpectedCode: http.StatusInternalServerError,
+			Setup: func(svc *MockLoginService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Login{}, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "success",
+			Token:        token.TestToken(t, "test"),
+			ExpectedCode: http.StatusOK,
+			ID:           uuid.NameSpaceDNS.String(),
+			Expected: api.GetLoginResponse{
+				Login: api.Login{
+					ID:       uuid.NameSpaceDNS.String(),
+					Username: "test",
+					Password: "test",
+					Domains:  []string{"test"},
+				},
+			},
+			Setup: func(svc *MockLoginService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Login{
+						ID:       uuid.NameSpaceDNS,
+						Username: "test",
+						Password: "test",
+						Domains:  []string{"test"},
+					}, nil).Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			svc := NewMockLoginService(t)
+			if tc.Setup != nil {
+				tc.Setup(svc)
+			}
+
+			w := httptest.NewRecorder()
+			r := request(t, http.MethodGet, "/api/v1/login", nil).
+				WithContext(token.ToContext(t.Context(), tc.Token))
+			r.SetPathValue("id", tc.ID)
+
+			api.NewLoginAPI(svc).Get(w, r)
+
+			require.Equal(t, tc.ExpectedCode, w.Code)
+			if tc.ExpectsError {
+				assertAPIError(t, w)
+				return
+			}
+
+			assertResponse(t, w, tc.Expected)
+		})
+	}
+}

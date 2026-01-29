@@ -84,3 +84,26 @@ func (r *LoginRepository) Delete(id uuid.UUID) error {
 		return txn.Delete(key)
 	})
 }
+
+// Get a login record by its id, returns ErrLoginNotFound if the login record does not exist.
+func (r *LoginRepository) Get(id uuid.UUID) (Login, error) {
+	return view(r.db, func(txn *badger.Txn) (Login, error) {
+		login := Login{
+			ID: id,
+		}
+
+		item, err := txn.Get(login.key())
+		switch {
+		case errors.Is(err, badger.ErrKeyNotFound):
+			return Login{}, ErrLoginNotFound
+		case err != nil:
+			return Login{}, err
+		}
+
+		err = item.Value(func(val []byte) error {
+			return json.Unmarshal(val, &login)
+		})
+
+		return login, err
+	})
+}

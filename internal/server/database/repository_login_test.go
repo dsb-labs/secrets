@@ -140,3 +140,61 @@ func TestLoginRepository_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestLoginRepository_Get(t *testing.T) {
+	t.Parallel()
+
+	db := testDB(t)
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		ExpectsError bool
+		Expected     database.Login
+		Setup        func(logins *database.LoginRepository)
+	}{
+		{
+			Name: "gets login",
+			ID:   uuid.NameSpaceDNS,
+			Expected: database.Login{
+				ID:       uuid.NameSpaceDNS,
+				Username: "test@test.com",
+				Password: "password",
+				Domains:  []string{"test.com"},
+			},
+			Setup: func(logins *database.LoginRepository) {
+				expected := database.Login{
+					ID:       uuid.NameSpaceDNS,
+					Username: "test@test.com",
+					Password: "password",
+					Domains:  []string{"test.com"},
+				}
+
+				require.NoError(t, logins.Create(expected))
+			},
+		},
+		{
+			Name:         "error if login does not exist",
+			ID:           uuid.NameSpaceURL,
+			ExpectsError: true,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			logins := database.NewLoginRepository(db)
+			if tc.Setup != nil {
+				tc.Setup(logins)
+			}
+
+			actual, err := logins.Get(tc.ID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.EqualValues(t, tc.Expected, actual)
+		})
+	}
+}
