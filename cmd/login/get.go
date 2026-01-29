@@ -1,7 +1,10 @@
-// Package login provides the "login" command and its subcommands.
 package login
 
 import (
+	"encoding/json"
+	"fmt"
+	"os"
+
 	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
 
@@ -9,29 +12,35 @@ import (
 	"github.com/davidsbond/passwords/internal/cli/config"
 )
 
-// Command returns a cobra.Command named "login" used as a parent to subcommands that manage user logins.
-func Command() *cobra.Command {
+func get() *cobra.Command {
 	var (
 		apiURL     string
 		configPath string
 	)
 
 	cmd := &cobra.Command{
-		Use:               "login",
-		Short:             "Subcommands for managing logins",
-		PersistentPreRunE: cli.CreateClient,
+		Use:   "get [id]",
+		Short: "Get a login",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			client := cli.ClientFromContext(ctx)
+
+			login, err := client.GetLogin(ctx, args[0])
+			if err != nil {
+				return fmt.Errorf("failed to get login: %w", err)
+			}
+
+			encoder := json.NewEncoder(os.Stdout)
+			encoder.SetIndent("", "  ")
+			
+			return encoder.Encode(login)
+		},
 	}
 
-	flags := cmd.PersistentFlags()
+	flags := cmd.Flags()
 	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the passwords api")
 	flags.StringVar(&configPath, "config", envvar.String("PASSWORDS_CONFIG", config.DefaultConfigPath()), "path to config file")
-
-	cmd.AddCommand(
-		create(),
-		list(),
-		delete(),
-		get(),
-	)
 
 	return cmd
 }

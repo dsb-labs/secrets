@@ -84,3 +84,23 @@ func (c *Client) DeleteLogin(ctx context.Context, id string) error {
 
 	return nil
 }
+
+// GetLogin attempts to obtain the login record with the specified id for the authenticated user.
+func (c *Client) GetLogin(ctx context.Context, id string) (Login, error) {
+	request, err := c.buildRequest(ctx, http.MethodGet, path.Join("/api/v1/login", id), nil)
+	if err != nil {
+		return Login{}, err
+	}
+
+	response, err := doRequest[api.GetLoginResponse](c.client, request)
+	if err != nil {
+		return Login{}, err
+	}
+
+	return Login{
+		ID:       response.Login.ID,
+		Username: response.Login.Username,
+		Password: response.Login.Password,
+		Domains:  response.Login.Domains,
+	}, nil
+}
