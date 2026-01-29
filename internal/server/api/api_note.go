@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/davidsbond/x/filter"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
@@ -22,7 +23,7 @@ type (
 		// Create should create a new note record for the given user id.
 		Create(uuid.UUID, service.Note) error
 		// List should return all notes associated with the given user id.
-		List(uuid.UUID) ([]service.Note, error)
+		List(uuid.UUID, ...filter.Filter[service.Note]) ([]service.Note, error)
 		// Delete should remove the note record associated with the given user and note id. Returning
 		// service.ErrNoteNotFound if it does not exist.
 		Delete(uuid.UUID, uuid.UUID) error
@@ -123,7 +124,12 @@ func (api *NoteAPI) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := api.notes.List(tkn.ID())
+	filters := make([]filter.Filter[service.Note], 0)
+	if query := r.URL.Query().Get("query"); query != "" {
+		filters = append(filters, service.NotesByQuery(query))
+	}
+
+	results, err := api.notes.List(tkn.ID(), filters...)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))

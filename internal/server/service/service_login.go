@@ -179,10 +179,10 @@ func (svc *LoginService) Get(userID uuid.UUID, loginID uuid.UUID) (Login, error)
 	}, nil
 }
 
-// LoginByDomain returns a filter.Filter implementation that checks if a given Login contains a domain that matches
+// LoginsByDomain returns a filter.Filter implementation that checks if a given Login contains a domain that matches
 // the one specified. Domains are compared by generating stable host/site keys which allows for flexibility such as
 // accounts.google.com matching a domain of google.com.
-func LoginByDomain(domain string) filter.Filter[Login] {
+func LoginsByDomain(domain string) filter.Filter[Login] {
 	want, ok := urlcmp.SiteKey(domain)
 
 	return func(login Login) bool {

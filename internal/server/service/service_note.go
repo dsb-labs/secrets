@@ -3,7 +3,9 @@ package service
 import (
 	"errors"
 	"fmt"
+	"strings"
 
+	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 
 	"github.com/davidsbond/passwords/internal/server/database"
@@ -80,7 +82,7 @@ func (svc *NoteService) Create(userID uuid.UUID, note Note) error {
 
 // List all note records for the specified user. Returns ErrReauthenticate if the underlying individual user
 // database's lifetime has expired and the caller must reauthenticate.
-func (svc *NoteService) List(userID uuid.UUID) ([]Note, error) {
+func (svc *NoteService) List(userID uuid.UUID, filters ...filter.Filter[Note]) ([]Note, error) {
 	repo, err := svc.notes.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
@@ -106,7 +108,11 @@ func (svc *NoteService) List(userID uuid.UUID) ([]Note, error) {
 		}
 	}
 
-	return notes, nil
+	if len(filters) == 0 {
+		return notes, nil
+	}
+
+	return filter.All(notes, filters...), nil
 }
 
 // Delete a note record for the given user. Returns ErrReauthenticate if the underlying individual user database's
@@ -132,4 +138,14 @@ func (svc *NoteService) Delete(userID uuid.UUID, noteID uuid.UUID) error {
 	}
 
 	return nil
+}
+
+// NotesByQuery returns a filter.Filter implementation that filters notes based on a given query value. The filter
+// returns true if either the name or content of the note contains the query text. This filter does not match on
+// casing.
+func NotesByQuery(query string) filter.Filter[Note] {
+	return func(note Note) bool {
+		return strings.Contains(strings.ToLower(note.Name), strings.ToLower(query)) ||
+			strings.Contains(strings.ToLower(note.Content), strings.ToLower(query))
+	}
 }

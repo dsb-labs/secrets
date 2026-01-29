@@ -240,7 +240,7 @@ func TestLoginService_List(t *testing.T) {
 				logins.EXPECT().List().Return(expected, nil).Once()
 			},
 			Filters: []filter.Filter[service.Login]{
-				service.LoginByDomain("google.com"),
+				service.LoginsByDomain("google.com"),
 			},
 		},
 	}

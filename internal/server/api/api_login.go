@@ -135,7 +135,7 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 
 	filters := make([]filter.Filter[service.Login], 0)
 	if domain := r.URL.Query().Get("domain"); domain != "" {
-		filters = append(filters, service.LoginByDomain(domain))
+		filters = append(filters, service.LoginsByDomain(domain))
 	}
 
 	results, err := api.logins.List(tkn.ID(), filters...)

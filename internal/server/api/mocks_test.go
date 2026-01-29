@@ -742,8 +742,14 @@ func (_c *MockNoteService_Delete_Call) RunAndReturn(run func(uUID uuid.UUID, uUI
 }
 
 // List provides a mock function for the type MockNoteService
-func (_mock *MockNoteService) List(uUID uuid.UUID) ([]service.Note, error) {
-	ret := _mock.Called(uUID)
+func (_mock *MockNoteService) List(uUID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error) {
+	var tmpRet mock.Arguments
+	if len(filters) > 0 {
+		tmpRet = _mock.Called(uUID, filters)
+	} else {
+		tmpRet = _mock.Called(uUID)
+	}
+	ret := tmpRet
 
 	if len(ret) == 0 {
 		panic("no return value specified for List")
@@ -751,18 +757,18 @@ func (_mock *MockNoteService) List(uUID uuid.UUID) ([]service.Note, error) {
 
 	var r0 []service.Note
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) ([]service.Note, error)); ok {
-		return returnFunc(uUID)
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Note]) ([]service.Note, error)); ok {
+		return returnFunc(uUID, filters...)
 	}
-	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) []service.Note); ok {
-		r0 = returnFunc(uUID)
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Note]) []service.Note); ok {
+		r0 = returnFunc(uUID, filters...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]service.Note)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(uuid.UUID) error); ok {
-		r1 = returnFunc(uUID)
+	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, ...filter.Filter[service.Note]) error); ok {
+		r1 = returnFunc(uUID, filters...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -776,18 +782,27 @@ type MockNoteService_List_Call struct {
 
 // List is a helper method to define mock.On call
 //   - uUID uuid.UUID
-func (_e *MockNoteService_Expecter) List(uUID interface{}) *MockNoteService_List_Call {
-	return &MockNoteService_List_Call{Call: _e.mock.On("List", uUID)}
+//   - filters ...filter.Filter[service.Note]
+func (_e *MockNoteService_Expecter) List(uUID interface{}, filters ...interface{}) *MockNoteService_List_Call {
+	return &MockNoteService_List_Call{Call: _e.mock.On("List",
+		append([]interface{}{uUID}, filters...)...)}
 }
 
-func (_c *MockNoteService_List_Call) Run(run func(uUID uuid.UUID)) *MockNoteService_List_Call {
+func (_c *MockNoteService_List_Call) Run(run func(uUID uuid.UUID, filters ...filter.Filter[service.Note])) *MockNoteService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
 			arg0 = args[0].(uuid.UUID)
 		}
+		var arg1 []filter.Filter[service.Note]
+		var variadicArgs []filter.Filter[service.Note]
+		if len(args) > 1 {
+			variadicArgs = args[1].([]filter.Filter[service.Note])
+		}
+		arg1 = variadicArgs
 		run(
 			arg0,
+			arg1...,
 		)
 	})
 	return _c
@@ -798,7 +813,7 @@ func (_c *MockNoteService_List_Call) Return(notes []service.Note, err error) *Mo
 	return _c
 }
 
-func (_c *MockNoteService_List_Call) RunAndReturn(run func(uUID uuid.UUID) ([]service.Note, error)) *MockNoteService_List_Call {
+func (_c *MockNoteService_List_Call) RunAndReturn(run func(uUID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error)) *MockNoteService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }

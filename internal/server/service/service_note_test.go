@@ -204,6 +204,40 @@ func TestNoteService_List(t *testing.T) {
 				notes.EXPECT().List().Return(expected, nil).Once()
 			},
 		},
+		{
+			Name:   "uses filters",
+			UserID: uuid.NameSpaceDNS,
+			Expected: []service.Note{
+				{
+					ID:      uuid.NameSpaceDNS,
+					Name:    "test",
+					Content: "test",
+				},
+			},
+			Setup: func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(notes, nil).Once()
+
+				expected := []database.Note{
+					{
+						ID:      uuid.NameSpaceDNS,
+						Name:    "test",
+						Content: "test",
+					},
+					{
+						ID:      uuid.NameSpaceURL,
+						Name:    "bing",
+						Content: "bong",
+					},
+				}
+
+				notes.EXPECT().List().Return(expected, nil).Once()
+			},
+			Filters: []filter.Filter[service.Note]{
+				service.NotesByQuery("tes"),
+			},
+		},
 	}
 
 	for _, tc := range tt {
@@ -215,7 +249,7 @@ func TestNoteService_List(t *testing.T) {
 				tc.Setup(notes, provider)
 			}
 
-			actual, err := service.NewNoteService(provider).List(tc.UserID)
+			actual, err := service.NewNoteService(provider).List(tc.UserID, tc.Filters...)
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return
