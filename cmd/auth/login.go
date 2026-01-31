@@ -3,7 +3,6 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"syscall"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -23,7 +22,7 @@ func login() *cobra.Command {
 			client := cli.ClientFromContext(ctx)
 
 			fmt.Print("Enter password: ")
-			password, err := term.ReadPassword(syscall.Stdin)
+			password, err := term.ReadPassword(cli.Stdin)
 			if err != nil {
 				return fmt.Errorf("failed to read password: %w", err)
 			}

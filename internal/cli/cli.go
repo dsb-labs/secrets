@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 
@@ -14,6 +15,12 @@ import (
 
 type (
 	ctxKey struct{}
+)
+
+var (
+	// Stdin is an integer representation of the file descriptor/handle for os.Stdin. This should be used when attempting
+	// to read passwords from os.Stdin in a cross-compatible way.
+	Stdin = int(os.Stdin.Fd())
 )
 
 // CreateClient is to be used as a PersistentPreRun function for a cobra root command that adds a keeper.Client
