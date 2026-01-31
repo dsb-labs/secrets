@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/passwords/internal/server/api"
-	"github.com/davidsbond/passwords/internal/server/service"
-	"github.com/davidsbond/passwords/internal/server/token"
+	"github.com/davidsbond/keeper/internal/server/api"
+	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/token"
 )
 
 func TestLoginAPI_Create(t *testing.T) {

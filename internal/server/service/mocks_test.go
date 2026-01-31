@@ -5,8 +5,8 @@
 package service_test
 
 import (
-	"github.com/davidsbond/passwords/internal/server/database"
-	"github.com/davidsbond/passwords/internal/server/token"
+	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/davidsbond/keeper/internal/server/token"
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )

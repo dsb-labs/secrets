@@ -5,8 +5,8 @@ import (
 	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/passwords/internal/cli"
-	"github.com/davidsbond/passwords/internal/cli/config"
+	"github.com/davidsbond/keeper/internal/cli"
+	"github.com/davidsbond/keeper/internal/cli/config"
 )
 
 // Command returns a cobra.Command named "login" used as a parent to subcommands that manage user logins.
@@ -24,7 +24,7 @@ func Command() *cobra.Command {
 	}
 
 	flags := cmd.PersistentFlags()
-	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the passwords api")
+	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the keeper api")
 	flags.StringVar(&configPath, "config", envvar.String("PASSWORDS_CONFIG", config.DefaultConfigPath()), "path to config file")
 
 	cmd.AddCommand(

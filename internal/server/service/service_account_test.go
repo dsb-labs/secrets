@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/passwords/internal/server/database"
-	"github.com/davidsbond/passwords/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/davidsbond/keeper/internal/server/service"
 )
 
 func TestAccountService_Create(t *testing.T) {

@@ -1,4 +1,4 @@
-module github.com/davidsbond/passwords
+module github.com/davidsbond/keeper
 
 go 1.25.1
 

@@ -3,8 +3,8 @@ package note
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/passwords/internal/cli"
-	"github.com/davidsbond/passwords/pkg/passwords"
+	"github.com/davidsbond/keeper/internal/cli"
+	"github.com/davidsbond/keeper/pkg/keeper"
 )
 
 func create() *cobra.Command {
@@ -16,7 +16,7 @@ func create() *cobra.Command {
 			ctx := cmd.Context()
 			client := cli.ClientFromContext(ctx)
 
-			note := passwords.Note{
+			note := keeper.Note{
 				Name:    args[0],
 				Content: args[1],
 			}

@@ -1,3 +1,3 @@
-# passwords
+# keeper
 
-A simple, self-hostable password manager.
+A simple, self-hostable secret manager.

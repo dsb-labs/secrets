@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/passwords/internal/cli"
+	"github.com/davidsbond/keeper/internal/cli"
 )
 
 func list() *cobra.Command {

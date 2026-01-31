@@ -1,5 +1,5 @@
-// Package passwords provides the go client for the passwords api.
-package passwords
+// Package keeper provides the go client for the keeper api.
+package keeper
 
 import (
 	"bytes"
@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/davidsbond/passwords/internal/server/api"
+	"github.com/davidsbond/keeper/internal/server/api"
 )
 
 type (
-	// The Client type is responsible for managing API requests made against the passwords API.
+	// The Client type is responsible for managing API requests made against the keeper API.
 	Client struct {
 		baseURL string
 		client  *http.Client

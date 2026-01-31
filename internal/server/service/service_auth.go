@@ -7,8 +7,8 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/davidsbond/passwords/internal/server/database"
-	"github.com/davidsbond/passwords/internal/server/token"
+	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/davidsbond/keeper/internal/server/token"
 )
 
 type (

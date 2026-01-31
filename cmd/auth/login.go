@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/davidsbond/passwords/internal/cli/config"
-	"github.com/davidsbond/passwords/pkg/passwords"
+	"github.com/davidsbond/keeper/internal/cli/config"
+	"github.com/davidsbond/keeper/pkg/keeper"
 )
 
 func login() *cobra.Command {
@@ -21,12 +21,12 @@ func login() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "login [email]",
-		Short: "Authenticate and unlock your passwords",
+		Short: "Authenticate and unlock your keeper",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 
-			client := passwords.NewClient(apiURL)
+			client := keeper.NewClient(apiURL)
 
 			fmt.Print("Enter password: ")
 			password, err := term.ReadPassword(syscall.Stdin)
@@ -59,7 +59,7 @@ func login() *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the passwords api")
+	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the keeper api")
 	flags.StringVar(&configPath, "config", envvar.String("PASSWORDS_CONFIG", config.DefaultConfigPath()), "path to config file")
 
 	return cmd

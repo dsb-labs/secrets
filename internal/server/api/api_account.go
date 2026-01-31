@@ -7,7 +7,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 
-	"github.com/davidsbond/passwords/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/service"
 )
 
 type (

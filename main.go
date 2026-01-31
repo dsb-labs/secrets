@@ -8,21 +8,21 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/passwords/cmd/auth"
-	"github.com/davidsbond/passwords/cmd/login"
-	"github.com/davidsbond/passwords/cmd/note"
-	"github.com/davidsbond/passwords/cmd/serve"
+	"github.com/davidsbond/keeper/cmd/auth"
+	"github.com/davidsbond/keeper/cmd/login"
+	"github.com/davidsbond/keeper/cmd/note"
+	"github.com/davidsbond/keeper/cmd/serve"
 )
 
 //go:generate go tool mockery
-//go:generate go tool go-licenses save --one_output --force --ignore "github.com/davidsbond/passwords" --save_path licenses .
+//go:generate go tool go-licenses save --one_output --force --ignore "github.com/davidsbond/keeper" --save_path licenses .
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
 
 	cmd := &cobra.Command{
-		Use:          "passwords",
-		Short:        "A simple password manager",
+		Use:          "keeper",
+		Short:        "A simple, self-hostable secret manager",
 		SilenceUsage: true,
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,

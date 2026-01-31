@@ -1,4 +1,4 @@
-// Package server provides types and functions for running the passwords server.
+// Package server provides types and functions for running the keeper server.
 package server
 
 import (
@@ -16,10 +16,10 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/davidsbond/passwords/internal/server/api"
-	"github.com/davidsbond/passwords/internal/server/database"
-	"github.com/davidsbond/passwords/internal/server/service"
-	"github.com/davidsbond/passwords/internal/server/token"
+	"github.com/davidsbond/keeper/internal/server/api"
+	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/token"
 )
 
 // Run the server using the provided configuration. This function blocks until the provided context is cancelled or

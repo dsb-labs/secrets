@@ -8,8 +8,8 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/passwords/internal/server/service"
-	"github.com/davidsbond/passwords/internal/server/token"
+	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/token"
 )
 
 type (

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/passwords/internal/server/database"
+	"github.com/davidsbond/keeper/internal/server/database"
 )
 
 func TestAccountRepository_Create(t *testing.T) {

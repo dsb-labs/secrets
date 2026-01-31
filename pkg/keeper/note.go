@@ -1,11 +1,11 @@
-package passwords
+package keeper
 
 import (
 	"context"
 	"net/http"
 	"path"
 
-	"github.com/davidsbond/passwords/internal/server/api"
+	"github.com/davidsbond/keeper/internal/server/api"
 )
 
 type (

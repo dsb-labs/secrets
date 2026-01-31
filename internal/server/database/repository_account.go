@@ -12,7 +12,7 @@ import (
 type (
 	// The AccountRepository type is responsible for managing the persistence of individual user accounts. This should
 	// be instantiated against the master database, as that is where metadata for accounts is stored. Actual account
-	// data, such as passwords etc should be stored within their respective, encrypted user databases.
+	// data, such as keeper etc should be stored within their respective, encrypted user databases.
 	AccountRepository struct {
 		db *badger.DB
 	}

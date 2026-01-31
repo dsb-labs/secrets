@@ -1,10 +1,10 @@
-package passwords
+package keeper
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/davidsbond/passwords/internal/server/api"
+	"github.com/davidsbond/keeper/internal/server/api"
 )
 
 // Login attempts to obtain an authentication token for the given email and password combination. On success, a token

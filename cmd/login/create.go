@@ -7,8 +7,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/davidsbond/passwords/internal/cli"
-	"github.com/davidsbond/passwords/pkg/passwords"
+	"github.com/davidsbond/keeper/internal/cli"
+	"github.com/davidsbond/keeper/pkg/keeper"
 )
 
 func create() *cobra.Command {
@@ -31,7 +31,7 @@ func create() *cobra.Command {
 			}
 			fmt.Println("")
 
-			login := passwords.Login{
+			login := keeper.Login{
 				Username: args[0],
 				Password: string(password),
 				Domains:  domains,

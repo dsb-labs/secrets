@@ -8,7 +8,7 @@ import (
 	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/passwords/internal/server/database"
+	"github.com/davidsbond/keeper/internal/server/database"
 )
 
 type (

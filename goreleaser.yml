@@ -1,8 +1,8 @@
-project_name: "passwords"
+project_name: "keeper"
 version: 2
 builds:
-  - id: passwords
-    binary: passwords
+  - id: keeper
+    binary: keeper
     mod_timestamp: "{{ .CommitTimestamp }}"
     goos:
       - linux
@@ -43,9 +43,9 @@ upx:
     lzma: false
 
 dockers_v2:
-  - id: passwords
+  - id: keeper
     images:
-      - "ghcr.io/davidsbond/passwords"
+      - "ghcr.io/davidsbond/keeper"
     tags:
       - "{{ .Tag }}"
       - "v{{ .Major }}.{{ .Minor }}"
@@ -54,7 +54,7 @@ dockers_v2:
       - linux/amd64
       - linux/arm64
     ids:
-      - passwords
+      - keeper
     extra_files:
       - LICENSE.md
       - README.md

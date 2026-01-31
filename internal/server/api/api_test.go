@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/passwords/internal/server/api"
+	"github.com/davidsbond/keeper/internal/server/api"
 )
 
 func request(t *testing.T, method, url string, body any) *http.Request {
