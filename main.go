@@ -10,6 +10,7 @@ import (
 
 	"github.com/davidsbond/passwords/cmd/auth"
 	"github.com/davidsbond/passwords/cmd/login"
+	"github.com/davidsbond/passwords/cmd/note"
 	"github.com/davidsbond/passwords/cmd/serve"
 )
 
@@ -36,6 +37,7 @@ func main() {
 		serve.Command(),
 		auth.Command(),
 		login.Command(),
+		note.Command(),
 	)
 
 	if err := cmd.ExecuteContext(ctx); err != nil {

@@ -46,7 +46,7 @@ func create() *cobra.Command {
 	}
 
 	flags := cmd.Flags()
-	flags.StringSliceVar(&domains, "domains", nil, "domains where this login can be used")
+	flags.StringSliceVarP(&domains, "domains", "d", nil, "domains where this login can be used")
 
 	return cmd
 }

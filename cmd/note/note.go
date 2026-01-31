@@ -1,5 +1,5 @@
-// Package login provides the "login" command and its subcommands.
-package login
+// Package note provides the "note" command and its subcommands.
+package note
 
 import (
 	"github.com/davidsbond/x/envvar"
@@ -9,7 +9,7 @@ import (
 	"github.com/davidsbond/passwords/internal/cli/config"
 )
 
-// Command returns a cobra.Command named "login" used as a parent to subcommands that manage user logins.
+// Command returns a cobra.Command named "note" used as a parent to subcommands that manage user notes.
 func Command() *cobra.Command {
 	var (
 		apiURL     string
@@ -17,9 +17,9 @@ func Command() *cobra.Command {
 	)
 
 	cmd := &cobra.Command{
-		Use:               "login",
-		Aliases:           []string{"logins"},
-		Short:             "Subcommands for managing logins",
+		Use:               "note",
+		Aliases:           []string{"notes"},
+		Short:             "Subcommands for managing notes",
 		PersistentPreRunE: cli.CreateClient,
 	}
 
@@ -31,7 +31,6 @@ func Command() *cobra.Command {
 		create(),
 		list(),
 		delete(),
-		get(),
 	)
 
 	return cmd

@@ -1,0 +1,31 @@
+package note
+
+import (
+	"github.com/spf13/cobra"
+
+	"github.com/davidsbond/passwords/internal/cli"
+	"github.com/davidsbond/passwords/pkg/passwords"
+)
+
+func create() *cobra.Command {
+	return &cobra.Command{
+		Use:   "create [name] [content]",
+		Short: "Create a new note",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx := cmd.Context()
+			client := cli.ClientFromContext(ctx)
+
+			note := passwords.Note{
+				Name:    args[0],
+				Content: args[1],
+			}
+
+			if err := client.CreateNote(ctx, note); err != nil {
+				return err
+			}
+
+			return nil
+		},
+	}
+}
