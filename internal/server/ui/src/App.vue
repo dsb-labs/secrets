@@ -1,11 +1,13 @@
 <template>
-  <main class="h-full w-full">
+  <Header />
+  <main class="w-full">
     <RouterView :key="route.fullPath" />
   </main>
 </template>
 
 <script setup lang="ts">
 import { useRoute } from "vue-router"
+import Header from "@/components/Header.vue"
 
 const route = useRoute()
 </script>

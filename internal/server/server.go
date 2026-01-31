@@ -21,6 +21,7 @@ import (
 	"github.com/davidsbond/keeper/internal/server/database"
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/davidsbond/keeper/internal/server/ui"
 )
 
 // Run the server using the provided configuration. This function blocks until the provided context is cancelled or
@@ -73,6 +74,9 @@ func Run(ctx context.Context, config Config) error {
 	api.NewAccountAPI(service.NewAccountService(accounts, databaseManager)).Register(mux)
 	api.NewLoginAPI(service.NewLoginService(logins)).Register(mux)
 	api.NewNoteAPI(service.NewNoteService(notes)).Register(mux)
+
+	// The UI handler must always be registered last as a fall-through for all routes.
+	ui.NewHandler().Register(mux)
 
 	server := &http.Server{
 		Addr:    config.HTTP.Bind,
