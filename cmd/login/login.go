@@ -24,8 +24,8 @@ func Command() *cobra.Command {
 	}
 
 	flags := cmd.PersistentFlags()
-	flags.StringVar(&apiURL, "api-url", envvar.String("PASSWORDS_API_URL", "http://localhost:8080"), "base url of the keeper api")
-	flags.StringVar(&configPath, "config", envvar.String("PASSWORDS_CONFIG", config.DefaultConfigPath()), "path to config file")
+	flags.StringVar(&apiURL, "api-url", envvar.String("KEEPER_API_URL", "http://localhost:8080"), "base url of the keeper api")
+	flags.StringVar(&configPath, "config", envvar.String("KEEPER_CONFIG", config.DefaultConfigPath()), "path to config file")
 
 	cmd.AddCommand(
 		create(),

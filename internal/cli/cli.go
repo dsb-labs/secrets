@@ -34,7 +34,9 @@ func CreateClient(cmd *cobra.Command, _ []string) error {
 	cfg, err := config.Load(configPath)
 	switch {
 	case errors.Is(err, config.ErrNotFound):
-		return fmt.Errorf("config file not found at %q", configPath)
+		// If there's no config, it could be a first time run so we can just set up a client
+		// without a token as we're probably about to login
+		break
 	case err != nil:
 		return fmt.Errorf("failed to load config: %w", err)
 	}
