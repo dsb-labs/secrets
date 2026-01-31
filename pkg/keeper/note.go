@@ -80,3 +80,22 @@ func (c *Client) DeleteNote(ctx context.Context, id string) error {
 
 	return nil
 }
+
+// GetNote attempts to obtain the note record with the specified id for the authenticated user.
+func (c *Client) GetNote(ctx context.Context, id string) (Note, error) {
+	request, err := c.buildRequest(ctx, http.MethodGet, path.Join("/api/v1/note", id), nil)
+	if err != nil {
+		return Note{}, err
+	}
+
+	response, err := doRequest[api.GetNoteResponse](c.client, request)
+	if err != nil {
+		return Note{}, err
+	}
+
+	return Note{
+		ID:      response.Note.ID,
+		Name:    response.Note.Name,
+		Content: response.Note.Content,
+	}, nil
+}

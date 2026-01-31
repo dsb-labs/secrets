@@ -1,4 +1,4 @@
-package login
+package note
 
 import (
 	"encoding/json"
@@ -13,21 +13,21 @@ import (
 func get() *cobra.Command {
 	return &cobra.Command{
 		Use:   "get [id]",
-		Short: "Get a login",
+		Short: "Get a note",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()
 			client := cli.ClientFromContext(ctx)
 
-			login, err := client.GetLogin(ctx, args[0])
+			note, err := client.GetNote(ctx, args[0])
 			if err != nil {
-				return fmt.Errorf("failed to get login: %w", err)
+				return fmt.Errorf("failed to get note: %w", err)
 			}
 
 			encoder := json.NewEncoder(os.Stdout)
 			encoder.SetIndent("", "  ")
 
-			return encoder.Encode(login)
+			return encoder.Encode(note)
 		},
 	}
 }

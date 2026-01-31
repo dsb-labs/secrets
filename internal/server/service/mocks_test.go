@@ -833,6 +833,66 @@ func (_c *MockNoteRepository_Delete_Call) RunAndReturn(run func(uUID uuid.UUID) 
 	return _c
 }
 
+// Get provides a mock function for the type MockNoteRepository
+func (_mock *MockNoteRepository) Get(uUID uuid.UUID) (database.Note, error) {
+	ret := _mock.Called(uUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Get")
+	}
+
+	var r0 database.Note
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) (database.Note, error)); ok {
+		return returnFunc(uUID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) database.Note); ok {
+		r0 = returnFunc(uUID)
+	} else {
+		r0 = ret.Get(0).(database.Note)
+	}
+	if returnFunc, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = returnFunc(uUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockNoteRepository_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type MockNoteRepository_Get_Call struct {
+	*mock.Call
+}
+
+// Get is a helper method to define mock.On call
+//   - uUID uuid.UUID
+func (_e *MockNoteRepository_Expecter) Get(uUID interface{}) *MockNoteRepository_Get_Call {
+	return &MockNoteRepository_Get_Call{Call: _e.mock.On("Get", uUID)}
+}
+
+func (_c *MockNoteRepository_Get_Call) Run(run func(uUID uuid.UUID)) *MockNoteRepository_Get_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockNoteRepository_Get_Call) Return(note database.Note, err error) *MockNoteRepository_Get_Call {
+	_c.Call.Return(note, err)
+	return _c
+}
+
+func (_c *MockNoteRepository_Get_Call) RunAndReturn(run func(uUID uuid.UUID) (database.Note, error)) *MockNoteRepository_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // List provides a mock function for the type MockNoteRepository
 func (_mock *MockNoteRepository) List() ([]database.Note, error) {
 	ret := _mock.Called()

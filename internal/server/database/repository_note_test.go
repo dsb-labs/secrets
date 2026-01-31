@@ -136,3 +136,59 @@ func TestNoteRepository_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestNoteRepository_Get(t *testing.T) {
+	t.Parallel()
+
+	db := testDB(t)
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		ExpectsError bool
+		Expected     database.Note
+		Setup        func(notes *database.NoteRepository)
+	}{
+		{
+			Name: "gets note",
+			ID:   uuid.NameSpaceDNS,
+			Expected: database.Note{
+				ID:      uuid.NameSpaceDNS,
+				Name:    "test",
+				Content: "test",
+			},
+			Setup: func(notes *database.NoteRepository) {
+				expected := database.Note{
+					ID:      uuid.NameSpaceDNS,
+					Name:    "test",
+					Content: "test",
+				}
+
+				require.NoError(t, notes.Create(expected))
+			},
+		},
+		{
+			Name:         "error if note does not exist",
+			ID:           uuid.NameSpaceURL,
+			ExpectsError: true,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			notes := database.NewNoteRepository(db)
+			if tc.Setup != nil {
+				tc.Setup(notes)
+			}
+
+			actual, err := notes.Get(tc.ID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.EqualValues(t, tc.Expected, actual)
+		})
+	}
+}

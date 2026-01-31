@@ -76,7 +76,7 @@ func (c *Client) buildRequest(ctx context.Context, method, path string, body any
 
 func doRequest[T any](client *http.Client, r *http.Request) (T, error) {
 	var body T
-
+	
 	response, err := client.Do(r)
 	if err != nil {
 		return body, err

@@ -741,6 +741,72 @@ func (_c *MockNoteService_Delete_Call) RunAndReturn(run func(uUID uuid.UUID, uUI
 	return _c
 }
 
+// Get provides a mock function for the type MockNoteService
+func (_mock *MockNoteService) Get(uUID uuid.UUID, uUID1 uuid.UUID) (service.Note, error) {
+	ret := _mock.Called(uUID, uUID1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Get")
+	}
+
+	var r0 service.Note
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) (service.Note, error)); ok {
+		return returnFunc(uUID, uUID1)
+	}
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) service.Note); ok {
+		r0 = returnFunc(uUID, uUID1)
+	} else {
+		r0 = ret.Get(0).(service.Note)
+	}
+	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, uuid.UUID) error); ok {
+		r1 = returnFunc(uUID, uUID1)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockNoteService_Get_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Get'
+type MockNoteService_Get_Call struct {
+	*mock.Call
+}
+
+// Get is a helper method to define mock.On call
+//   - uUID uuid.UUID
+//   - uUID1 uuid.UUID
+func (_e *MockNoteService_Expecter) Get(uUID interface{}, uUID1 interface{}) *MockNoteService_Get_Call {
+	return &MockNoteService_Get_Call{Call: _e.mock.On("Get", uUID, uUID1)}
+}
+
+func (_c *MockNoteService_Get_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockNoteService_Get_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		var arg1 uuid.UUID
+		if args[1] != nil {
+			arg1 = args[1].(uuid.UUID)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockNoteService_Get_Call) Return(note service.Note, err error) *MockNoteService_Get_Call {
+	_c.Call.Return(note, err)
+	return _c
+}
+
+func (_c *MockNoteService_Get_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) (service.Note, error)) *MockNoteService_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // List provides a mock function for the type MockNoteService
 func (_mock *MockNoteService) List(uUID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error) {
 	var tmpRet mock.Arguments

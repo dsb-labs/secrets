@@ -31,6 +31,7 @@ func Command() *cobra.Command {
 		create(),
 		list(),
 		delete(),
+		get(),
 	)
 
 	return cmd

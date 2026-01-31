@@ -363,3 +363,127 @@ func TestNoteService_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestNoteService_Get(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		UserID       uuid.UUID
+		NoteID       uuid.UUID
+		Expected     service.Note
+		ExpectsError bool
+		Setup        func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository])
+	}{
+		{
+			Name:         "error if database lifetime has expired",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Setup: func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "error when getting user database fails",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Setup: func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "error if database lifetime expired has on delete",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			NoteID:       uuid.NameSpaceDNS,
+			Setup: func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(notes, nil).Once()
+
+				notes.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Note{}, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "error when querying note",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			NoteID:       uuid.NameSpaceDNS,
+			Setup: func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(notes, nil).Once()
+
+				notes.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Note{}, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "error if note does not exist",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			NoteID:       uuid.NameSpaceDNS,
+			Setup: func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(notes, nil).Once()
+
+				notes.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Note{}, database.ErrNoteNotFound).Once()
+			},
+		},
+		{
+			Name:   "success",
+			UserID: uuid.NameSpaceDNS,
+			NoteID: uuid.NameSpaceDNS,
+			Expected: service.Note{
+				ID:      uuid.NameSpaceDNS,
+				Name:    "test",
+				Content: "test",
+			},
+			Setup: func(notes *MockNoteRepository, provider *MockRepositoryProvider[service.NoteRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(notes, nil).Once()
+
+				expected := database.Note{
+					ID:      uuid.NameSpaceDNS,
+					Name:    "test",
+					Content: "test",
+				}
+
+				notes.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(expected, nil).Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			notes := NewMockNoteRepository(t)
+			provider := NewMockRepositoryProvider[service.NoteRepository](t)
+
+			if tc.Setup != nil {
+				tc.Setup(notes, provider)
+			}
+
+			actual, err := service.NewNoteService(provider).Get(tc.UserID, tc.NoteID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.Equal(t, tc.Expected, actual)
+		})
+	}
+}

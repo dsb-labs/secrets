@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
@@ -25,6 +24,9 @@ type (
 		List() ([]database.Note, error)
 		// Delete should remove a note record, returning database.ErrNoteNotFound if it does not exist.
 		Delete(uuid.UUID) error
+		// Get should return the note record associated with the given id, returning database.ErrNoteNotFound if it
+		// does not exist.
+		Get(uuid.UUID) (database.Note, error)
 	}
 
 	// The Note type represents a single user note record.
@@ -140,12 +142,31 @@ func (svc *NoteService) Delete(userID uuid.UUID, noteID uuid.UUID) error {
 	return nil
 }
 
-// NotesByQuery returns a filter.Filter implementation that filters notes based on a given query value. The filter
-// returns true if either the name or content of the note contains the query text. This filter does not match on
-// casing.
-func NotesByQuery(query string) filter.Filter[Note] {
-	return func(note Note) bool {
-		return strings.Contains(strings.ToLower(note.Name), strings.ToLower(query)) ||
-			strings.Contains(strings.ToLower(note.Content), strings.ToLower(query))
+// Get a note record associated with the given user and note identifiers. Returns ErrReauthenticate if the underlying
+// individual user database's lifetime has expired and the caller must reauthenticate. Returns ErrNoteNotFound if the
+// specified note record does not exist.
+func (svc *NoteService) Get(userID uuid.UUID, noteID uuid.UUID) (Note, error) {
+	repo, err := svc.notes.For(userID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return Note{}, ErrReauthenticate
+	case err != nil:
+		return Note{}, fmt.Errorf("failed to get database for user: %w", err)
 	}
+
+	result, err := repo.Get(noteID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return Note{}, ErrReauthenticate
+	case errors.Is(err, database.ErrNoteNotFound):
+		return Note{}, ErrNoteNotFound
+	case err != nil:
+		return Note{}, fmt.Errorf("failed to get note record: %w", err)
+	}
+
+	return Note{
+		ID:      result.ID,
+		Name:    result.Name,
+		Content: result.Content,
+	}, nil
 }

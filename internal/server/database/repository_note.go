@@ -82,3 +82,26 @@ func (r *NoteRepository) Delete(id uuid.UUID) error {
 		return txn.Delete(key)
 	})
 }
+
+// Get a note record by its id, returns ErrNoteNotFound if the note record does not exist.
+func (r *NoteRepository) Get(id uuid.UUID) (Note, error) {
+	return view(r.db, func(txn *badger.Txn) (Note, error) {
+		note := Note{
+			ID: id,
+		}
+
+		item, err := txn.Get(note.key())
+		switch {
+		case errors.Is(err, badger.ErrKeyNotFound):
+			return Note{}, ErrNoteNotFound
+		case err != nil:
+			return Note{}, err
+		}
+
+		err = item.Value(func(val []byte) error {
+			return json.Unmarshal(val, &note)
+		})
+
+		return note, err
+	})
+}

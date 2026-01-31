@@ -27,6 +27,9 @@ type (
 		// Delete should remove the note record associated with the given user and note id. Returning
 		// service.ErrNoteNotFound if it does not exist.
 		Delete(uuid.UUID, uuid.UUID) error
+		// Get should return the note record associated with the given user and note id. Returning
+		// service.ErrNoteNotFound if it does not exist.
+		Get(uuid.UUID, uuid.UUID) (service.Note, error)
 	}
 
 	// The Note type represents a single password.
@@ -51,6 +54,7 @@ func (api *NoteAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/note", api.Create)
 	mux.HandleFunc("GET /api/v1/note", api.List)
 	mux.HandleFunc("DELETE /api/v1/note/{id}", api.Delete)
+	mux.HandleFunc("GET /api/v1/note/{id}", api.Get)
 }
 
 type (
@@ -185,4 +189,49 @@ func (api *NoteAPI) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	write(w, http.StatusOK, DeleteNoteResponse{})
+}
+
+type (
+	// The GetNoteResponse type represents the response body returned when calling NoteAPI.Get
+	GetNoteResponse struct {
+		// The requested note details.
+		Note Note `json:"note"`
+	}
+)
+
+// Get handles an inbound HTTP request to query a note record for a user. On success, it responds with
+// an http.StatusOK code and a JSON-encoded GetNoteResponse.
+func (api *NoteAPI) Get(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	noteID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErrorf(w, http.StatusBadRequest, "failed to parse note id: %v", err)
+		return
+	}
+
+	result, err := api.notes.Get(tkn.ID(), noteID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	case errors.Is(err, service.ErrNoteNotFound):
+		writeErrorf(w, http.StatusNotFound, "note %q does not exist", noteID)
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to get note: %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, GetNoteResponse{
+		Note: Note{
+			ID:      result.ID.String(),
+			Name:    result.Name,
+			Content: result.Content,
+		},
+	})
 }

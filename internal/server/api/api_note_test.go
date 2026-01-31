@@ -298,3 +298,113 @@ func TestNoteAPI_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestNoteAPI_Get(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		Expected     api.GetNoteResponse
+		Token        token.Token
+		ID           string
+		ExpectedCode int
+		ExpectsError bool
+		Setup        func(svc *MockNoteService)
+	}{
+		{
+			Name:         "error if no token",
+			Token:        token.Token{},
+			ExpectsError: true,
+			ExpectedCode: http.StatusUnauthorized,
+		},
+		{
+			Name:         "error if note id is not uuid",
+			Token:        token.TestToken(t, "test"),
+			ID:           "not-a-uuid",
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name:         "error if lifetime has expired",
+			Token:        token.TestToken(t, "test"),
+			ID:           uuid.NameSpaceDNS.String(),
+			ExpectsError: true,
+			ExpectedCode: http.StatusUnauthorized,
+			Setup: func(svc *MockNoteService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Note{}, service.ErrReauthenticate).Once()
+			},
+		},
+		{
+			Name:         "error if note does not exist",
+			Token:        token.TestToken(t, "test"),
+			ID:           uuid.NameSpaceDNS.String(),
+			ExpectsError: true,
+			ExpectedCode: http.StatusNotFound,
+			Setup: func(svc *MockNoteService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Note{}, service.ErrNoteNotFound).Once()
+			},
+		},
+		{
+			Name:         "error if get fails",
+			Token:        token.TestToken(t, "test"),
+			ID:           uuid.NameSpaceDNS.String(),
+			ExpectsError: true,
+			ExpectedCode: http.StatusInternalServerError,
+			Setup: func(svc *MockNoteService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Note{}, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "success",
+			Token:        token.TestToken(t, "test"),
+			ExpectedCode: http.StatusOK,
+			ID:           uuid.NameSpaceDNS.String(),
+			Expected: api.GetNoteResponse{
+				Note: api.Note{
+					ID:      uuid.NameSpaceDNS.String(),
+					Name:    "test",
+					Content: "test",
+				},
+			},
+			Setup: func(svc *MockNoteService) {
+				svc.EXPECT().
+					Get(mock.Anything, uuid.NameSpaceDNS).
+					Return(service.Note{
+						ID:      uuid.NameSpaceDNS,
+						Name:    "test",
+						Content: "test",
+					}, nil).Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			svc := NewMockNoteService(t)
+			if tc.Setup != nil {
+				tc.Setup(svc)
+			}
+
+			w := httptest.NewRecorder()
+			r := request(t, http.MethodGet, "/api/v1/note", nil).
+				WithContext(token.ToContext(t.Context(), tc.Token))
+			r.SetPathValue("id", tc.ID)
+
+			api.NewNoteAPI(svc).Get(w, r)
+
+			require.Equal(t, tc.ExpectedCode, w.Code)
+			if tc.ExpectsError {
+				assertAPIError(t, w)
+				return
+			}
+
+			assertResponse(t, w, tc.Expected)
+		})
+	}
+}
