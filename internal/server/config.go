@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net"
@@ -47,7 +48,7 @@ type (
 		// The TTL of each token.
 		TTL time.Duration `toml:"ttl"`
 		// The key used to sign and verify each JWT token.
-		SigningKey []byte `toml:"signing-key"`
+		SigningKey string `toml:"signing-key"`
 		// The JWT audience.
 		Audience string `toml:"audience"`
 	}
@@ -67,7 +68,7 @@ func DefaultConfig() Config {
 		JWT: JWTConfig{
 			Issuer:     "dev",
 			TTL:        time.Hour,
-			SigningKey: bytes.Repeat([]byte{0}, 32),
+			SigningKey: base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0}, 32)),
 			Audience:   "dev",
 		},
 	}

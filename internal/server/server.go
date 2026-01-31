@@ -3,6 +3,7 @@ package server
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"net/http"
@@ -44,17 +45,22 @@ func Run(ctx context.Context, config Config) error {
 	}
 	closers.Add(masterDB)
 
+	signingKey, err := base64.StdEncoding.DecodeString(config.JWT.SigningKey)
+	if err != nil {
+		return err
+	}
+
 	tokenGenerator := token.NewGenerator(token.GeneratorConfig{
 		Issuer:     config.JWT.Issuer,
 		TTL:        config.JWT.TTL,
-		SigningKey: config.JWT.SigningKey,
+		SigningKey: signingKey,
 		Audience:   config.JWT.Audience,
 	})
 
 	tokenParser := token.NewParser(token.ParserConfig{
 		Issuer:     config.JWT.Issuer,
 		Audience:   config.JWT.Audience,
-		SigningKey: config.JWT.SigningKey,
+		SigningKey: signingKey,
 	})
 
 	mux := http.NewServeMux()
