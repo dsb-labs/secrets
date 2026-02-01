@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/term"
 
 	"github.com/davidsbond/keeper/internal/cli"
 	"github.com/davidsbond/keeper/pkg/keeper"
@@ -23,16 +22,14 @@ func create() *cobra.Command {
 			ctx := cmd.Context()
 			client := cli.ClientFromContext(ctx)
 
-			fmt.Print("Enter password: ")
-			password, err := term.ReadPassword(cli.Stdin)
+			password, err := cli.PromptPassword()
 			if err != nil {
 				return fmt.Errorf("failed to read password: %w", err)
 			}
-			fmt.Println("")
 
 			login := keeper.Login{
 				Username: args[0],
-				Password: string(password),
+				Password: password,
 				Domains:  domains,
 			}
 

@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"golang.org/x/term"
 
 	"github.com/davidsbond/keeper/internal/cli/config"
 	"github.com/davidsbond/keeper/pkg/keeper"
@@ -15,12 +16,6 @@ import (
 
 type (
 	ctxKey struct{}
-)
-
-var (
-	// Stdin is an integer representation of the file descriptor/handle for os.Stdin. This should be used when attempting
-	// to read passwords from os.Stdin in a cross-compatible way.
-	Stdin = int(os.Stdin.Fd())
 )
 
 // CreateClient is to be used as a PersistentPreRun function for a cobra root command that adds a keeper.Client
@@ -69,4 +64,17 @@ func ClientFromContext(ctx context.Context) *keeper.Client {
 	}
 
 	return client
+}
+
+// PromptPassword creates an "enter password" prompt on stdout/stdin that masks the input text, returning the entered
+// password as a string.
+func PromptPassword() (string, error) {
+	fmt.Print("Enter password: ")
+	pwd, err := term.ReadPassword(int(os.Stdin.Fd()))
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println("")
+	return string(pwd), nil
 }

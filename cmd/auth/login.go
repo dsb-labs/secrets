@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
-	"golang.org/x/term"
 
 	"github.com/davidsbond/keeper/internal/cli"
 	"github.com/davidsbond/keeper/internal/cli/config"
@@ -21,14 +21,19 @@ func login() *cobra.Command {
 
 			client := cli.ClientFromContext(ctx)
 
-			fmt.Print("Enter password: ")
-			password, err := term.ReadPassword(cli.Stdin)
-			if err != nil {
-				return fmt.Errorf("failed to read password: %w", err)
-			}
-			fmt.Println("")
+			var (
+				password string
+				err      error
+			)
 
-			if err = client.Login(ctx, args[0], string(password)); err != nil {
+			if password = envvar.String("KEEPER_PASSWORD", ""); password == "" {
+				password, err = cli.PromptPassword()
+				if err != nil {
+					return fmt.Errorf("failed to read password: %w", err)
+				}
+			}
+
+			if err = client.Login(ctx, args[0], password); err != nil {
 				return fmt.Errorf("failed to login: %w", err)
 			}
 
