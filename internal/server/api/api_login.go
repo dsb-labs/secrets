@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
@@ -148,17 +149,16 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logins := make([]Login, len(results))
-	for i, result := range results {
-		logins[i] = Login{
-			ID:       result.ID.String(),
-			Username: result.Username,
-			Password: result.Password,
-			Domains:  result.Domains,
-		}
-	}
-
-	write(w, http.StatusOK, ListLoginsResponse{Logins: logins})
+	write(w, http.StatusOK, ListLoginsResponse{
+		Logins: convert.Slice(results, func(in service.Login) Login {
+			return Login{
+				ID:       in.ID.String(),
+				Username: in.Username,
+				Password: in.Password,
+				Domains:  in.Domains,
+			}
+		}),
+	})
 }
 
 type (

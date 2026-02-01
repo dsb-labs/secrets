@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 
@@ -101,15 +102,14 @@ func (svc *NoteService) List(userID uuid.UUID, filters ...filter.Filter[Note]) (
 		return nil, fmt.Errorf("failed to list note records: %w", err)
 	}
 
-	notes := make([]Note, len(results))
-	for i, result := range results {
-		notes[i] = Note{
-			ID:      result.ID,
-			Name:    result.Name,
-			Content: result.Content,
+	notes := convert.Slice(results, func(in database.Note) Note {
+		return Note{
+			ID:      in.ID,
+			Name:    in.Name,
+			Content: in.Content,
 		}
-	}
-
+	})
+	
 	if len(filters) == 0 {
 		return notes, nil
 	}

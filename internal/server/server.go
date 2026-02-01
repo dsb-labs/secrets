@@ -74,6 +74,7 @@ func Run(ctx context.Context, config Config) error {
 	api.NewAccountAPI(service.NewAccountService(accounts, databaseManager)).Register(mux)
 	api.NewLoginAPI(service.NewLoginService(logins)).Register(mux)
 	api.NewNoteAPI(service.NewNoteService(notes)).Register(mux)
+	api.NewToolAPI(service.NewToolService(logins, notes)).Register(mux)
 
 	// The UI handler must always be registered last as a fall-through for all routes.
 	ui.NewHandler().Register(mux)

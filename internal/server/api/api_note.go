@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
@@ -143,16 +144,15 @@ func (api *NoteAPI) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	notes := make([]Note, len(results))
-	for i, result := range results {
-		notes[i] = Note{
-			ID:      result.ID.String(),
-			Name:    result.Name,
-			Content: result.Content,
-		}
-	}
-
-	write(w, http.StatusOK, ListNotesResponse{Notes: notes})
+	write(w, http.StatusOK, ListNotesResponse{
+		Notes: convert.Slice(results, func(in service.Note) Note {
+			return Note{
+				ID:      in.ID.String(),
+				Name:    in.Name,
+				Content: in.Content,
+			}
+		}),
+	})
 }
 
 type (

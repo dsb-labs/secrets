@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/BurntSushi/toml v1.6.0
-	github.com/davidsbond/x v0.0.0-20260127205618-e449101aac27
+	github.com/davidsbond/x v0.0.0-20260201150601-d39cb40efe72
 	github.com/dgraph-io/badger/v4 v4.9.0
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/golang-jwt/jwt/v5 v5.3.1

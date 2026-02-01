@@ -62,7 +62,8 @@ func (m *Manager) Unlock(id uuid.UUID, key []byte) error {
 	opts := badger.DefaultOptions(path).
 		WithEncryptionKey(key).
 		WithLoggingLevel(badger.ERROR).
-		WithIndexCacheSize(100 << 20)
+		WithIndexCacheSize(100 << 20).
+		WithNumVersionsToKeep(1)
 
 	db, err := badger.Open(opts)
 	if err != nil {

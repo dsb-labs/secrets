@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 
@@ -104,15 +105,14 @@ func (svc *LoginService) List(userID uuid.UUID, filters ...filter.Filter[Login])
 		return nil, fmt.Errorf("failed to list login records: %w", err)
 	}
 
-	logins := make([]Login, len(results))
-	for i, result := range results {
-		logins[i] = Login{
-			ID:       result.ID,
-			Username: result.Username,
-			Password: result.Password,
-			Domains:  result.Domains,
+	logins := convert.Slice(results, func(in database.Login) Login {
+		return Login{
+			ID:       in.ID,
+			Username: in.Username,
+			Password: in.Password,
+			Domains:  in.Domains,
 		}
-	}
+	})
 
 	if len(filters) == 0 {
 		return logins, nil

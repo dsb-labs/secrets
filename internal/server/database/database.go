@@ -10,7 +10,11 @@ import (
 
 // Open a new badger database at the specified path.
 func Open(path string) (*badger.DB, error) {
-	return badger.Open(badger.DefaultOptions(path).WithLoggingLevel(badger.ERROR))
+	options := badger.DefaultOptions(path).
+		WithLoggingLevel(badger.ERROR).
+		WithNumVersionsToKeep(1)
+
+	return badger.Open(options)
 }
 
 func update(db *badger.DB, fn func(txn *badger.Txn) error) error {
