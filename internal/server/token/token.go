@@ -17,8 +17,9 @@ import (
 type (
 	// The Token type represents a parsed JWT token.
 	Token struct {
-		id  uuid.UUID
-		raw string
+		id      uuid.UUID
+		raw     string
+		expires time.Time
 	}
 )
 
@@ -35,6 +36,11 @@ func (t Token) String() string {
 // Valid returns true if the Token has both an id and raw string representation.
 func (t Token) Valid() bool {
 	return t.raw != "" && t.id != uuid.Nil
+}
+
+// ExpiresAt returns the time at which the token will become invalid.
+func (t Token) ExpiresAt() time.Time {
+	return t.expires
 }
 
 type (
@@ -73,12 +79,13 @@ func NewGenerator(config GeneratorConfig) *Generator {
 // Generate a new Token, using the provided uuid.UUID as the subject.
 func (g *Generator) Generate(id uuid.UUID) (Token, error) {
 	now := time.Now()
+	expires := now.Add(g.ttl)
 
 	claims := jwt.RegisteredClaims{
 		Issuer:    g.issuer,
 		Subject:   id.String(),
 		Audience:  []string{g.audience},
-		ExpiresAt: jwt.NewNumericDate(now.Add(g.ttl)),
+		ExpiresAt: jwt.NewNumericDate(expires),
 		NotBefore: jwt.NewNumericDate(now),
 		IssuedAt:  jwt.NewNumericDate(now),
 		ID:        uuid.New().String(),
@@ -90,7 +97,7 @@ func (g *Generator) Generate(id uuid.UUID) (Token, error) {
 		return Token{}, fmt.Errorf("failed to sign token: %w", err)
 	}
 
-	return Token{id: id, raw: tokenString}, nil
+	return Token{id: id, raw: tokenString, expires: expires}, nil
 }
 
 type (
@@ -142,7 +149,7 @@ func (p *Parser) Parse(tokenString string) (Token, error) {
 		return Token{}, fmt.Errorf("failed to parse token subject: %w", err)
 	}
 
-	return Token{id: subject, raw: tokenString}, nil
+	return Token{id: subject, raw: tokenString, expires: claims.ExpiresAt.Time}, nil
 }
 
 type (
@@ -170,6 +177,15 @@ func ToContext(ctx context.Context, tkn Token) context.Context {
 // not present or invalid, this must be handled by the respective HTTP handlers that care about tokens being present.
 func Middleware(p *Parser, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if cookie, _ := r.Cookie("keeper"); cookie != nil {
+			tkn, err := p.Parse(cookie.Value)
+			if err == nil {
+				ctx := ToContext(r.Context(), tkn)
+				next.ServeHTTP(w, r.WithContext(ctx))
+				return
+			}
+		}
+
 		header := r.Header.Get("Authorization")
 		if header == "" {
 			next.ServeHTTP(w, r)
@@ -183,12 +199,7 @@ func Middleware(p *Parser, next http.Handler) http.Handler {
 		}
 
 		tkn, err := p.Parse(strings.TrimSpace(bearer))
-		if err != nil {
-			next.ServeHTTP(w, r)
-			return
-		}
-
-		if !tkn.Valid() {
+		if err != nil || !tkn.Valid() {
 			next.ServeHTTP(w, r)
 			return
 		}

@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
@@ -131,6 +132,11 @@ func TestAuthAPI_Login(t *testing.T) {
 			}
 
 			assertResponse(t, w, tc.Expected)
+
+			cookie, err := http.ParseSetCookie(w.Header().Get("Set-Cookie"))
+			require.NoError(t, err)
+			require.NotNil(t, cookie)
+			assert.EqualValues(t, tc.Expected.Token, cookie.Value)
 		})
 	}
 }
@@ -192,6 +198,11 @@ func TestAuthAPI_Logout(t *testing.T) {
 			}
 
 			assertResponse(t, w, tc.Expected)
+			cookie, err := http.ParseSetCookie(w.Header().Get("Set-Cookie"))
+			require.NoError(t, err)
+			require.NotNil(t, cookie)
+			assert.Empty(t, cookie.Value)
+			assert.EqualValues(t, -1, cookie.MaxAge)
 		})
 	}
 }

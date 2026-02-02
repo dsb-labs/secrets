@@ -80,25 +80,48 @@ func TestMiddleware(t *testing.T) {
 
 	tt := []struct {
 		Name         string
-		Token        func(g *token.Generator) string
+		Token        func(g *token.Generator, r *http.Request)
 		ExpectsToken bool
 		ExpectedID   uuid.UUID
 	}{
 		{
-			Name: "ignore no token header",
+			Name: "ignore no token header or cookie",
 		},
 		{
 			Name: "ignore invalid token in header",
-			Token: func(g *token.Generator) string {
-				return "invalid"
+			Token: func(g *token.Generator, r *http.Request) {
+				r.Header.Set("Authorization", "Bearer invalid")
 			},
 		},
 		{
-			Name: "propagate valid token",
-			Token: func(g *token.Generator) string {
+			Name: "propagate valid token from header",
+			Token: func(g *token.Generator, r *http.Request) {
 				tkn, err := g.Generate(uuid.NameSpaceDNS)
 				require.NoError(t, err)
-				return tkn.String()
+				r.Header.Set("Authorization", "Bearer "+tkn.String())
+			},
+			ExpectsToken: true,
+			ExpectedID:   uuid.NameSpaceDNS,
+		},
+		{
+			Name: "ignore invalid token in cookie",
+			Token: func(g *token.Generator, r *http.Request) {
+				r.AddCookie(&http.Cookie{
+					Name:  "keeper",
+					Value: "invalid",
+				})
+			},
+		},
+
+		{
+			Name: "propagate valid token from cookie",
+			Token: func(g *token.Generator, r *http.Request) {
+				tkn, err := g.Generate(uuid.NameSpaceDNS)
+				require.NoError(t, err)
+				r.AddCookie(&http.Cookie{
+					Name:  "keeper",
+					Value: tkn.String(),
+				})
 			},
 			ExpectsToken: true,
 			ExpectedID:   uuid.NameSpaceDNS,
@@ -134,9 +157,7 @@ func TestMiddleware(t *testing.T) {
 		r := httptest.NewRequest(http.MethodGet, "/", nil)
 
 		if tc.Token != nil {
-			if tkn := tc.Token(generator); tkn != "" {
-				r.Header.Set("Authorization", "Bearer "+tkn)
-			}
+			tc.Token(generator, r)
 		}
 
 		handler.ServeHTTP(w, r)
