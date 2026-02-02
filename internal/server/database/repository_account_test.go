@@ -118,3 +118,59 @@ func TestAccountRepository_FindByEmail(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountRepository_FindByID(t *testing.T) {
+	t.Parallel()
+
+	db := testDB(t)
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		ExpectsError bool
+		Expected     database.Account
+		Setup        func(accounts *database.AccountRepository)
+	}{
+		{
+			Name: "account exists",
+			ID:   uuid.NameSpaceDNS,
+			Setup: func(accounts *database.AccountRepository) {
+				require.NoError(t, accounts.Create(database.Account{
+					ID:           uuid.NameSpaceDNS,
+					Email:        "test@test.com",
+					PasswordHash: []byte("hash"),
+					DisplayName:  "test",
+				}))
+			},
+			Expected: database.Account{
+				ID:           uuid.NameSpaceDNS,
+				Email:        "test@test.com",
+				PasswordHash: []byte("hash"),
+				DisplayName:  "test",
+			},
+		},
+		{
+			Name:         "error if account does not exist",
+			ID:           uuid.NameSpaceURL,
+			ExpectsError: true,
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			accounts := database.NewAccountRepository(db)
+			if tc.Setup != nil {
+				tc.Setup(accounts)
+			}
+
+			actual, err := accounts.FindByID(tc.ID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.EqualValues(t, tc.Expected, actual)
+		})
+	}
+}

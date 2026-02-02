@@ -90,3 +90,27 @@ func (r *AccountRepository) FindByEmail(email string) (Account, error) {
 
 	return account, nil
 }
+
+// FindByID attempts to return the account record associated with the given identifier address. Returns ErrAccountNotFound
+// if the specified account does not exist.
+func (r *AccountRepository) FindByID(id uuid.UUID) (Account, error) {
+	account := Account{ID: id}
+	return view(r.db, func(txn *badger.Txn) (Account, error) {
+		item, err := txn.Get(account.key())
+		switch {
+		case errors.Is(err, badger.ErrKeyNotFound):
+			return Account{}, ErrAccountNotFound
+		case err != nil:
+			return Account{}, err
+		}
+
+		err = item.Value(func(val []byte) error {
+			return json.Unmarshal(val, &account)
+		})
+		if err != nil {
+			return Account{}, err
+		}
+
+		return account, nil
+	})
+}

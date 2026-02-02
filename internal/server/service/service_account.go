@@ -25,6 +25,9 @@ type (
 		// FindByEmail should return the account record associated with the provided email address, returning
 		// database.ErrAccountNotFound if an account record cannot be found.
 		FindByEmail(string) (database.Account, error)
+		// FindByID should return the account record associated with the given identifier, returning
+		// database.ErrAccountNotFound fi an account record cannot be found.
+		FindByID(uuid.UUID) (database.Account, error)
 	}
 
 	// The Account type represents an individual user account.
@@ -85,4 +88,21 @@ func (svc *AccountService) Create(account Account) ([]byte, error) {
 	restoreKey := deriveKey(account.Password, record.ID[:])
 
 	return restoreKey, nil
+}
+
+// Get an account by its unique identifier. Returns ErrAccountNotFound if the specified account does not exist.
+func (svc *AccountService) Get(id uuid.UUID) (Account, error) {
+	record, err := svc.accounts.FindByID(id)
+	switch {
+	case errors.Is(err, database.ErrAccountNotFound):
+		return Account{}, ErrAccountNotFound
+	case err != nil:
+		return Account{}, fmt.Errorf("failed to query account: %w", err)
+	}
+
+	return Account{
+		Email:       record.Email,
+		DisplayName: record.DisplayName,
+		Password:    "REDACTED", // Never set this.
+	}, nil
 }

@@ -373,6 +373,66 @@ func (_c *MockAccountRepository_FindByEmail_Call) RunAndReturn(run func(s string
 	return _c
 }
 
+// FindByID provides a mock function for the type MockAccountRepository
+func (_mock *MockAccountRepository) FindByID(uUID uuid.UUID) (database.Account, error) {
+	ret := _mock.Called(uUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindByID")
+	}
+
+	var r0 database.Account
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) (database.Account, error)); ok {
+		return returnFunc(uUID)
+	}
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) database.Account); ok {
+		r0 = returnFunc(uUID)
+	} else {
+		r0 = ret.Get(0).(database.Account)
+	}
+	if returnFunc, ok := ret.Get(1).(func(uuid.UUID) error); ok {
+		r1 = returnFunc(uUID)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockAccountRepository_FindByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindByID'
+type MockAccountRepository_FindByID_Call struct {
+	*mock.Call
+}
+
+// FindByID is a helper method to define mock.On call
+//   - uUID uuid.UUID
+func (_e *MockAccountRepository_Expecter) FindByID(uUID interface{}) *MockAccountRepository_FindByID_Call {
+	return &MockAccountRepository_FindByID_Call{Call: _e.mock.On("FindByID", uUID)}
+}
+
+func (_c *MockAccountRepository_FindByID_Call) Run(run func(uUID uuid.UUID)) *MockAccountRepository_FindByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockAccountRepository_FindByID_Call) Return(account database.Account, err error) *MockAccountRepository_FindByID_Call {
+	_c.Call.Return(account, err)
+	return _c
+}
+
+func (_c *MockAccountRepository_FindByID_Call) RunAndReturn(run func(uUID uuid.UUID) (database.Account, error)) *MockAccountRepository_FindByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockTokenGenerator creates a new instance of MockTokenGenerator. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockTokenGenerator(t interface {

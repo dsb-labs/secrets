@@ -6,8 +6,10 @@ import (
 
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
+	"github.com/google/uuid"
 
 	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/token"
 )
 
 type (
@@ -22,6 +24,17 @@ type (
 		// disaster recovery scenario and need to manually decrypt their data. If an account with the given email
 		// already exists, service.ErrAccountExists should be returned.
 		Create(service.Account) ([]byte, error)
+		// Get should return the account associated with the given identifier. Returning service.ErrAccountNotFound
+		// if the account does not exist.
+		Get(uuid.UUID) (service.Account, error)
+	}
+
+	// The Account type represents an individual user account as returned by the API.
+	Account struct {
+		// The user's display name.
+		DisplayName string `json:"displayName"`
+		// The user's email address.
+		Email string `json:"email"`
 	}
 )
 
@@ -36,6 +49,7 @@ func NewAccountAPI(accounts AccountService) *AccountAPI {
 // Register the HTTP endpoints onto the given http.ServeMux.
 func (api *AccountAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/account", api.Create)
+	mux.HandleFunc("GET /api/v1/account", api.Get)
 }
 
 type (
@@ -92,5 +106,40 @@ func (api *AccountAPI) Create(w http.ResponseWriter, r *http.Request) {
 
 	write(w, http.StatusCreated, CreateAccountResponse{
 		RestoreKey: restoreKey,
+	})
+}
+
+type (
+	// The GetAccountResponse type represents the response body returned when calling AccountAPI.Get
+	GetAccountResponse struct {
+		// The user's account details.
+		Account Account `json:"account"`
+	}
+)
+
+// Get handles an inbound HTTP request to query the caller's account details. On success, it responds with
+// an http.StatusOK code and a JSON-encoded GetAccountResponse.
+func (api *AccountAPI) Get(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	account, err := api.accounts.Get(tkn.ID())
+	switch {
+	case errors.Is(err, service.ErrAccountNotFound):
+		writeError(w, http.StatusNotFound, "account not found")
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to get account %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, GetAccountResponse{
+		Account: Account{
+			DisplayName: account.DisplayName,
+			Email:       account.Email,
+		},
 	})
 }
