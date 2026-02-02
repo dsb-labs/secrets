@@ -25,6 +25,8 @@ type (
 		Email string
 		// The user's hashed password.
 		PasswordHash []byte
+		// The user's display name.
+		DisplayName string
 	}
 )
 

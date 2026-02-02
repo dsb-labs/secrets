@@ -24,8 +24,9 @@ func TestAccountService_Create(t *testing.T) {
 			Name:         "error if account already exists",
 			ExpectsError: true,
 			Account: service.Account{
-				Email:    "test@test.com",
-				Password: "test",
+				Email:       "test@test.com",
+				Password:    "test",
+				DisplayName: "test",
 			},
 			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
 				accounts.EXPECT().Create(mock.Anything).Return(database.ErrAccountExists).Once()
@@ -35,8 +36,9 @@ func TestAccountService_Create(t *testing.T) {
 			Name:         "error if insertion fails",
 			ExpectsError: true,
 			Account: service.Account{
-				Email:    "test@test.com",
-				Password: "test",
+				Email:       "test@test.com",
+				Password:    "test",
+				DisplayName: "test",
 			},
 			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
 				accounts.EXPECT().Create(mock.Anything).Return(io.EOF).Once()
@@ -45,8 +47,9 @@ func TestAccountService_Create(t *testing.T) {
 		{
 			Name: "returns restore key on success",
 			Account: service.Account{
-				Email:    "test@test.com",
-				Password: "test",
+				Email:       "test@test.com",
+				Password:    "test",
+				DisplayName: "test",
 			},
 			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
 				accounts.EXPECT().Create(mock.Anything).Return(nil).Once()

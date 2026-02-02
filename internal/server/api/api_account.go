@@ -45,6 +45,8 @@ type (
 		Email string `json:"email"`
 		// The user's password.
 		Password string `json:"password"`
+		// The user's display name.
+		DisplayName string `json:"displayName"`
 	}
 
 	// The CreateAccountResponse type represents the response body returned when calling AccountAPI.Create.
@@ -59,6 +61,7 @@ func (r CreateAccountRequest) Validate() error {
 	return validation.ValidateStruct(&r,
 		validation.Field(&r.Email, validation.Required, is.Email),
 		validation.Field(&r.Password, validation.Required),
+		validation.Field(&r.DisplayName, validation.Required),
 	)
 }
 
@@ -72,8 +75,9 @@ func (api *AccountAPI) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	account := service.Account{
-		Email:    request.Email,
-		Password: request.Password,
+		Email:       request.Email,
+		Password:    request.Password,
+		DisplayName: request.DisplayName,
 	}
 
 	restoreKey, err := api.accounts.Create(account)

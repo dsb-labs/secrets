@@ -33,6 +33,8 @@ type (
 		Email string
 		// The user's password.
 		Password string
+		// The user's display name.
+		DisplayName string
 	}
 )
 
@@ -67,6 +69,7 @@ func (svc *AccountService) Create(account Account) ([]byte, error) {
 		ID:           uuid.New(),
 		Email:        account.Email,
 		PasswordHash: passwordHash,
+		DisplayName:  account.DisplayName,
 	}
 
 	err = svc.accounts.Create(record)

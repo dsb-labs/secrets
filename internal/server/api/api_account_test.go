@@ -27,8 +27,9 @@ func TestAccountAPI_Create(t *testing.T) {
 		{
 			Name: "error if missing email address",
 			Request: api.CreateAccountRequest{
-				Email:    "",
-				Password: "password",
+				Email:       "",
+				Password:    "password",
+				DisplayName: "test",
 			},
 			ExpectsError: true,
 			ExpectedCode: http.StatusBadRequest,
@@ -36,8 +37,9 @@ func TestAccountAPI_Create(t *testing.T) {
 		{
 			Name: "error if missing password",
 			Request: api.CreateAccountRequest{
-				Email:    "test@test.com",
-				Password: "",
+				Email:       "test@test.com",
+				Password:    "",
+				DisplayName: "test",
 			},
 			ExpectsError: true,
 			ExpectedCode: http.StatusBadRequest,
@@ -45,8 +47,19 @@ func TestAccountAPI_Create(t *testing.T) {
 		{
 			Name: "error if email is invalid",
 			Request: api.CreateAccountRequest{
-				Email:    "not-an-email",
-				Password: "password",
+				Email:       "not-an-email",
+				Password:    "password",
+				DisplayName: "test",
+			},
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
+			Name: "error if missing display name",
+			Request: api.CreateAccountRequest{
+				Email:       "test@test.com",
+				Password:    "password",
+				DisplayName: "",
 			},
 			ExpectsError: true,
 			ExpectedCode: http.StatusBadRequest,
@@ -54,8 +67,9 @@ func TestAccountAPI_Create(t *testing.T) {
 		{
 			Name: "error if account already exists",
 			Request: api.CreateAccountRequest{
-				Email:    "test@test.com",
-				Password: "password",
+				Email:       "test@test.com",
+				Password:    "password",
+				DisplayName: "test",
 			},
 			ExpectsError: true,
 			ExpectedCode: http.StatusConflict,
@@ -66,8 +80,9 @@ func TestAccountAPI_Create(t *testing.T) {
 		{
 			Name: "error if creation fails",
 			Request: api.CreateAccountRequest{
-				Email:    "test@test.com",
-				Password: "password",
+				Email:       "test@test.com",
+				Password:    "password",
+				DisplayName: "test",
 			},
 			ExpectsError: true,
 			ExpectedCode: http.StatusInternalServerError,
@@ -78,8 +93,9 @@ func TestAccountAPI_Create(t *testing.T) {
 		{
 			Name: "returns restore key on success",
 			Request: api.CreateAccountRequest{
-				Email:    "test@test.com",
-				Password: "password",
+				Email:       "test@test.com",
+				Password:    "password",
+				DisplayName: "test",
 			},
 			ExpectedCode: http.StatusCreated,
 			Expected: api.CreateAccountResponse{

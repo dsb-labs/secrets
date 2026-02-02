@@ -26,6 +26,7 @@ func TestAccountRepository_Create(t *testing.T) {
 				ID:           uuid.New(),
 				Email:        "test@test.com",
 				PasswordHash: []byte("hash"),
+				DisplayName:  "test",
 			},
 		},
 		{
@@ -35,6 +36,7 @@ func TestAccountRepository_Create(t *testing.T) {
 				ID:           uuid.New(),
 				Email:        "test@test.com",
 				PasswordHash: []byte("hash"),
+				DisplayName:  "test",
 			},
 		},
 		{
@@ -43,6 +45,7 @@ func TestAccountRepository_Create(t *testing.T) {
 				ID:           uuid.New(),
 				Email:        "test1@test.com",
 				PasswordHash: []byte("hash"),
+				DisplayName:  "test",
 			},
 		},
 	}
@@ -80,12 +83,14 @@ func TestAccountRepository_FindByEmail(t *testing.T) {
 					ID:           uuid.NameSpaceDNS,
 					Email:        "test@test.com",
 					PasswordHash: []byte("hash"),
+					DisplayName:  "test",
 				}))
 			},
 			Expected: database.Account{
 				ID:           uuid.NameSpaceDNS,
 				Email:        "test@test.com",
 				PasswordHash: []byte("hash"),
+				DisplayName:  "test",
 			},
 		},
 		{
