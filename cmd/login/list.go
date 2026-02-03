@@ -1,9 +1,7 @@
 package login
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -30,10 +28,7 @@ func list() *cobra.Command {
 				return fmt.Errorf("failed to list logins: %w", err)
 			}
 
-			encoder := json.NewEncoder(os.Stdout)
-			encoder.SetIndent("", "  ")
-
-			return encoder.Encode(logins)
+			return cli.Write(logins)
 		},
 	}
 

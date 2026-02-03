@@ -8,6 +8,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/davidsbond/keeper/cmd/account"
 	"github.com/davidsbond/keeper/cmd/auth"
 	"github.com/davidsbond/keeper/cmd/login"
 	"github.com/davidsbond/keeper/cmd/note"
@@ -38,6 +39,7 @@ func main() {
 		auth.Command(),
 		login.Command(),
 		note.Command(),
+		account.Command(),
 	)
 
 	if err := cmd.ExecuteContext(ctx); err != nil {

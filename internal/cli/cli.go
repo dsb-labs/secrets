@@ -3,6 +3,7 @@ package cli
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -77,4 +78,12 @@ func PromptPassword() (string, error) {
 
 	fmt.Println("")
 	return string(pwd), nil
+}
+
+// Write the JSON-encoded value with indentation to os.Stdout.
+func Write(value any) error {
+	encoder := json.NewEncoder(os.Stdout)
+	encoder.SetIndent("", "  ")
+
+	return encoder.Encode(value)
 }

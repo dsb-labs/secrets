@@ -1,9 +1,7 @@
 package login
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -24,10 +22,7 @@ func get() *cobra.Command {
 				return fmt.Errorf("failed to get login: %w", err)
 			}
 
-			encoder := json.NewEncoder(os.Stdout)
-			encoder.SetIndent("", "  ")
-
-			return encoder.Encode(login)
+			return cli.Write(login)
 		},
 	}
 }
