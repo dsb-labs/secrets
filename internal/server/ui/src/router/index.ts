@@ -9,6 +9,11 @@ const router = createRouter({
       path: "/auth/login",
       component: () => import("../views/Login.vue"),
     },
+    {
+      name: "login-list",
+      path: "/secrets/logins",
+      component: () => import("../views/logins/List.vue"),
+    },
   ],
 });
 
@@ -25,7 +30,7 @@ router.beforeEach(async (to, from) => {
     return { name: "login" };
   }
 
-  return to;
+  return true;
 });
 
 export default router;
