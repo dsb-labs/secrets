@@ -26,8 +26,11 @@ type (
 		// database.ErrAccountNotFound if an account record cannot be found.
 		FindByEmail(string) (database.Account, error)
 		// FindByID should return the account record associated with the given identifier, returning
-		// database.ErrAccountNotFound fi an account record cannot be found.
+		// database.ErrAccountNotFound if an account record cannot be found.
 		FindByID(uuid.UUID) (database.Account, error)
+		// Delete should delete the account record associated with the given identifier, returning
+		// database.ErrAccountNotFound if an account record cannot be found.
+		Delete(uuid.UUID) error
 	}
 
 	// The Account type represents an individual user account.
@@ -105,4 +108,22 @@ func (svc *AccountService) Get(id uuid.UUID) (Account, error) {
 		DisplayName: record.DisplayName,
 		Password:    "REDACTED", // Never set this.
 	}, nil
+}
+
+// Delete the account associated with the given identifier. Returns ErrAccountNotFound if the specified account does not
+// exist.
+func (svc *AccountService) Delete(id uuid.UUID) error {
+	err := svc.accounts.Delete(id)
+	switch {
+	case errors.Is(err, database.ErrAccountNotFound):
+		return ErrAccountNotFound
+	case err != nil:
+		return fmt.Errorf("failed to delete account: %w", err)
+	}
+
+	if err = svc.databases.Delete(id); err != nil {
+		return fmt.Errorf("failed to delete user database: %w", err)
+	}
+
+	return nil
 }

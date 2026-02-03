@@ -86,6 +86,20 @@ func (m *Manager) Lock(id uuid.UUID) error {
 	return nil
 }
 
+// Delete a user's encrypted database.
+func (m *Manager) Delete(id uuid.UUID) error {
+	if err := m.Lock(id); err != nil {
+		return err
+	}
+
+	path := filepath.Join(m.dir, id.String())
+	if err := os.RemoveAll(path); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Close all open user databases.
 func (m *Manager) Close() error {
 	errs := make([]error, 0)

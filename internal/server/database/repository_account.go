@@ -114,3 +114,17 @@ func (r *AccountRepository) FindByID(id uuid.UUID) (Account, error) {
 		return account, nil
 	})
 }
+
+// Delete the account associated with the given id. Returns ErrAccountNotFound if the specified account does not
+// exist.
+func (r *AccountRepository) Delete(id uuid.UUID) error {
+	return update(r.db, func(txn *badger.Txn) error {
+		key := Account{ID: id}.key()
+
+		if _, err := txn.Get(key); errors.Is(err, badger.ErrKeyNotFound) {
+			return ErrAccountNotFound
+		}
+
+		return txn.Delete(key)
+	})
+}

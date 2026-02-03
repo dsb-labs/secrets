@@ -27,6 +27,9 @@ type (
 		// Get should return the account associated with the given identifier. Returning service.ErrAccountNotFound
 		// if the account does not exist.
 		Get(uuid.UUID) (service.Account, error)
+		// Delete should delete the account associated with the given identifier. Returning service.ErrAccountNotFound
+		// if the account does not exist.
+		Delete(uuid.UUID) error
 	}
 
 	// The Account type represents an individual user account as returned by the API.
@@ -50,6 +53,7 @@ func NewAccountAPI(accounts AccountService) *AccountAPI {
 func (api *AccountAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/account", api.Create)
 	mux.HandleFunc("GET /api/v1/account", api.Get)
+	mux.HandleFunc("DELETE /api/v1/account", api.Delete)
 }
 
 type (
@@ -142,4 +146,31 @@ func (api *AccountAPI) Get(w http.ResponseWriter, r *http.Request) {
 			Email:       account.Email,
 		},
 	})
+}
+
+type (
+	// The DeleteAccountResponse type represents the response body returned when calling AccountAPI.Delete
+	DeleteAccountResponse struct{}
+)
+
+// Delete handles an inbound HTTP request to delete the caller's account. On success, it responds with
+// an http.StatusOK code and a JSON-encoded DeleteAccountResponse.
+func (api *AccountAPI) Delete(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	err := api.accounts.Delete(tkn.ID())
+	switch {
+	case errors.Is(err, service.ErrAccountNotFound):
+		writeError(w, http.StatusNotFound, "account not found")
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to delete account %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, DeleteAccountResponse{})
 }

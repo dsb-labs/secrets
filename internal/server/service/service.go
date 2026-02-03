@@ -16,6 +16,8 @@ type (
 		Unlock(uuid.UUID, []byte) error
 		// Lock should close the user database associated with the given user identifier.
 		Lock(uuid.UUID) error
+		// Delete should delete the user database associated with the given user identifier.
+		Delete(uuid.UUID) error
 	}
 )
 

@@ -174,3 +174,51 @@ func TestAccountRepository_FindByID(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountRepository_Delete(t *testing.T) {
+	t.Parallel()
+
+	db := testDB(t)
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		ExpectsError bool
+		Setup        func(accounts *database.AccountRepository)
+	}{
+		{
+			Name:         "account does not exist",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+		},
+		{
+			Name: "account exists",
+			ID:   uuid.NameSpaceDNS,
+			Setup: func(accounts *database.AccountRepository) {
+				require.NoError(t, accounts.Create(database.Account{
+					ID:           uuid.NameSpaceDNS,
+					Email:        "test@test.com",
+					PasswordHash: []byte("password"),
+					DisplayName:  "Test McTest",
+				}))
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			accounts := database.NewAccountRepository(db)
+			if tc.Setup != nil {
+				tc.Setup(accounts)
+			}
+
+			err := accounts.Delete(tc.ID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+		})
+	}
+}

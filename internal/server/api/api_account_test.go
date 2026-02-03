@@ -218,3 +218,79 @@ func TestAccountAPI_Get(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountAPI_Delete(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		Expected     api.DeleteAccountResponse
+		Token        token.Token
+		ExpectedCode int
+		ExpectsError bool
+		Setup        func(svc *MockAccountService)
+	}{
+		{
+			Name:         "error if no token",
+			Token:        token.Token{},
+			ExpectsError: true,
+			ExpectedCode: http.StatusUnauthorized,
+		},
+		{
+			Name:         "error if account does not exist",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusNotFound,
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					Delete(mock.Anything).
+					Return(service.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error if delete fails",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusInternalServerError,
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					Delete(mock.Anything).
+					Return(io.EOF).Once()
+			},
+		},
+		{
+			Name:         "success",
+			Token:        token.TestToken(t, "test"),
+			ExpectedCode: http.StatusOK,
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					Delete(mock.Anything).
+					Return(nil).Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			svc := NewMockAccountService(t)
+			if tc.Setup != nil {
+				tc.Setup(svc)
+			}
+
+			w := httptest.NewRecorder()
+			r := request(t, http.MethodDelete, "/api/v1/account", nil).
+				WithContext(token.ToContext(t.Context(), tc.Token))
+
+			api.NewAccountAPI(svc).Delete(w, r)
+
+			require.Equal(t, tc.ExpectedCode, w.Code)
+			if tc.ExpectsError {
+				assertAPIError(t, w)
+				return
+			}
+
+			assertResponse(t, w, tc.Expected)
+		})
+	}
+}

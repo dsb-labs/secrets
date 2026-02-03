@@ -127,6 +127,57 @@ func (_m *MockDatabaseManager) EXPECT() *MockDatabaseManager_Expecter {
 	return &MockDatabaseManager_Expecter{mock: &_m.Mock}
 }
 
+// Delete provides a mock function for the type MockDatabaseManager
+func (_mock *MockDatabaseManager) Delete(uUID uuid.UUID) error {
+	ret := _mock.Called(uUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = returnFunc(uUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockDatabaseManager_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type MockDatabaseManager_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - uUID uuid.UUID
+func (_e *MockDatabaseManager_Expecter) Delete(uUID interface{}) *MockDatabaseManager_Delete_Call {
+	return &MockDatabaseManager_Delete_Call{Call: _e.mock.On("Delete", uUID)}
+}
+
+func (_c *MockDatabaseManager_Delete_Call) Run(run func(uUID uuid.UUID)) *MockDatabaseManager_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockDatabaseManager_Delete_Call) Return(err error) *MockDatabaseManager_Delete_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockDatabaseManager_Delete_Call) RunAndReturn(run func(uUID uuid.UUID) error) *MockDatabaseManager_Delete_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Lock provides a mock function for the type MockDatabaseManager
 func (_mock *MockDatabaseManager) Lock(uUID uuid.UUID) error {
 	ret := _mock.Called(uUID)
@@ -309,6 +360,57 @@ func (_c *MockAccountRepository_Create_Call) Return(err error) *MockAccountRepos
 }
 
 func (_c *MockAccountRepository_Create_Call) RunAndReturn(run func(account database.Account) error) *MockAccountRepository_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Delete provides a mock function for the type MockAccountRepository
+func (_mock *MockAccountRepository) Delete(uUID uuid.UUID) error {
+	ret := _mock.Called(uUID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Delete")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) error); ok {
+		r0 = returnFunc(uUID)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockAccountRepository_Delete_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Delete'
+type MockAccountRepository_Delete_Call struct {
+	*mock.Call
+}
+
+// Delete is a helper method to define mock.On call
+//   - uUID uuid.UUID
+func (_e *MockAccountRepository_Expecter) Delete(uUID interface{}) *MockAccountRepository_Delete_Call {
+	return &MockAccountRepository_Delete_Call{Call: _e.mock.On("Delete", uUID)}
+}
+
+func (_c *MockAccountRepository_Delete_Call) Run(run func(uUID uuid.UUID)) *MockAccountRepository_Delete_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockAccountRepository_Delete_Call) Return(err error) *MockAccountRepository_Delete_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockAccountRepository_Delete_Call) RunAndReturn(run func(uUID uuid.UUID) error) *MockAccountRepository_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
