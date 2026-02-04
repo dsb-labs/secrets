@@ -1,6 +1,6 @@
 <template>
   <div class="flex min-h-screen bg-gray-100 dark:bg-gray-800">
-    <Sidebar />
+    <Sidebar v-if="!route.meta.hideSidebar" />
     <main class="flex-1 overflow-y-auto">
       <Suspense>
         <RouterView />

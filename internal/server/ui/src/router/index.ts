@@ -8,6 +8,9 @@ const router = createRouter({
       name: "login",
       path: "/auth/login",
       component: () => import("../views/Login.vue"),
+      meta: {
+        hideSidebar: true,
+      },
     },
     {
       name: "login-list",

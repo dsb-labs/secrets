@@ -19,7 +19,9 @@
         </li>
       </RouterLink>
     </ul>
-    <RouterView :key="route.fullPath" />
+    <Suspense>
+      <RouterView :key="route.fullPath" />
+    </Suspense>
   </div>
 </template>
 

@@ -1,16 +1,6 @@
 <template>
   <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-      <img
-        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-        alt="Your Company"
-        class="mx-auto h-10 w-auto dark:hidden"
-      />
-      <img
-        src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-        alt="Your Company"
-        class="mx-auto hidden h-10 w-auto dark:block"
-      />
       <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900 dark:text-white">
         Sign in to your account
       </h2>
@@ -36,13 +26,6 @@
         <div>
           <div class="flex items-center justify-between">
             <label for="password" class="block text-sm/6 font-medium text-gray-900 dark:text-gray-100">Password</label>
-            <div class="text-sm">
-              <a
-                href="#"
-                class="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-                >Forgot password?</a
-              >
-            </div>
           </div>
           <div class="mt-2">
             <input
@@ -68,11 +51,10 @@
       </form>
 
       <p class="mt-10 text-center text-sm/6 text-gray-500 dark:text-gray-400">
-        Not a member?
         <a
           href="#"
           class="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-          >Start a 14 day free trial</a
+          >Create an account</a
         >
       </p>
     </div>

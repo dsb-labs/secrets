@@ -33,6 +33,10 @@ type ListResponse = {
   logins: Login[];
 };
 
+type GetResponse = {
+  login: Login;
+};
+
 /**
  * The LoginClient class is an extension of the HTTPClient class that performs API requests for user
  * login records.
@@ -45,5 +49,11 @@ export class LoginClient extends HTTPClient {
     const { logins } = await this.get<ListResponse>("/api/v1/login");
 
     return logins;
+  }
+
+  async find(id: string): Promise<Login> {
+    const { login } = await this.get<GetResponse>(`/api/v1/login/${id}`);
+
+    return login;
   }
 }
