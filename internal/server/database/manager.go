@@ -27,6 +27,7 @@ type (
 		Get(uuid.UUID) (*lifetime.Lifetime[*badger.DB], bool)
 		Put(uuid.UUID, *lifetime.Lifetime[*badger.DB])
 		Range() iter.Seq2[uuid.UUID, *lifetime.Lifetime[*badger.DB]]
+		Remove(uuid.UUID)
 	}
 )
 
@@ -92,6 +93,7 @@ func (m *Manager) Delete(id uuid.UUID) error {
 		return err
 	}
 
+	m.state.Remove(id)
 	path := filepath.Join(m.dir, id.String())
 	if err := os.RemoveAll(path); err != nil {
 		return err
@@ -120,6 +122,8 @@ func (m *Manager) Close() error {
 		if err = db.Close(); err != nil {
 			errs = append(errs, err)
 		}
+
+		lt.Expire()
 	}
 
 	return errors.Join(errs...)
