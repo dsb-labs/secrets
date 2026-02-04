@@ -13,6 +13,14 @@ const router = createRouter({
       name: "login-list",
       path: "/secrets/logins",
       component: () => import("../views/logins/List.vue"),
+      children: [
+        {
+          name: "login-view",
+          props: true,
+          path: "/secrets/logins/:id/view",
+          component: () => import("../views/logins/View.vue"),
+        },
+      ],
     },
   ],
 });

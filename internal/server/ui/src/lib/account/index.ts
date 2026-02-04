@@ -15,10 +15,10 @@ export type Account = {
 };
 
 /**
- * The GetAccountResponse type represents the HTTP response when calling the /api/v1/account
+ * The GetResponse type represents the HTTP response when calling the GET /api/v1/account
  * endpoint.
  */
-type GetAccountResponse = {
+type GetResponse = {
   /**
    * The caller's account details.
    */
@@ -31,10 +31,10 @@ type GetAccountResponse = {
  */
 export class AccountClient extends HTTPClient {
   /**
-   * Find returns the caller's account details.
+   * Find the caller's account details.
    */
   async find(): Promise<Account> {
-    const { account } = await this.get<GetAccountResponse>("/api/v1/account");
+    const { account } = await this.get<GetResponse>("/api/v1/account");
 
     return account;
   }
