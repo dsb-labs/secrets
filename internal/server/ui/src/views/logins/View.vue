@@ -33,7 +33,7 @@
                 <div class="flex w-0 flex-1 items-center">
                   <div class="ml-4 flex min-w-0 flex-1 gap-2">
                     <img alt="favicon" :src="`${domain}/favicon.ico`" class="w-6" />
-                    <a href="{{ domain }}" target="_blank" class="truncate font-medium text-gray-900 dark:text-white">{{
+                    <a :href="domain" target="_blank" class="truncate font-medium text-gray-900 dark:text-white">{{
                       domain
                     }}</a>
                   </div>
