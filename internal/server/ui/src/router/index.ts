@@ -28,6 +28,12 @@ const router = createRouter({
           path: "/secrets/logins/:id/view",
           component: () => import("../views/logins/View.vue"),
         },
+        {
+          name: "login-edit",
+          props: true,
+          path: "/secrets/logins/:id/edit",
+          component: () => import("../views/logins/Edit.vue"),
+        },
       ],
     },
   ],

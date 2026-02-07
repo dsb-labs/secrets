@@ -10,7 +10,7 @@
       >
         <div class="flex min-w-0 gap-x-4">
           <div class="min-w-0 flex-auto">
-            <p class="text-sm/6 font-semibold text-gray-900 dark:text-white">{{ login.username }}</p>
+            <p class="text-sm/6 font-semibold">{{ login.username }}</p>
           </div>
         </div>
         <div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end" v-if="login.domains.length">
