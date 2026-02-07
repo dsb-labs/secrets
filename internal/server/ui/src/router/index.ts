@@ -18,6 +18,11 @@ const router = createRouter({
       component: () => import("../views/logins/List.vue"),
       children: [
         {
+          name: "login-empty",
+          path: "/secrets/logins",
+          component: () => import("../views/logins/Empty.vue"),
+        },
+        {
           name: "login-view",
           props: true,
           path: "/secrets/logins/:id/view",
