@@ -13,6 +13,7 @@ import (
 	"github.com/davidsbond/keeper/cmd/login"
 	"github.com/davidsbond/keeper/cmd/note"
 	"github.com/davidsbond/keeper/cmd/serve"
+	"github.com/davidsbond/keeper/cmd/tool"
 )
 
 //go:generate go tool mockery
@@ -40,6 +41,7 @@ func main() {
 		login.Command(),
 		note.Command(),
 		account.Command(),
+		tool.Command(),
 	)
 
 	if err := cmd.ExecuteContext(ctx); err != nil {
