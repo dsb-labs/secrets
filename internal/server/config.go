@@ -39,6 +39,8 @@ type (
 		// The TTL of individual account databases. Once opened, they will automatically be closed after this
 		// time.
 		TTL time.Duration `toml:"ttl"`
+		// The encryption key for the master database.
+		MasterKey string `toml:"master_key"`
 	}
 
 	// The JWTConfig type contains fields used to configure JWT tokens generated/parsed via the server.
@@ -48,7 +50,7 @@ type (
 		// The TTL of each token.
 		TTL time.Duration `toml:"ttl"`
 		// The key used to sign and verify each JWT token.
-		SigningKey string `toml:"signing-key"`
+		SigningKey string `toml:"signing_key"`
 		// The JWT audience.
 		Audience string `toml:"audience"`
 	}
@@ -62,8 +64,9 @@ func DefaultConfig() Config {
 			Bind: "0.0.0.0:8080",
 		},
 		Database: DatabaseConfig{
-			Path: defaultDatabasePath(),
-			TTL:  time.Hour,
+			Path:      defaultDatabasePath(),
+			TTL:       time.Hour,
+			MasterKey: base64.StdEncoding.EncodeToString(bytes.Repeat([]byte{0}, 32)),
 		},
 		JWT: JWTConfig{
 			Issuer:     "dev",

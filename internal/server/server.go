@@ -40,7 +40,12 @@ func Run(ctx context.Context, config Config) error {
 	databaseManager := database.NewManager(config.Database.Path, databaseState, config.Database.TTL)
 	closers.Add(databaseManager)
 
-	masterDB, err := database.Open(filepath.Join(config.Database.Path, "master"))
+	masterKey, err := base64.StdEncoding.DecodeString(config.Database.MasterKey)
+	if err != nil {
+		return err
+	}
+
+	masterDB, err := database.Open(filepath.Join(config.Database.Path, "master"), masterKey)
 	if err != nil {
 		return err
 	}

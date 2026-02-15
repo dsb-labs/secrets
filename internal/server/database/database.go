@@ -8,10 +8,12 @@ import (
 	"github.com/dgraph-io/badger/v4"
 )
 
-// Open a new badger database at the specified path.
-func Open(path string) (*badger.DB, error) {
+// Open a new badger database at the specified path, encrypting it with the given key.
+func Open(path string, key []byte) (*badger.DB, error) {
 	options := badger.DefaultOptions(path).
+		WithEncryptionKey(key).
 		WithLoggingLevel(badger.ERROR).
+		WithIndexCacheSize(100 << 20).
 		WithNumVersionsToKeep(1)
 
 	return badger.Open(options)

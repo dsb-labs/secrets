@@ -4,9 +4,10 @@ bind = "0.0.0.0:8080"
 [database]
 path = ".data"
 ttl = "1h"
+master_key = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 
 [jwt]
 issuer = "dev"
 audience = "dev"
 ttl = "30m"
-signing-key = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+signing_key = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
