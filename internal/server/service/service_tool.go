@@ -15,6 +15,7 @@ type (
 	ToolService struct {
 		logins RepositoryProvider[LoginRepository]
 		notes  RepositoryProvider[NoteRepository]
+		cards  RepositoryProvider[CardRepository]
 	}
 
 	// The Export type represents a user's entire dataset.
@@ -23,15 +24,18 @@ type (
 		Logins []Login
 		// The user's notes.
 		Notes []Note
+		// The user's payment cards.
+		Cards []Card
 	}
 )
 
-// NewToolService returns a new instance of the ToolService type that will query logins and notes from the given
+// NewToolService returns a new instance of the ToolService type that will query logins, cards and notes from the given
 // repository provider implementations.
-func NewToolService(logins RepositoryProvider[LoginRepository], notes RepositoryProvider[NoteRepository]) *ToolService {
+func NewToolService(logins RepositoryProvider[LoginRepository], notes RepositoryProvider[NoteRepository], cards RepositoryProvider[CardRepository]) *ToolService {
 	return &ToolService{
 		notes:  notes,
 		logins: logins,
+		cards:  cards,
 	}
 }
 
@@ -47,6 +51,14 @@ func (svc *ToolService) Export(userID uuid.UUID) (Export, error) {
 	}
 
 	noteRepo, err := svc.notes.For(userID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return Export{}, ErrReauthenticate
+	case err != nil:
+		return Export{}, fmt.Errorf("failed to get database for user: %w", err)
+	}
+
+	cardRepo, err := svc.cards.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
 		return Export{}, ErrReauthenticate
@@ -70,6 +82,14 @@ func (svc *ToolService) Export(userID uuid.UUID) (Export, error) {
 		return Export{}, fmt.Errorf("failed to list notes: %w", err)
 	}
 
+	cards, err := cardRepo.List()
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return Export{}, ErrReauthenticate
+	case err != nil:
+		return Export{}, fmt.Errorf("failed to list cards: %w", err)
+	}
+
 	return Export{
 		Notes: convert.Slice(notes, func(in database.Note) Note {
 			return Note{
@@ -84,6 +104,16 @@ func (svc *ToolService) Export(userID uuid.UUID) (Export, error) {
 				Username: in.Username,
 				Password: in.Password,
 				Domains:  in.Domains,
+			}
+		}),
+		Cards: convert.Slice(cards, func(in database.Card) Card {
+			return Card{
+				ID:          in.ID,
+				HolderName:  in.HolderName,
+				Number:      in.Number,
+				ExpiryMonth: in.ExpiryMonth,
+				ExpiryYear:  in.ExpiryYear,
+				CVV:         in.CVV,
 			}
 		}),
 	}, nil
