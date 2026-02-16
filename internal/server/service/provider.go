@@ -32,3 +32,9 @@ func LoginRepositoryProvider(db *badger.DB) LoginRepository {
 func NoteRepositoryProvider(db *badger.DB) NoteRepository {
 	return database.NewNoteRepository(db)
 }
+
+// CardRepositoryProvider is a RepositoryProvider implementation that returns a CardRepository implementation
+// backed by a badger database.
+func CardRepositoryProvider(db *badger.DB) CardRepository {
+	return database.NewCardRepository(db)
+}
