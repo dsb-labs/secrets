@@ -74,12 +74,14 @@ func Run(ctx context.Context, config Config) error {
 	accounts := database.NewAccountRepository(masterDB)
 	logins := database.NewRepositoryProvider(databaseState, service.LoginRepositoryProvider)
 	notes := database.NewRepositoryProvider(databaseState, service.NoteRepositoryProvider)
+	cards := database.NewRepositoryProvider(databaseState, service.CardRepositoryProvider)
 
 	api.NewAuthAPI(service.NewAuthService(accounts, databaseManager, tokenGenerator)).Register(mux)
 	api.NewAccountAPI(service.NewAccountService(accounts, databaseManager)).Register(mux)
 	api.NewLoginAPI(service.NewLoginService(logins)).Register(mux)
 	api.NewNoteAPI(service.NewNoteService(notes)).Register(mux)
-	api.NewToolAPI(service.NewToolService(logins, notes)).Register(mux)
+	api.NewToolAPI(service.NewToolService(logins, notes, cards)).Register(mux)
+	api.NewCardAPI(service.NewCardService(cards)).Register(mux)
 
 	// The UI handler must always be registered last as a fall-through for all routes.
 	ui.NewHandler().Register(mux)

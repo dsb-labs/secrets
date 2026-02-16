@@ -1,0 +1,258 @@
+package api
+
+import (
+	"errors"
+	"net/http"
+	"time"
+
+	"github.com/davidsbond/x/convert"
+	"github.com/davidsbond/x/filter"
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+	"github.com/google/uuid"
+
+	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/token"
+)
+
+type (
+	// The CardAPI exposes HTTP endpoints for managing individual payment cards.
+	CardAPI struct {
+		cards CardService
+	}
+
+	// The CardService interface describes types that manage payment cards.
+	CardService interface {
+		// Create should create a new payment card record for the given user id.
+		Create(uuid.UUID, service.Card) error
+		// List should return all cards associated with the given user id.
+		List(uuid.UUID, ...filter.Filter[service.Card]) ([]service.Card, error)
+		// Delete should remove the payment card record associated with the given user and card id. Returning
+		// service.ErrCardNotFound if it does not exist.
+		Delete(uuid.UUID, uuid.UUID) error
+		// Get should return the payment card record associated with the given user and card id. Returning
+		// service.ErrCardNotFound if it does not exist.
+		Get(uuid.UUID, uuid.UUID) (service.Card, error)
+	}
+
+	// The Card type represents a single payment card.
+	Card struct {
+		// The unique identifier of the card.
+		ID string `json:"id"`
+		// The cardholder's name.
+		HolderName string `json:"holderName"`
+		// The card number.
+		Number string `json:"number"`
+		// The month the card expires.
+		ExpiryMonth time.Month `json:"expiryMonth"`
+		// The year the card expires.
+		ExpiryYear int `json:"expiryYear"`
+		// The card's CVV.
+		CVV string `json:"cvv"`
+	}
+)
+
+// NewCardAPI returns a new instance of the CardAPI type that manages payment cards via the
+// given CardService implementation.
+func NewCardAPI(cards CardService) *CardAPI {
+	return &CardAPI{cards: cards}
+}
+
+// Register the HTTP endpoints onto the given http.ServeMux.
+func (api *CardAPI) Register(mux *http.ServeMux) {
+	mux.HandleFunc("POST /api/v1/card", api.Create)
+	mux.HandleFunc("GET /api/v1/card", api.List)
+	mux.HandleFunc("GET /api/v1/card/{id}", api.Get)
+	mux.HandleFunc("DELETE /api/v1/card/{id}", api.Delete)
+}
+
+type (
+	// The CreateCardRequest type represents the request body given when calling CardAPI.Create
+	CreateCardRequest struct {
+		// The cardholder's name.
+		HolderName string `json:"holderName"`
+		// The card number.
+		Number string `json:"number"`
+		// The month the card expires.
+		ExpiryMonth time.Month `json:"expiryMonth"`
+		// The year the card expires.
+		ExpiryYear int `json:"expiryYear"`
+		// The card's CVV.
+		CVV string `json:"cvv"`
+	}
+
+	// The CreateCardResponse type represents the response body returned when calling CardAPI.Create
+	CreateCardResponse struct{}
+)
+
+// Validate the request.
+func (r CreateCardRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Number, validation.Required, is.CreditCard),
+		validation.Field(&r.ExpiryMonth, validation.Required, validation.Min(time.January), validation.Max(time.December)),
+		validation.Field(&r.ExpiryYear, validation.Required),
+		validation.Field(&r.CVV, validation.Required, validation.Length(3, 4)),
+	)
+}
+
+// Create handles an inbound HTTP request to store a new payment card record for a user. On success, it responds with
+// an http.StatusCreated code and a JSON-encoded CreateCardResponse.
+func (api *CardAPI) Create(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	request, err := decode[CreateCardRequest](r.Body)
+	if err != nil {
+		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)
+		return
+	}
+
+	card := service.Card{
+		ID:          uuid.New(),
+		HolderName:  request.HolderName,
+		Number:      request.Number,
+		ExpiryMonth: request.ExpiryMonth,
+		ExpiryYear:  request.ExpiryYear,
+		CVV:         request.CVV,
+	}
+
+	err = api.cards.Create(tkn.ID(), card)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to create card: %v", err)
+		return
+	}
+
+	write(w, http.StatusCreated, CreateCardResponse{})
+}
+
+type (
+	// The ListCardsResponse type represents the response body returned when calling CardAPI.List
+	ListCardsResponse struct {
+		// The cards stored for the account.
+		Cards []Card `json:"cards"`
+	}
+)
+
+// List handles an inbound HTTP request to list all payment card records for a user. On success, it responds with
+// an http.StatusOK code and a JSON-encoded ListCardsResponse.
+func (api *CardAPI) List(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	results, err := api.cards.List(tkn.ID())
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to list cards: %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, ListCardsResponse{
+		Cards: convert.Slice(results, func(in service.Card) Card {
+			return Card{
+				ID:          in.ID.String(),
+				HolderName:  in.HolderName,
+				Number:      in.Number,
+				ExpiryMonth: in.ExpiryMonth,
+				ExpiryYear:  in.ExpiryYear,
+				CVV:         in.CVV,
+			}
+		}),
+	})
+}
+
+type (
+	// The DeleteCardResponse type represents the response body returned when calling CardAPI.Delete
+	DeleteCardResponse struct{}
+)
+
+// Delete handles an inbound HTTP request to delete a payment card record for a user. On success, it responds with
+// an http.StatusOK code and a JSON-encoded DeleteCardResponse.
+func (api *CardAPI) Delete(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	cardID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErrorf(w, http.StatusBadRequest, "failed to parse card id: %v", err)
+		return
+	}
+
+	err = api.cards.Delete(tkn.ID(), cardID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	case errors.Is(err, service.ErrCardNotFound):
+		writeErrorf(w, http.StatusNotFound, "card %q does not exist", cardID)
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to delete card: %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, DeleteCardResponse{})
+}
+
+type (
+	// The GetCardResponse type represents the response body returned when calling CardAPI.Get
+	GetCardResponse struct {
+		// The requested card details.
+		Card Card `json:"card"`
+	}
+)
+
+// Get handles an inbound HTTP request to query a payment card record for a user. On success, it responds with
+// an http.StatusOK code and a JSON-encoded GetCardResponse.
+func (api *CardAPI) Get(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	cardID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		writeErrorf(w, http.StatusBadRequest, "failed to parse card id: %v", err)
+		return
+	}
+
+	result, err := api.cards.Get(tkn.ID(), cardID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	case errors.Is(err, service.ErrCardNotFound):
+		writeErrorf(w, http.StatusNotFound, "card %q does not exist", cardID)
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to get card: %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, GetCardResponse{
+		Card: Card{
+			ID:          result.ID.String(),
+			HolderName:  result.HolderName,
+			Number:      result.Number,
+			ExpiryMonth: result.ExpiryMonth,
+			ExpiryYear:  result.ExpiryYear,
+			CVV:         result.CVV,
+		},
+	})
+}

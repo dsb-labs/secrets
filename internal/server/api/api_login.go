@@ -33,7 +33,7 @@ type (
 		Get(uuid.UUID, uuid.UUID) (service.Login, error)
 	}
 
-	// The Login type represents a single password.
+	// The Login type represents a single username/password combination.
 	Login struct {
 		// The unique identifier of the login.
 		ID string `json:"id"`
