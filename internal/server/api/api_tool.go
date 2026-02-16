@@ -44,6 +44,8 @@ type (
 		Logins []Login `json:"logins"`
 		// The user's notes.
 		Notes []Note `json:"notes"`
+		// The user's payment cards.
+		Cards []Card `json:"cards"`
 	}
 )
 
@@ -80,6 +82,16 @@ func (api *ToolAPI) Export(w http.ResponseWriter, r *http.Request) {
 				ID:      in.ID.String(),
 				Name:    in.Name,
 				Content: in.Content,
+			}
+		}),
+		Cards: convert.Slice(export.Cards, func(in service.Card) Card {
+			return Card{
+				ID:          in.ID.String(),
+				HolderName:  in.HolderName,
+				Number:      in.Number,
+				ExpiryMonth: in.ExpiryMonth,
+				ExpiryYear:  in.ExpiryYear,
+				CVV:         in.CVV,
 			}
 		}),
 	})

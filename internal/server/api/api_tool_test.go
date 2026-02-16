@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -74,6 +75,16 @@ func TestToolAPI_Export(t *testing.T) {
 						Content: "test",
 					},
 				},
+				Cards: []api.Card{
+					{
+						ID:          uuid.NameSpaceOID.String(),
+						HolderName:  "test",
+						Number:      "4111 1111 1111 1111",
+						ExpiryMonth: time.January,
+						ExpiryYear:  2025,
+						CVV:         "123",
+					},
+				},
 			},
 			Setup: func(svc *MockToolService) {
 				expected := service.Export{
@@ -90,6 +101,16 @@ func TestToolAPI_Export(t *testing.T) {
 							ID:      uuid.NameSpaceURL,
 							Name:    "test",
 							Content: "test",
+						},
+					},
+					Cards: []service.Card{
+						{
+							ID:          uuid.NameSpaceOID,
+							HolderName:  "test",
+							Number:      "4111 1111 1111 1111",
+							ExpiryMonth: time.January,
+							ExpiryYear:  2025,
+							CVV:         "123",
 						},
 					},
 				}
