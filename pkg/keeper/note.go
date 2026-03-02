@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/davidsbond/x/convert"
+
 	"github.com/davidsbond/keeper/internal/server/api"
 )
 
@@ -55,16 +57,13 @@ func (c *Client) ListNotes(ctx context.Context, query string) ([]Note, error) {
 		return nil, err
 	}
 
-	notes := make([]Note, len(response.Notes))
-	for i, note := range response.Notes {
-		notes[i] = Note{
-			ID:      note.ID,
-			Name:    note.Name,
-			Content: note.Content,
+	return convert.Slice(response.Notes, func(in api.Note) Note {
+		return Note{
+			ID:      in.ID,
+			Name:    in.Name,
+			Content: in.Content,
 		}
-	}
-
-	return notes, nil
+	}), nil
 }
 
 // DeleteNote attempts to delete the note record with the specified id for the authenticated user.

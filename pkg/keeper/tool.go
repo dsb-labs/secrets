@@ -16,6 +16,8 @@ type (
 		Logins []Login
 		// The user's notes.
 		Notes []Note
+		// The user's payment cards.
+		Cards []Card
 	}
 )
 
@@ -45,6 +47,16 @@ func (c *Client) Export(ctx context.Context) (Export, error) {
 				ID:      note.ID,
 				Name:    note.Name,
 				Content: note.Content,
+			}
+		}),
+		Cards: convert.Slice(response.Cards, func(card api.Card) Card {
+			return Card{
+				ID:          card.ID,
+				HolderName:  card.HolderName,
+				Number:      card.Number,
+				ExpiryMonth: card.ExpiryMonth,
+				ExpiryYear:  card.ExpiryYear,
+				CVV:         card.CVV,
 			}
 		}),
 	}, nil

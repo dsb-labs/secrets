@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/davidsbond/x/convert"
+
 	"github.com/davidsbond/keeper/internal/server/api"
 )
 
@@ -58,17 +60,14 @@ func (c *Client) ListLogins(ctx context.Context, domain string) ([]Login, error)
 		return nil, err
 	}
 
-	logins := make([]Login, len(response.Logins))
-	for i, login := range response.Logins {
-		logins[i] = Login{
-			ID:       login.ID,
-			Username: login.Username,
-			Password: login.Password,
-			Domains:  login.Domains,
+	return convert.Slice(response.Logins, func(in api.Login) Login {
+		return Login{
+			ID:       in.ID,
+			Username: in.Username,
+			Password: in.Password,
+			Domains:  in.Domains,
 		}
-	}
-
-	return logins, nil
+	}), nil
 }
 
 // DeleteLogin attempts to delete the login record with the specified id for the authenticated user.
