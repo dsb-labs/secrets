@@ -1,6 +1,7 @@
 package account
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/davidsbond/x/envvar"
@@ -22,9 +23,18 @@ func create() *cobra.Command {
 			)
 
 			if password = envvar.String("KEEPER_PASSWORD", ""); password == "" {
-				password, err = cli.PromptPassword()
+				password, err = cli.PromptPassword("Enter password")
 				if err != nil {
 					return fmt.Errorf("failed to read password: %w", err)
+				}
+
+				confirm, err := cli.PromptPassword("Confirm password")
+				if err != nil {
+					return fmt.Errorf("failed to read password: %w", err)
+				}
+
+				if password != confirm {
+					return errors.New("passwords do not match")
 				}
 			}
 

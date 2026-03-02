@@ -22,7 +22,7 @@ func create() *cobra.Command {
 			ctx := cmd.Context()
 			client := cli.ClientFromContext(ctx)
 
-			password, err := cli.PromptPassword()
+			password, err := cli.PromptPassword("Enter password")
 			if err != nil {
 				return fmt.Errorf("failed to read password: %w", err)
 			}

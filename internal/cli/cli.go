@@ -69,8 +69,8 @@ func ClientFromContext(ctx context.Context) *keeper.Client {
 
 // PromptPassword creates an "enter password" prompt on stdout/stdin that masks the input text, returning the entered
 // password as a string.
-func PromptPassword() (string, error) {
-	fmt.Print("Enter password: ")
+func PromptPassword(prompt string) (string, error) {
+	fmt.Print(prompt, ": ")
 	pwd, err := term.ReadPassword(int(os.Stdin.Fd()))
 	if err != nil {
 		return "", err
