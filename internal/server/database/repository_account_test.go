@@ -222,3 +222,65 @@ func TestAccountRepository_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountRepository_Update(t *testing.T) {
+	t.Parallel()
+
+	db := testDB(t)
+
+	tt := []struct {
+		Name         string
+		Setup        func(accounts *database.AccountRepository)
+		Expected     database.Account
+		ExpectsError bool
+	}{
+		{
+			Name: "updates account",
+			Setup: func(accounts *database.AccountRepository) {
+				require.NoError(t, accounts.Create(database.Account{
+					ID:           uuid.NameSpaceDNS,
+					Email:        "test@test.com",
+					PasswordHash: []byte("old"),
+					DisplayName:  "old",
+				}))
+			},
+			Expected: database.Account{
+				ID:           uuid.NameSpaceDNS,
+				Email:        "test@test.com",
+				PasswordHash: []byte("new"),
+				DisplayName:  "new",
+			},
+		},
+		{
+			Name:         "error if account does not exist",
+			ExpectsError: true,
+			Expected: database.Account{
+				ID:           uuid.NameSpaceURL,
+				Email:        "test@test.com",
+				PasswordHash: []byte("new"),
+				DisplayName:  "new",
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			accounts := database.NewAccountRepository(db)
+			if tc.Setup != nil {
+				tc.Setup(accounts)
+			}
+
+			err := accounts.Update(tc.Expected)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+
+			actual, err := accounts.FindByID(tc.Expected.ID)
+			require.NoError(t, err)
+			assert.EqualValues(t, tc.Expected, actual)
+		})
+	}
+}

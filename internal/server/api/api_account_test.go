@@ -294,3 +294,140 @@ func TestAccountAPI_Delete(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountAPI_ChangePassword(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		Token        token.Token
+		Request      api.UpdatePasswordRequest
+		Expected     api.UpdatePasswordResponse
+		ExpectedCode int
+		ExpectsError bool
+		Setup        func(svc *MockAccountService)
+	}{
+		{
+			Name:         "error if no token",
+			Token:        token.Token{},
+			ExpectsError: true,
+			ExpectedCode: http.StatusUnauthorized,
+		},
+		{
+			Name:         "error if missing old password",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.UpdatePasswordRequest{
+				NewPassword: "test",
+				OldPassword: "",
+			},
+		},
+		{
+			Name:         "error if missing new password",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.UpdatePasswordRequest{
+				NewPassword: "",
+				OldPassword: "test",
+			},
+		},
+		{
+			Name:         "error if old password matches new password",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.UpdatePasswordRequest{
+				NewPassword: "test",
+				OldPassword: "test",
+			},
+		},
+		{
+			Name:         "error if account does not exist",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusNotFound,
+			Request: api.UpdatePasswordRequest{
+				NewPassword: "new",
+				OldPassword: "old",
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					ChangePassword(mock.Anything, "old", "new").
+					Return(service.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error if old password is incorrect",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.UpdatePasswordRequest{
+				NewPassword: "new",
+				OldPassword: "old",
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					ChangePassword(mock.Anything, "old", "new").
+					Return(service.ErrInvalidPassword).
+					Once()
+			},
+		},
+		{
+			Name:         "error changing password",
+			Token:        token.TestToken(t, "test"),
+			ExpectsError: true,
+			ExpectedCode: http.StatusInternalServerError,
+			Request: api.UpdatePasswordRequest{
+				NewPassword: "new",
+				OldPassword: "old",
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					ChangePassword(mock.Anything, "old", "new").
+					Return(io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "success",
+			Token:        token.TestToken(t, "test"),
+			ExpectedCode: http.StatusOK,
+			Request: api.UpdatePasswordRequest{
+				NewPassword: "new",
+				OldPassword: "old",
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					ChangePassword(mock.Anything, "old", "new").
+					Return(nil).
+					Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			svc := NewMockAccountService(t)
+			if tc.Setup != nil {
+				tc.Setup(svc)
+			}
+
+			w := httptest.NewRecorder()
+			r := request(t, http.MethodPut, "/api/v1/account/password", tc.Request).
+				WithContext(token.ToContext(t.Context(), tc.Token))
+
+			api.NewAccountAPI(svc).UpdatePassword(w, r)
+
+			require.Equal(t, tc.ExpectedCode, w.Code)
+			if tc.ExpectsError {
+				assertAPIError(t, w)
+				return
+			}
+
+			assertResponse(t, w, tc.Expected)
+		})
+	}
+}

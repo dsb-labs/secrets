@@ -229,6 +229,69 @@ func (_c *MockDatabaseManager_Lock_Call) RunAndReturn(run func(uUID uuid.UUID) e
 	return _c
 }
 
+// RotateKey provides a mock function for the type MockDatabaseManager
+func (_mock *MockDatabaseManager) RotateKey(uUID uuid.UUID, bytes []byte, bytes1 []byte) error {
+	ret := _mock.Called(uUID, bytes, bytes1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RotateKey")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, []byte, []byte) error); ok {
+		r0 = returnFunc(uUID, bytes, bytes1)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockDatabaseManager_RotateKey_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RotateKey'
+type MockDatabaseManager_RotateKey_Call struct {
+	*mock.Call
+}
+
+// RotateKey is a helper method to define mock.On call
+//   - uUID uuid.UUID
+//   - bytes []byte
+//   - bytes1 []byte
+func (_e *MockDatabaseManager_Expecter) RotateKey(uUID interface{}, bytes interface{}, bytes1 interface{}) *MockDatabaseManager_RotateKey_Call {
+	return &MockDatabaseManager_RotateKey_Call{Call: _e.mock.On("RotateKey", uUID, bytes, bytes1)}
+}
+
+func (_c *MockDatabaseManager_RotateKey_Call) Run(run func(uUID uuid.UUID, bytes []byte, bytes1 []byte)) *MockDatabaseManager_RotateKey_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		var arg1 []byte
+		if args[1] != nil {
+			arg1 = args[1].([]byte)
+		}
+		var arg2 []byte
+		if args[2] != nil {
+			arg2 = args[2].([]byte)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockDatabaseManager_RotateKey_Call) Return(err error) *MockDatabaseManager_RotateKey_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockDatabaseManager_RotateKey_Call) RunAndReturn(run func(uUID uuid.UUID, bytes []byte, bytes1 []byte) error) *MockDatabaseManager_RotateKey_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Unlock provides a mock function for the type MockDatabaseManager
 func (_mock *MockDatabaseManager) Unlock(uUID uuid.UUID, bytes []byte) error {
 	ret := _mock.Called(uUID, bytes)
@@ -531,6 +594,57 @@ func (_c *MockAccountRepository_FindByID_Call) Return(account database.Account, 
 }
 
 func (_c *MockAccountRepository_FindByID_Call) RunAndReturn(run func(uUID uuid.UUID) (database.Account, error)) *MockAccountRepository_FindByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Update provides a mock function for the type MockAccountRepository
+func (_mock *MockAccountRepository) Update(account database.Account) error {
+	ret := _mock.Called(account)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Update")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(database.Account) error); ok {
+		r0 = returnFunc(account)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockAccountRepository_Update_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Update'
+type MockAccountRepository_Update_Call struct {
+	*mock.Call
+}
+
+// Update is a helper method to define mock.On call
+//   - account database.Account
+func (_e *MockAccountRepository_Expecter) Update(account interface{}) *MockAccountRepository_Update_Call {
+	return &MockAccountRepository_Update_Call{Call: _e.mock.On("Update", account)}
+}
+
+func (_c *MockAccountRepository_Update_Call) Run(run func(account database.Account)) *MockAccountRepository_Update_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 database.Account
+		if args[0] != nil {
+			arg0 = args[0].(database.Account)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockAccountRepository_Update_Call) Return(err error) *MockAccountRepository_Update_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockAccountRepository_Update_Call) RunAndReturn(run func(account database.Account) error) *MockAccountRepository_Update_Call {
 	_c.Call.Return(run)
 	return _c
 }

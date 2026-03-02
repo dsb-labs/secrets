@@ -31,6 +31,9 @@ type (
 		// Delete should delete the account record associated with the given identifier, returning
 		// database.ErrAccountNotFound if an account record cannot be found.
 		Delete(uuid.UUID) error
+		// Update should replace the existing account record with the provided new one, returning database.ErrAccountNotFound
+		// if an account does not exist with the matching identifier.
+		Update(database.Account) error
 	}
 
 	// The Account type represents an individual user account.
@@ -123,6 +126,53 @@ func (svc *AccountService) Delete(id uuid.UUID) error {
 
 	if err = svc.databases.Delete(id); err != nil {
 		return fmt.Errorf("failed to delete user database: %w", err)
+	}
+
+	return nil
+}
+
+// ChangePassword attempts to replace the user's current password with the new one. This causes the derived key that
+// encrypts the user's personal database to change, effectively logging them out on all platforms in which they
+// are authenticated. Returns ErrAccountNotFound if the specified user does not exist or ErrInvalidPassword if the
+// provided old password does not match that of the user's.
+func (svc *AccountService) ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) error {
+	account, err := svc.accounts.FindByID(userID)
+	switch {
+	case errors.Is(err, database.ErrAccountNotFound):
+		return ErrAccountNotFound
+	case err != nil:
+		return fmt.Errorf("failed to query account: %w", err)
+	}
+
+	err = bcrypt.CompareHashAndPassword(account.PasswordHash, []byte(oldPassword))
+	switch {
+	case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+		return ErrInvalidPassword
+	case err != nil:
+		return fmt.Errorf("failed to compare password: %w", err)
+	}
+
+	account.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	// TODO(davidsbond): this feels a little fragile, we probably need some undo/redo mechanism here to avoid a
+	// situation where the account's password hash has been changed but the key rotation failed.
+	err = svc.accounts.Update(account)
+	switch {
+	case errors.Is(err, database.ErrAccountNotFound):
+		return ErrAccountNotFound
+	case err != nil:
+		return fmt.Errorf("failed to update account: %w", err)
+	}
+
+	salt := account.ID[:]
+	oldKey := deriveKey(oldPassword, salt)
+	newKey := deriveKey(newPassword, salt)
+
+	if err = svc.databases.RotateKey(account.ID, oldKey, newKey); err != nil {
+		return fmt.Errorf("failed to rotate encryption key: %w", err)
 	}
 
 	return nil

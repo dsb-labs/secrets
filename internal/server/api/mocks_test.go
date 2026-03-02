@@ -110,6 +110,69 @@ func (_m *MockAccountService) EXPECT() *MockAccountService_Expecter {
 	return &MockAccountService_Expecter{mock: &_m.Mock}
 }
 
+// ChangePassword provides a mock function for the type MockAccountService
+func (_mock *MockAccountService) ChangePassword(uUID uuid.UUID, s string, s1 string) error {
+	ret := _mock.Called(uUID, s, s1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ChangePassword")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, string, string) error); ok {
+		r0 = returnFunc(uUID, s, s1)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockAccountService_ChangePassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangePassword'
+type MockAccountService_ChangePassword_Call struct {
+	*mock.Call
+}
+
+// ChangePassword is a helper method to define mock.On call
+//   - uUID uuid.UUID
+//   - s string
+//   - s1 string
+func (_e *MockAccountService_Expecter) ChangePassword(uUID interface{}, s interface{}, s1 interface{}) *MockAccountService_ChangePassword_Call {
+	return &MockAccountService_ChangePassword_Call{Call: _e.mock.On("ChangePassword", uUID, s, s1)}
+}
+
+func (_c *MockAccountService_ChangePassword_Call) Run(run func(uUID uuid.UUID, s string, s1 string)) *MockAccountService_ChangePassword_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		var arg1 string
+		if args[1] != nil {
+			arg1 = args[1].(string)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockAccountService_ChangePassword_Call) Return(err error) *MockAccountService_ChangePassword_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockAccountService_ChangePassword_Call) RunAndReturn(run func(uUID uuid.UUID, s string, s1 string) error) *MockAccountService_ChangePassword_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Create provides a mock function for the type MockAccountService
 func (_mock *MockAccountService) Create(account service.Account) ([]byte, error) {
 	ret := _mock.Called(account)

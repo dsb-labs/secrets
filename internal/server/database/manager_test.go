@@ -67,6 +67,15 @@ func TestManager(t *testing.T) {
 		require.False(t, lt.Expired())
 	})
 
+	t.Run("updates existing database's key", func(t *testing.T) {
+		newKey := bytes.Repeat([]byte{1}, 32)
+		err := manager.RotateKey(uuid.NameSpaceDNS, key, newKey)
+		require.NoError(t, err)
+
+		err = manager.Unlock(uuid.NameSpaceDNS, newKey)
+		require.NoError(t, err)
+	})
+
 	t.Run("deletes existing database", func(t *testing.T) {
 		require.NoError(t, manager.Delete(uuid.NameSpaceDNS))
 

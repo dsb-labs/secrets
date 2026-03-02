@@ -18,6 +18,9 @@ type (
 		Lock(uuid.UUID) error
 		// Delete should delete the user database associated with the given user identifier.
 		Delete(uuid.UUID) error
+		// RotateKey should replace the first encryption key with the second encryption key for the
+		// given user identifier.
+		RotateKey(uuid.UUID, []byte, []byte) error
 	}
 )
 

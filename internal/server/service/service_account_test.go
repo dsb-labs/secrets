@@ -160,3 +160,267 @@ func TestAccountService_Get(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountService_Delete(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		ExpectsError bool
+		Setup        func(accounts *MockAccountRepository, databases *MockDatabaseManager)
+	}{
+		{
+			Name:         "error if account does not exist",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					Delete(uuid.NameSpaceDNS).
+					Return(database.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error deleting account",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					Delete(uuid.NameSpaceDNS).
+					Return(io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "error deleting database",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					Delete(uuid.NameSpaceDNS).
+					Return(nil).
+					Once()
+
+				databases.EXPECT().
+					Delete(uuid.NameSpaceDNS).
+					Return(io.EOF).
+					Once()
+			},
+		},
+		{
+			Name: "success",
+			ID:   uuid.NameSpaceDNS,
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					Delete(uuid.NameSpaceDNS).
+					Return(nil).
+					Once()
+
+				databases.EXPECT().
+					Delete(uuid.NameSpaceDNS).
+					Return(nil).
+					Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			accounts := NewMockAccountRepository(t)
+			databases := NewMockDatabaseManager(t)
+
+			if tc.Setup != nil {
+				tc.Setup(accounts, databases)
+			}
+
+			svc := service.NewAccountService(accounts, databases)
+			err := svc.Delete(tc.ID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+		})
+	}
+}
+
+func TestAccountService_ChangePassword(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		OldPassword  string
+		NewPassword  string
+		ExpectsError bool
+		Setup        func(accounts *MockAccountRepository, databases *MockDatabaseManager)
+	}{
+		{
+			Name:         "error if account does not exist",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			OldPassword:  "test",
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(database.Account{}, database.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error querying account",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			OldPassword:  "test",
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(database.Account{}, io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "old password does not match",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			OldPassword:  "test",
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:           uuid.NameSpaceDNS,
+					PasswordHash: mustBcrypt(t, "boop"),
+				}
+
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(account, nil).
+					Once()
+			},
+		},
+		{
+			Name:         "account not found when updating",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			OldPassword:  "test",
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:           uuid.NameSpaceDNS,
+					PasswordHash: mustBcrypt(t, "test"),
+				}
+
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(account, nil).
+					Once()
+
+				accounts.EXPECT().
+					Update(mock.Anything).
+					Return(database.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error when updating account",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			OldPassword:  "test",
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:           uuid.NameSpaceDNS,
+					PasswordHash: mustBcrypt(t, "test"),
+				}
+
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(account, nil).
+					Once()
+
+				accounts.EXPECT().
+					Update(mock.Anything).
+					Return(io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "error when rotating key",
+			ID:           uuid.NameSpaceDNS,
+			ExpectsError: true,
+			OldPassword:  "test",
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:           uuid.NameSpaceDNS,
+					PasswordHash: mustBcrypt(t, "test"),
+				}
+
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(account, nil).
+					Once()
+
+				accounts.EXPECT().
+					Update(mock.Anything).
+					Return(nil).
+					Once()
+
+				databases.EXPECT().
+					RotateKey(uuid.NameSpaceDNS, mock.Anything, mock.Anything).
+					Return(io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:        "success",
+			ID:          uuid.NameSpaceDNS,
+			OldPassword: "test",
+			NewPassword: "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:           uuid.NameSpaceDNS,
+					PasswordHash: mustBcrypt(t, "test"),
+				}
+
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(account, nil).
+					Once()
+
+				accounts.EXPECT().
+					Update(mock.Anything).
+					Return(nil).
+					Once()
+
+				databases.EXPECT().
+					RotateKey(uuid.NameSpaceDNS, mock.Anything, mock.Anything).
+					Return(nil).
+					Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			accounts := NewMockAccountRepository(t)
+			databases := NewMockDatabaseManager(t)
+
+			if tc.Setup != nil {
+				tc.Setup(accounts, databases)
+			}
+
+			svc := service.NewAccountService(accounts, databases)
+			err := svc.ChangePassword(tc.ID, tc.OldPassword, tc.NewPassword)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+		})
+	}
+}

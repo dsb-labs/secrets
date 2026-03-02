@@ -102,6 +102,42 @@ func (m *Manager) Delete(id uuid.UUID) error {
 	return nil
 }
 
+// RotateKey updates the master encryption key used to encrypt individual user databases.
+func (m *Manager) RotateKey(id uuid.UUID, oldKey, newKey []byte) error {
+	// The badger database must be offline to perform a key rotation. This will effectively force a logout for all
+	// devices the user is authenticated on when they change their password.
+	lt, ok := m.state.Get(id)
+	if ok && !lt.Expired() {
+		lt.Expire()
+	}
+
+	// The path may not exist yet if the user has never logged in before. So we can just do nothing here.
+	path := filepath.Join(m.dir, id.String())
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil
+	}
+
+	opt := badger.KeyRegistryOptions{
+		Dir:                           path,
+		ReadOnly:                      true,
+		EncryptionKey:                 oldKey,
+		EncryptionKeyRotationDuration: 10 * 24 * time.Hour,
+	}
+
+	registry, err := badger.OpenKeyRegistry(opt)
+	if err != nil {
+		return err
+	}
+	defer registry.Close()
+
+	opt.EncryptionKey = newKey
+	if err = badger.WriteKeyRegistry(registry, opt); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Close all open user databases.
 func (m *Manager) Close() error {
 	errs := make([]error, 0)

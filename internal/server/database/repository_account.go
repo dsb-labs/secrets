@@ -128,3 +128,20 @@ func (r *AccountRepository) Delete(id uuid.UUID) error {
 		return txn.Delete(key)
 	})
 }
+
+// Update an account record with the one provided. Returns ErrAccountNotFound if an account with the same identifier
+// does not exist.
+func (r *AccountRepository) Update(account Account) error {
+	if _, err := r.FindByID(account.ID); err != nil {
+		return err
+	}
+
+	data, err := json.Marshal(account)
+	if err != nil {
+		return err
+	}
+
+	return update(r.db, func(txn *badger.Txn) error {
+		return txn.Set(account.key(), data)
+	})
+}

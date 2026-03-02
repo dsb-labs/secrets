@@ -54,8 +54,12 @@ func (svc *AuthService) Login(email, password string) (token.Token, error) {
 		return token.Token{}, fmt.Errorf("failed to find account %q: %w", email, err)
 	}
 
-	if err = bcrypt.CompareHashAndPassword(account.PasswordHash, []byte(password)); err != nil {
+	err = bcrypt.CompareHashAndPassword(account.PasswordHash, []byte(password))
+	switch {
+	case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
 		return token.Token{}, ErrInvalidPassword
+	case err != nil:
+		return token.Token{}, fmt.Errorf("failed to compare password: %w", err)
 	}
 
 	key := deriveKey(password, account.ID[:])

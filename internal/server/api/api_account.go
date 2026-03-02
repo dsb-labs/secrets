@@ -30,6 +30,9 @@ type (
 		// Delete should delete the account associated with the given identifier. Returning service.ErrAccountNotFound
 		// if the account does not exist.
 		Delete(uuid.UUID) error
+		// ChangePassword should update the account's password to the new value if the old password provided is
+		// correct.
+		ChangePassword(uuid.UUID, string, string) error
 	}
 
 	// The Account type represents an individual user account as returned by the API.
@@ -54,6 +57,7 @@ func (api *AccountAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/account", api.Create)
 	mux.HandleFunc("GET /api/v1/account", api.Get)
 	mux.HandleFunc("DELETE /api/v1/account", api.Delete)
+	mux.HandleFunc("PUT /api/v1/account/password", api.UpdatePassword)
 }
 
 type (
@@ -173,4 +177,56 @@ func (api *AccountAPI) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	write(w, http.StatusOK, DeleteAccountResponse{})
+}
+
+type (
+	// The UpdatePasswordRequest type represents the request body given when calling AccountAPI.UpdatePassword.
+	UpdatePasswordRequest struct {
+		// The user's current password.
+		OldPassword string `json:"oldPassword"`
+		// The user's new password.
+		NewPassword string `json:"newPassword"`
+	}
+
+	// The UpdatePasswordResponse type represents the response body returned when calling AccountAPI.UpdatePassword
+	UpdatePasswordResponse struct{}
+)
+
+// Validate the request.
+func (r UpdatePasswordRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.OldPassword, validation.Required),
+		validation.Field(&r.NewPassword, validation.Required, validation.NotIn(r.OldPassword)),
+	)
+}
+
+// UpdatePassword handles an inbound HTTP request to change the caller's password. On success, it responds with
+// an http.StatusOK code and a JSON-encoded UpdatePasswordResponse.
+func (api *AccountAPI) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	tkn := token.FromContext(r.Context())
+	if !tkn.Valid() {
+		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+		return
+	}
+
+	request, err := decode[UpdatePasswordRequest](r.Body)
+	if err != nil {
+		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)
+		return
+	}
+
+	err = api.accounts.ChangePassword(tkn.ID(), request.OldPassword, request.NewPassword)
+	switch {
+	case errors.Is(err, service.ErrAccountNotFound):
+		writeError(w, http.StatusNotFound, "account not found")
+		return
+	case errors.Is(err, service.ErrInvalidPassword):
+		writeError(w, http.StatusBadRequest, "invalid password for account")
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to update password: %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, UpdatePasswordResponse{})
 }
