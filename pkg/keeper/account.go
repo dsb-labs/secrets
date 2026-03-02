@@ -54,3 +54,21 @@ func (c *Client) GetAccount(ctx context.Context) (Account, error) {
 		DisplayName: response.Account.DisplayName,
 	}, nil
 }
+
+// ChangePassword attempts to update the caller's password to the new one. The old password must match the user's
+// existing password.
+func (c *Client) ChangePassword(ctx context.Context, oldPassword, newPassword string) error {
+	request, err := c.buildRequest(ctx, http.MethodPut, "/api/v1/account/password", api.UpdatePasswordRequest{
+		OldPassword: oldPassword,
+		NewPassword: newPassword,
+	})
+	if err != nil {
+		return err
+	}
+
+	if _, err = doRequest[api.UpdatePasswordResponse](c.client, request); err != nil {
+		return err
+	}
+
+	return nil
+}

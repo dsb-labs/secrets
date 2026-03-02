@@ -30,6 +30,7 @@ func Command() *cobra.Command {
 	cmd.AddCommand(
 		create(),
 		info(),
+		changePassword(),
 	)
 
 	return cmd
