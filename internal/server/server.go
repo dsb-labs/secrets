@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/davidsbond/x/closer"
 	"github.com/davidsbond/x/lifetime"
 	"github.com/davidsbond/x/syncmap"
@@ -21,7 +22,8 @@ import (
 	"github.com/davidsbond/keeper/internal/server/database"
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/server/ui"
+	"github.com/davidsbond/keeper/internal/server/ui/layout"
+	"github.com/davidsbond/keeper/internal/server/ui/view"
 )
 
 // Run the server using the provided configuration. This function blocks until the provided context is cancelled or
@@ -83,8 +85,7 @@ func Run(ctx context.Context, config Config) error {
 	api.NewToolAPI(service.NewToolService(logins, notes, cards)).Register(mux)
 	api.NewCardAPI(service.NewCardService(cards)).Register(mux)
 
-	// The UI handler must always be registered last as a fall-through for all routes.
-	ui.NewHandler().Register(mux)
+	mux.Handle("/ui/", templ.Handler(layout.Main("Test", view.Login())))
 
 	server := &http.Server{
 		Addr:    config.HTTP.Bind,

@@ -28,13 +28,6 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Install node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-          cache-dependency-path: internal/server/ui/yarn.lock
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -47,12 +40,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ github.token }}
- 
-      - name: Build ui
-        working-directory: internal/server/ui
-        run: |
-          yarn install
-          yarn build
 
       - name: Publish release
         env:
