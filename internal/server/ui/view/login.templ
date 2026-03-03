@@ -1,8 +1,29 @@
 package view
 
-import "github.com/davidsbond/keeper/internal/server/ui/component"
+type (
+    // The LoginViewModel type contains fields used to configure the login view.
+    LoginViewModel struct {
+        // Any errors that occurred during authentication.
+        Error string
+        // The email the user has previously provided. This would typically only be set when reporting an error.
+        Email string
+        // The password the user has previously provided. This would typically only be set when reporting an error.
+        Password string
+    }
+)
 
-templ Login() {
-    <div>LOGIN</div>
-    @component.Hello()
+// Login returns the login view using the provided view model values.
+templ Login(model LoginViewModel) {
+<form action="/auth/login" method="POST"> 
+    <label>
+        Email Address:
+        <input type="email" name="email" placeholder="Email Address" required value={ model.Email }/>
+    </label>
+    <label>
+        Password:
+        <input type="password" name="password" placeholder="Password" required value={ model.Password }/>
+    </label>
+    <button type="submit">Login</button>
+    <p>{ model.Error }</p>
+</form>
 }

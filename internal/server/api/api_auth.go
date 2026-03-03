@@ -86,14 +86,6 @@ func (api *AuthAPI) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.SetCookie(w, &http.Cookie{
-		Name:     "keeper",
-		Value:    tkn.String(),
-		Expires:  tkn.ExpiresAt(),
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
-	})
-
 	write(w, http.StatusOK, LoginResponse{
 		Token: tkn.String(),
 	})
@@ -117,11 +109,6 @@ func (api *AuthAPI) Logout(w http.ResponseWriter, r *http.Request) {
 		writeErrorf(w, http.StatusInternalServerError, "failed to logout: %v", err)
 		return
 	}
-
-	http.SetCookie(w, &http.Cookie{
-		Name:   "keeper",
-		MaxAge: -1,
-	})
 
 	write(w, http.StatusOK, LogoutResponse{})
 }

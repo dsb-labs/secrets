@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/a-h/templ"
 	"github.com/davidsbond/x/closer"
 	"github.com/davidsbond/x/lifetime"
 	"github.com/davidsbond/x/syncmap"
@@ -22,8 +21,7 @@ import (
 	"github.com/davidsbond/keeper/internal/server/database"
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/server/ui/layout"
-	"github.com/davidsbond/keeper/internal/server/ui/view"
+	"github.com/davidsbond/keeper/internal/server/ui"
 )
 
 // Run the server using the provided configuration. This function blocks until the provided context is cancelled or
@@ -73,19 +71,21 @@ func Run(ctx context.Context, config Config) error {
 
 	mux := http.NewServeMux()
 
-	accounts := database.NewAccountRepository(masterDB)
-	logins := database.NewRepositoryProvider(databaseState, service.LoginRepositoryProvider)
-	notes := database.NewRepositoryProvider(databaseState, service.NoteRepositoryProvider)
-	cards := database.NewRepositoryProvider(databaseState, service.CardRepositoryProvider)
+	accountRepo := database.NewAccountRepository(masterDB)
+	loginRepo := database.NewRepositoryProvider(databaseState, service.LoginRepositoryProvider)
+	noteRepo := database.NewRepositoryProvider(databaseState, service.NoteRepositoryProvider)
+	cardRepo := database.NewRepositoryProvider(databaseState, service.CardRepositoryProvider)
 
-	api.NewAuthAPI(service.NewAuthService(accounts, databaseManager, tokenGenerator)).Register(mux)
-	api.NewAccountAPI(service.NewAccountService(accounts, databaseManager)).Register(mux)
-	api.NewLoginAPI(service.NewLoginService(logins)).Register(mux)
-	api.NewNoteAPI(service.NewNoteService(notes)).Register(mux)
-	api.NewToolAPI(service.NewToolService(logins, notes, cards)).Register(mux)
-	api.NewCardAPI(service.NewCardService(cards)).Register(mux)
+	authSvc := service.NewAuthService(accountRepo, databaseManager, tokenGenerator)
 
-	mux.Handle("/ui/", templ.Handler(layout.Main("Test", view.Login())))
+	api.NewAuthAPI(authSvc).Register(mux)
+	api.NewAccountAPI(service.NewAccountService(accountRepo, databaseManager)).Register(mux)
+	api.NewLoginAPI(service.NewLoginService(loginRepo)).Register(mux)
+	api.NewNoteAPI(service.NewNoteService(noteRepo)).Register(mux)
+	api.NewToolAPI(service.NewToolService(loginRepo, noteRepo, cardRepo)).Register(mux)
+	api.NewCardAPI(service.NewCardService(cardRepo)).Register(mux)
+
+	ui.NewAuthHandler(authSvc).Register(mux)
 
 	server := &http.Server{
 		Addr:    config.HTTP.Bind,
