@@ -37,7 +37,7 @@ func (h *AuthHandler) Register(mux *http.ServeMux) {
 
 // Login renders the login view.
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	render(r.Context(), w, "Login", view.Login, view.LoginViewModel{})
+	render(r.Context(), w, view.Login, view.LoginViewModel{})
 }
 
 // LoginCallback handles a login attempt, rerendering the login view on error. On success, it redirects to the dashboard
@@ -56,15 +56,15 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
 		model.Error = "Account not found"
-		render(ctx, w, "Login", view.Login, model)
+		render(ctx, w, view.Login, model)
 		return
 	case errors.Is(err, service.ErrInvalidPassword):
 		model.Error = "Invalid password"
-		render(ctx, w, "Login", view.Login, model)
+		render(ctx, w, view.Login, model)
 		return
 	case err != nil:
 		model.Error = err.Error()
-		render(ctx, w, "Login", view.Login, model)
+		render(ctx, w, view.Login, model)
 		return
 	}
 

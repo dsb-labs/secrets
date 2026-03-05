@@ -1,5 +1,7 @@
 package view
 
+import "github.com/davidsbond/keeper/internal/server/ui/layout"
+
 type (
     // The LoginViewModel type contains fields used to configure the login view.
     LoginViewModel struct {
@@ -14,6 +16,10 @@ type (
 
 // Login returns the login view using the provided view model values.
 templ Login(model LoginViewModel) {
+    @layout.Main("Login", login(model))
+}
+
+templ login(model LoginViewModel) {
 <form action="/login" method="POST"> 
     <label>
         Email Address:

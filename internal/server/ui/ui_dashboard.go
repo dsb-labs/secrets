@@ -24,5 +24,5 @@ func (h *DashboardHandler) Register(mux *http.ServeMux) {
 
 // Dashboard renders the dashboard view.
 func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
-	render(r.Context(), w, "Dashboard", view.Dashboard, view.DashboardViewModel{})
+	render(r.Context(), w, view.Dashboard, view.DashboardViewModel{})
 }
