@@ -52,10 +52,10 @@ func NewNoteAPI(notes NoteService) *NoteAPI {
 
 // Register the HTTP endpoints onto the given http.ServeMux.
 func (api *NoteAPI) Register(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/v1/note", api.Create)
-	mux.HandleFunc("GET /api/v1/note", api.List)
-	mux.HandleFunc("DELETE /api/v1/note/{id}", api.Delete)
-	mux.HandleFunc("GET /api/v1/note/{id}", api.Get)
+	mux.Handle("POST /api/v1/note", requireToken(api.Create))
+	mux.Handle("GET /api/v1/note", requireToken(api.List))
+	mux.Handle("DELETE /api/v1/note/{id}", requireToken(api.Delete))
+	mux.Handle("GET /api/v1/note/{id}", requireToken(api.Get))
 }
 
 type (
@@ -83,11 +83,6 @@ func (r CreateNoteRequest) Validate() error {
 // an http.StatusCreated code and a JSON-encoded CreateNoteResponse.
 func (api *NoteAPI) Create(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	request, err := decode[CreateNoteRequest](r.Body)
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)
@@ -124,11 +119,6 @@ type (
 // an http.StatusOK code and a JSON-encoded ListNotesResponse.
 func (api *NoteAPI) List(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	filters := make([]filter.Filter[service.Note], 0)
 	if query := r.URL.Query().Get("query"); query != "" {
 		filters = append(filters, service.NotesByQuery(query))
@@ -164,11 +154,6 @@ type (
 // an http.StatusOK code and a JSON-encoded ListNotesResponse.
 func (api *NoteAPI) Delete(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	noteID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to parse note id: %v", err)
@@ -203,11 +188,6 @@ type (
 // an http.StatusOK code and a JSON-encoded GetNoteResponse.
 func (api *NoteAPI) Get(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	noteID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to parse note id: %v", err)

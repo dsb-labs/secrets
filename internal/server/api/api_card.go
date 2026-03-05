@@ -60,10 +60,10 @@ func NewCardAPI(cards CardService) *CardAPI {
 
 // Register the HTTP endpoints onto the given http.ServeMux.
 func (api *CardAPI) Register(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/v1/card", api.Create)
-	mux.HandleFunc("GET /api/v1/card", api.List)
-	mux.HandleFunc("GET /api/v1/card/{id}", api.Get)
-	mux.HandleFunc("DELETE /api/v1/card/{id}", api.Delete)
+	mux.Handle("POST /api/v1/card", requireToken(api.Create))
+	mux.Handle("GET /api/v1/card", requireToken(api.List))
+	mux.Handle("GET /api/v1/card/{id}", requireToken(api.Get))
+	mux.Handle("DELETE /api/v1/card/{id}", requireToken(api.Delete))
 }
 
 type (
@@ -99,11 +99,6 @@ func (r CreateCardRequest) Validate() error {
 // an http.StatusCreated code and a JSON-encoded CreateCardResponse.
 func (api *CardAPI) Create(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	request, err := decode[CreateCardRequest](r.Body)
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)
@@ -144,11 +139,6 @@ type (
 // an http.StatusOK code and a JSON-encoded ListCardsResponse.
 func (api *CardAPI) List(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	results, err := api.cards.List(tkn.ID())
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
@@ -182,11 +172,6 @@ type (
 // an http.StatusOK code and a JSON-encoded DeleteCardResponse.
 func (api *CardAPI) Delete(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	cardID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to parse card id: %v", err)
@@ -221,11 +206,6 @@ type (
 // an http.StatusOK code and a JSON-encoded GetCardResponse.
 func (api *CardAPI) Get(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	cardID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to parse card id: %v", err)

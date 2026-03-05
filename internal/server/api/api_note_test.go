@@ -28,16 +28,6 @@ func TestNoteAPI_Create(t *testing.T) {
 		Setup        func(svc *MockNoteService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-			Request: api.CreateNoteRequest{
-				Name:    "test",
-				Content: "test",
-			},
-		},
-		{
 			Name:  "error if missing name",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateNoteRequest{
@@ -134,12 +124,6 @@ func TestNoteAPI_List(t *testing.T) {
 		Setup        func(svc *MockNoteService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error if lifetime has expired",
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,
@@ -220,12 +204,6 @@ func TestNoteAPI_Delete(t *testing.T) {
 		ExpectsError bool
 		Setup        func(svc *MockNoteService)
 	}{
-		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
 		{
 			Name:         "error if note id is not uuid",
 			Token:        token.TestToken(t, "test"),
@@ -311,12 +289,6 @@ func TestNoteAPI_Get(t *testing.T) {
 		ExpectsError bool
 		Setup        func(svc *MockNoteService)
 	}{
-		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
 		{
 			Name:         "error if note id is not uuid",
 			Token:        token.TestToken(t, "test"),

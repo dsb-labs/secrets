@@ -37,7 +37,7 @@ func NewAuthAPI(auth AuthService) *AuthAPI {
 // Register the HTTP endpoints onto the given http.ServeMux.
 func (api *AuthAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/auth", api.Login)
-	mux.HandleFunc("DELETE /api/v1/auth", api.Logout)
+	mux.Handle("DELETE /api/v1/auth", requireToken(api.Logout))
 }
 
 type (
@@ -100,11 +100,6 @@ type (
 // an http.StatusOK code and a JSON-encoded LogoutResponse.
 func (api *AuthAPI) Logout(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	if err := api.auth.Logout(tkn.ID()); err != nil {
 		writeErrorf(w, http.StatusInternalServerError, "failed to logout: %v", err)
 		return

@@ -55,9 +55,9 @@ func NewAccountAPI(accounts AccountService) *AccountAPI {
 // Register the HTTP endpoints onto the given http.ServeMux.
 func (api *AccountAPI) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /api/v1/account", api.Create)
-	mux.HandleFunc("GET /api/v1/account", api.Get)
-	mux.HandleFunc("DELETE /api/v1/account", api.Delete)
-	mux.HandleFunc("PUT /api/v1/account/password", api.UpdatePassword)
+	mux.Handle("GET /api/v1/account", requireToken(api.Get))
+	mux.Handle("DELETE /api/v1/account", requireToken(api.Delete))
+	mux.Handle("PUT /api/v1/account/password", requireToken(api.UpdatePassword))
 }
 
 type (
@@ -129,11 +129,6 @@ type (
 // an http.StatusOK code and a JSON-encoded GetAccountResponse.
 func (api *AccountAPI) Get(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	account, err := api.accounts.Get(tkn.ID())
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
@@ -161,11 +156,6 @@ type (
 // an http.StatusOK code and a JSON-encoded DeleteAccountResponse.
 func (api *AccountAPI) Delete(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	err := api.accounts.Delete(tkn.ID())
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
@@ -204,11 +194,6 @@ func (r UpdatePasswordRequest) Validate() error {
 // an http.StatusOK code and a JSON-encoded UpdatePasswordResponse.
 func (api *AccountAPI) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	request, err := decode[UpdatePasswordRequest](r.Body)
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)

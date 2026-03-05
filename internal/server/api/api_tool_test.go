@@ -28,12 +28,6 @@ func TestToolAPI_Export(t *testing.T) {
 		Setup        func(svc *MockToolService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error if lifetime has expired",
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,

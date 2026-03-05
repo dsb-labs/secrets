@@ -3,7 +3,6 @@ package ui
 import (
 	"net/http"
 
-	"github.com/davidsbond/keeper/internal/server/token"
 	"github.com/davidsbond/keeper/internal/server/ui/view"
 )
 
@@ -20,16 +19,10 @@ func NewDashboardHandler() *DashboardHandler {
 
 // Register HTTP endpoints onto the provided http.ServeMux.
 func (h *DashboardHandler) Register(mux *http.ServeMux) {
-	mux.HandleFunc("GET /dashboard", h.Dashboard)
+	mux.Handle("GET /dashboard", requireToken(h.Dashboard))
 }
 
 // Dashboard renders the dashboard view.
 func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
-	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		redirect(w, r, "/login")
-		return
-	}
-
 	render(r.Context(), w, "Dashboard", view.Dashboard, view.DashboardViewModel{})
 }

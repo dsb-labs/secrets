@@ -54,10 +54,10 @@ func NewLoginAPI(logins LoginService) *LoginAPI {
 
 // Register the HTTP endpoints onto the given http.ServeMux.
 func (api *LoginAPI) Register(mux *http.ServeMux) {
-	mux.HandleFunc("POST /api/v1/login", api.Create)
-	mux.HandleFunc("GET /api/v1/login", api.List)
-	mux.HandleFunc("GET /api/v1/login/{id}", api.Get)
-	mux.HandleFunc("DELETE /api/v1/login/{id}", api.Delete)
+	mux.Handle("POST /api/v1/login", requireToken(api.Create))
+	mux.Handle("GET /api/v1/login", requireToken(api.List))
+	mux.Handle("GET /api/v1/login/{id}", requireToken(api.Get))
+	mux.Handle("DELETE /api/v1/login/{id}", requireToken(api.Delete))
 }
 
 type (
@@ -87,11 +87,6 @@ func (r CreateLoginRequest) Validate() error {
 // an http.StatusCreated code and a JSON-encoded CreateLoginResponse.
 func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	request, err := decode[CreateLoginRequest](r.Body)
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)
@@ -129,11 +124,6 @@ type (
 // an http.StatusOK code and a JSON-encoded ListLoginsResponse.
 func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	filters := make([]filter.Filter[service.Login], 0)
 	if domain := r.URL.Query().Get("domain"); domain != "" {
 		filters = append(filters, service.LoginsByDomain(domain))
@@ -170,11 +160,6 @@ type (
 // an http.StatusOK code and a JSON-encoded DeleteLoginResponse.
 func (api *LoginAPI) Delete(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	loginID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to parse login id: %v", err)
@@ -209,11 +194,6 @@ type (
 // an http.StatusOK code and a JSON-encoded GetLoginResponse.
 func (api *LoginAPI) Get(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	loginID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		writeErrorf(w, http.StatusBadRequest, "failed to parse login id: %v", err)

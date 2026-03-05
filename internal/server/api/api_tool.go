@@ -34,7 +34,7 @@ func NewToolAPI(tools ToolService) *ToolAPI {
 
 // Register the HTTP endpoints onto the given http.ServeMux.
 func (api *ToolAPI) Register(mux *http.ServeMux) {
-	mux.HandleFunc("GET /api/v1/export", api.Export)
+	mux.Handle("GET /api/v1/export", requireToken(api.Export))
 }
 
 type (
@@ -53,11 +53,6 @@ type (
 // code and a JSON-encoded ExportResponse.
 func (api *ToolAPI) Export(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	if !tkn.Valid() {
-		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
-		return
-	}
-
 	export, err := api.tools.Export(tkn.ID())
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):

@@ -147,12 +147,6 @@ func TestAuthAPI_Logout(t *testing.T) {
 		Setup        func(svc *MockAuthService)
 	}{
 		{
-			Name:         "error if no valid token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error service fails",
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,

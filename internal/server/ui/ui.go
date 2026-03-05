@@ -8,6 +8,7 @@ import (
 
 	"github.com/a-h/templ"
 
+	"github.com/davidsbond/keeper/internal/server/token"
 	"github.com/davidsbond/keeper/internal/server/ui/layout"
 )
 
@@ -22,4 +23,15 @@ func render[T any](ctx context.Context, w io.Writer, title string, view func(T) 
 	if err != nil {
 		panic(err)
 	}
+}
+
+func requireToken(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !token.FromContext(r.Context()).Valid() {
+			redirect(w, r, "/login")
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

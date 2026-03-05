@@ -28,16 +28,6 @@ func TestLoginAPI_Create(t *testing.T) {
 		Setup        func(svc *MockLoginService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-			Request: api.CreateLoginRequest{
-				Username: "test",
-				Password: "test",
-			},
-		},
-		{
 			Name:  "error if missing username",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateLoginRequest{
@@ -134,12 +124,6 @@ func TestLoginAPI_List(t *testing.T) {
 		Setup        func(svc *MockLoginService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error if lifetime has expired",
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,
@@ -222,12 +206,6 @@ func TestLoginAPI_Delete(t *testing.T) {
 		ExpectsError bool
 		Setup        func(svc *MockLoginService)
 	}{
-		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
 		{
 			Name:         "error if login id is not uuid",
 			Token:        token.TestToken(t, "test"),
@@ -313,12 +291,6 @@ func TestLoginAPI_Get(t *testing.T) {
 		ExpectsError bool
 		Setup        func(svc *MockLoginService)
 	}{
-		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
 		{
 			Name:         "error if login id is not uuid",
 			Token:        token.TestToken(t, "test"),

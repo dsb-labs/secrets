@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/davidsbond/keeper/internal/server/token"
 )
 
 type (
@@ -55,4 +57,15 @@ func write(w http.ResponseWriter, code int, body any) {
 		// TODO(davidsbond): something
 		fmt.Println(err)
 	}
+}
+
+func requireToken(next http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !token.FromContext(r.Context()).Valid() {
+			writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

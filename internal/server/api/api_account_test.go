@@ -143,12 +143,6 @@ func TestAccountAPI_Get(t *testing.T) {
 		Setup        func(svc *MockAccountService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error if account does not exist",
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,
@@ -231,12 +225,6 @@ func TestAccountAPI_Delete(t *testing.T) {
 		Setup        func(svc *MockAccountService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error if account does not exist",
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,
@@ -307,12 +295,6 @@ func TestAccountAPI_ChangePassword(t *testing.T) {
 		ExpectsError bool
 		Setup        func(svc *MockAccountService)
 	}{
-		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
 		{
 			Name:         "error if missing old password",
 			Token:        token.TestToken(t, "test"),

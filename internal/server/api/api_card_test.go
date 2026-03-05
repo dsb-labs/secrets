@@ -29,19 +29,6 @@ func TestCardAPI_Create(t *testing.T) {
 		Setup        func(svc *MockCardService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-			Request: api.CreateCardRequest{
-				HolderName:  "test",
-				Number:      "4111 1111 1111 1111",
-				ExpiryMonth: time.January,
-				ExpiryYear:  2025,
-				CVV:         "123",
-			},
-		},
-		{
 			Name:  "error if missing card number",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
@@ -192,12 +179,6 @@ func TestCardAPI_List(t *testing.T) {
 		Setup        func(svc *MockCardService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error if lifetime has expired",
 			Token:        token.TestToken(t, "test"),
 			ExpectsError: true,
@@ -285,12 +266,6 @@ func TestCardAPI_Delete(t *testing.T) {
 		Setup        func(svc *MockCardService)
 	}{
 		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
-		{
 			Name:         "error if card id is not uuid",
 			Token:        token.TestToken(t, "test"),
 			ID:           "not-a-uuid",
@@ -375,12 +350,6 @@ func TestCardAPI_Get(t *testing.T) {
 		ExpectsError bool
 		Setup        func(svc *MockCardService)
 	}{
-		{
-			Name:         "error if no token",
-			Token:        token.Token{},
-			ExpectsError: true,
-			ExpectedCode: http.StatusUnauthorized,
-		},
 		{
 			Name:         "error if card id is not uuid",
 			Token:        token.TestToken(t, "test"),
