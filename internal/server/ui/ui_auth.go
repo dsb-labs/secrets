@@ -74,6 +74,7 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 		Expires:  tkn.ExpiresAt(),
 		Secure:   true,
 		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
 	})
 
 	redirect(w, r, "/dashboard")

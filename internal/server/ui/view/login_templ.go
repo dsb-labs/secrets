@@ -41,7 +41,7 @@ func Login(model LoginViewModel) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form action=\"/auth/login\" method=\"POST\"><label>Email Address: <input type=\"email\" name=\"email\" placeholder=\"Email Address\" required value=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<form action=\"/login\" method=\"POST\"><label>Email Address: <input type=\"email\" name=\"email\" placeholder=\"Email Address\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

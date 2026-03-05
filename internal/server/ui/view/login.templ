@@ -14,7 +14,7 @@ type (
 
 // Login returns the login view using the provided view model values.
 templ Login(model LoginViewModel) {
-<form action="/auth/login" method="POST"> 
+<form action="/login" method="POST"> 
     <label>
         Email Address:
         <input type="email" name="email" placeholder="Email Address" required value={ model.Email }/>
