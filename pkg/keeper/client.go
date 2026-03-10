@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"sync"
 	"time"
@@ -76,7 +77,7 @@ func (c *Client) buildRequest(ctx context.Context, method, path string, body any
 
 func doRequest[T any](client *http.Client, r *http.Request) (T, error) {
 	var body T
-	
+
 	response, err := client.Do(r)
 	if err != nil {
 		return body, err
@@ -99,4 +100,28 @@ func doRequest[T any](client *http.Client, r *http.Request) (T, error) {
 	}
 
 	return body, nil
+}
+
+// IsNotFound returns true if the provided error is of type api.Error and has an http.StatusNotFound status code.
+func IsNotFound(err error) bool {
+	var e api.Error
+	return errors.As(err, &e) && e.Code == http.StatusNotFound
+}
+
+// IsConflict returns true if the provided error is of type api.Error and has an http.StatusConflict status code.
+func IsConflict(err error) bool {
+	var e api.Error
+	return errors.As(err, &e) && e.Code == http.StatusConflict
+}
+
+// IsUnauthorized returns true if the provided error is of type api.Error and has an http.StatusUnauthorized status code.
+func IsUnauthorized(err error) bool {
+	var e api.Error
+	return errors.As(err, &e) && e.Code == http.StatusUnauthorized
+}
+
+// IsBadRequest returns true if the provided error is of type api.Error and has an http.StatusBadRequest status code.
+func IsBadRequest(err error) bool {
+	var e api.Error
+	return errors.As(err, &e) && e.Code == http.StatusBadRequest
 }

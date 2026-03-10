@@ -72,3 +72,17 @@ func (c *Client) ChangePassword(ctx context.Context, oldPassword, newPassword st
 
 	return nil
 }
+
+// DeleteAccount attempts to delete the caller's account.
+func (c *Client) DeleteAccount(ctx context.Context) error {
+	request, err := c.buildRequest(ctx, http.MethodDelete, "/api/v1/account", nil)
+	if err != nil {
+		return err
+	}
+
+	if _, err = doRequest[api.DeleteAccountResponse](c.client, request); err != nil {
+		return err
+	}
+
+	return nil
+}
