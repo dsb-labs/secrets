@@ -21,7 +21,7 @@ import (
 	"github.com/davidsbond/keeper/internal/server/database"
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/server/ui"
+	"github.com/davidsbond/keeper/internal/ui"
 )
 
 // Run the server using the provided configuration. This function blocks until the provided context is cancelled or

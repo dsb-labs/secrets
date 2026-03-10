@@ -1,5 +1,2 @@
 .data/
-node_modules
 dist/*
-internal/server/ui/dist/*
-!internal/server/ui/dist/.gitkeep

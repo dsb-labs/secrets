@@ -1,0 +1,16 @@
+package view
+
+import "github.com/davidsbond/keeper/internal/ui/layout"
+
+type (
+	DashboardViewModel struct {
+	}
+)
+
+templ Dashboard(model DashboardViewModel) {
+	@layout.Main("Dashboard", dashboard(model))
+}
+
+templ dashboard(model DashboardViewModel) {
+	<div>test</div>
+}

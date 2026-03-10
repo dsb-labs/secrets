@@ -7,7 +7,7 @@ package view
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/davidsbond/keeper/internal/server/ui/layout"
+import "github.com/davidsbond/keeper/internal/ui/layout"
 
 type (
 	DashboardViewModel struct {

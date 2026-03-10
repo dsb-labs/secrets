@@ -3,7 +3,7 @@ package ui
 import (
 	"net/http"
 
-	"github.com/davidsbond/keeper/internal/server/ui/view"
+	"github.com/davidsbond/keeper/internal/ui/view"
 )
 
 type (
