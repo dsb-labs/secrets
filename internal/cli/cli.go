@@ -2,11 +2,13 @@
 package cli
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -67,7 +69,7 @@ func ClientFromContext(ctx context.Context) *keeper.Client {
 	return client
 }
 
-// PromptPassword creates an "enter password" prompt on stdout/stdin that masks the input text, returning the entered
+// PromptPassword creates an "enter password" prompt on stdin that masks the input text, returning the entered
 // password as a string.
 func PromptPassword(prompt string) (string, error) {
 	fmt.Print(prompt, ": ")
@@ -86,4 +88,17 @@ func Write(value any) error {
 	encoder.SetIndent("", "  ")
 
 	return encoder.Encode(value)
+}
+
+// PromptYesNo creates a "yes/no" prompt on stdin, returning a boolean representing if action should be taken.
+func PromptYesNo(prompt string) (bool, error) {
+	fmt.Print(prompt, " (y/n): ")
+
+	reader := bufio.NewReader(os.Stdin)
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		return false, err
+	}
+
+	return strings.ToLower(strings.TrimSpace(text)) == "y", nil
 }
