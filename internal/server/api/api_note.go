@@ -68,7 +68,9 @@ type (
 	}
 
 	// The CreateNoteResponse type represents the response body returned when calling NoteAPI.Create
-	CreateNoteResponse struct{}
+	CreateNoteResponse struct {
+		ID string `json:"id"`
+	}
 )
 
 // Validate the request.
@@ -90,6 +92,7 @@ func (api *NoteAPI) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	note := service.Note{
+		ID:      uuid.New(),
 		Name:    request.Name,
 		Content: request.Content,
 	}
@@ -104,7 +107,9 @@ func (api *NoteAPI) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	write(w, http.StatusCreated, CreateNoteResponse{})
+	write(w, http.StatusCreated, CreateNoteResponse{
+		ID: note.ID.String(),
+	})
 }
 
 type (

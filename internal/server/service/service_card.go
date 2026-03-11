@@ -74,7 +74,7 @@ func (svc *CardService) Create(userID uuid.UUID, card Card) error {
 	}
 
 	record := database.Card{
-		ID:          uuid.New(),
+		ID:          card.ID,
 		HolderName:  card.HolderName,
 		Number:      card.Number,
 		ExpiryMonth: card.ExpiryMonth,

@@ -72,7 +72,9 @@ type (
 	}
 
 	// The CreateLoginResponse type represents the response body returned when calling LoginAPI.Create
-	CreateLoginResponse struct{}
+	CreateLoginResponse struct {
+		ID string `json:"id"`
+	}
 )
 
 // Validate the request.
@@ -94,6 +96,7 @@ func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	login := service.Login{
+		ID:       uuid.New(),
 		Username: request.Username,
 		Password: request.Password,
 		Domains:  request.Domains,
@@ -109,7 +112,9 @@ func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	write(w, http.StatusCreated, CreateLoginResponse{})
+	write(w, http.StatusCreated, CreateLoginResponse{
+		ID: login.ID.String(),
+	})
 }
 
 type (

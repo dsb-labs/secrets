@@ -82,7 +82,9 @@ type (
 	}
 
 	// The CreateCardResponse type represents the response body returned when calling CardAPI.Create
-	CreateCardResponse struct{}
+	CreateCardResponse struct {
+		ID string `json:"id"`
+	}
 )
 
 // Validate the request.
@@ -124,7 +126,9 @@ func (api *CardAPI) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	write(w, http.StatusCreated, CreateCardResponse{})
+	write(w, http.StatusCreated, CreateCardResponse{
+		ID: card.ID.String(),
+	})
 }
 
 type (

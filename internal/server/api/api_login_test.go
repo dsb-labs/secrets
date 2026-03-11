@@ -107,7 +107,8 @@ func TestLoginAPI_Create(t *testing.T) {
 				return
 			}
 
-			assertResponse(t, w, tc.Expected)
+			actual := decode[api.CreateLoginResponse](t, w.Body)
+			require.NoError(t, uuid.Validate(actual.ID))
 		})
 	}
 }

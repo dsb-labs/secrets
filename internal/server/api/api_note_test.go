@@ -107,7 +107,8 @@ func TestNoteAPI_Create(t *testing.T) {
 				return
 			}
 
-			assertResponse(t, w, tc.Expected)
+			actual := decode[api.CreateNoteResponse](t, w.Body)
+			require.NoError(t, uuid.Validate(actual.ID))
 		})
 	}
 }

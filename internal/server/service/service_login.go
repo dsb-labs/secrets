@@ -69,7 +69,7 @@ func (svc *LoginService) Create(userID uuid.UUID, login Login) error {
 	}
 
 	record := database.Login{
-		ID:       uuid.New(),
+		ID:       login.ID,
 		Username: login.Username,
 		Password: login.Password,
 		Domains:  login.Domains,

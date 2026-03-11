@@ -67,7 +67,7 @@ func (svc *NoteService) Create(userID uuid.UUID, note Note) error {
 	}
 
 	record := database.Note{
-		ID:      uuid.New(),
+		ID:      note.ID,
 		Name:    note.Name,
 		Content: note.Content,
 	}
