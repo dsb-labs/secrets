@@ -16,7 +16,7 @@ func TestClient_CreateCard(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		err := client.CreateCard(ctx, keeper.Card{})
+		_, err := client.CreateCard(ctx, keeper.Card{})
 		require.Error(t, err)
 		assert.True(t, keeper.IsUnauthorized(err))
 	})
@@ -32,8 +32,9 @@ func TestClient_CreateCard(t *testing.T) {
 			CVV:         "123",
 		}
 
-		err := client.CreateCard(ctx, card)
+		id, err := client.CreateCard(ctx, card)
 		require.NoError(t, err)
+		assert.NoError(t, uuid.Validate(id))
 	})
 
 	t.Run("error if card is invalid", func(t *testing.T) {
@@ -45,7 +46,7 @@ func TestClient_CreateCard(t *testing.T) {
 			CVV:         "123",
 		}
 
-		err := client.CreateCard(ctx, card)
+		_, err := client.CreateCard(ctx, card)
 		require.Error(t, err)
 		assert.True(t, keeper.IsBadRequest(err))
 	})
@@ -77,7 +78,7 @@ func TestClient_ListCards(t *testing.T) {
 		CVV:         "123",
 	}
 
-	err := client.CreateCard(ctx, expected)
+	cardID, err := client.CreateCard(ctx, expected)
 	require.NoError(t, err)
 
 	t.Run("lists cards", func(t *testing.T) {
@@ -85,11 +86,12 @@ func TestClient_ListCards(t *testing.T) {
 		require.NoError(t, err)
 		if assert.Len(t, cards, 1) {
 			actual := cards[0]
-			assert.Equal(t, expected.CVV, actual.CVV)
-			assert.Equal(t, expected.HolderName, actual.HolderName)
-			assert.Equal(t, expected.Number, actual.Number)
-			assert.Equal(t, expected.ExpiryMonth, actual.ExpiryMonth)
-			assert.Equal(t, expected.ExpiryYear, actual.ExpiryYear)
+			assert.EqualValues(t, cardID, actual.ID)
+			assert.EqualValues(t, expected.CVV, actual.CVV)
+			assert.EqualValues(t, expected.HolderName, actual.HolderName)
+			assert.EqualValues(t, expected.Number, actual.Number)
+			assert.EqualValues(t, expected.ExpiryMonth, actual.ExpiryMonth)
+			assert.EqualValues(t, expected.ExpiryYear, actual.ExpiryYear)
 		}
 	})
 }
@@ -106,7 +108,7 @@ func TestClient_DeleteCard(t *testing.T) {
 
 	setupAccount(t, client)
 
-	err := client.CreateCard(ctx, keeper.Card{
+	cardID, err := client.CreateCard(ctx, keeper.Card{
 		HolderName:  "Test McTest",
 		Number:      "4111 1111 1111 1111",
 		ExpiryMonth: time.March,
@@ -115,10 +117,6 @@ func TestClient_DeleteCard(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	cards, err := client.ListCards(ctx)
-	require.NoError(t, err)
-	require.Len(t, cards, 1)
-
 	t.Run("error if card does not exist", func(t *testing.T) {
 		err = client.DeleteCard(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
@@ -126,12 +124,12 @@ func TestClient_DeleteCard(t *testing.T) {
 	})
 
 	t.Run("deletes card", func(t *testing.T) {
-		err = client.DeleteCard(ctx, cards[0].ID)
+		err = client.DeleteCard(ctx, cardID)
 		require.NoError(t, err)
 	})
 
 	t.Run("card does not exist", func(t *testing.T) {
-		_, err = client.GetCard(ctx, cards[0].ID)
+		_, err = client.GetCard(ctx, cardID)
 		require.Error(t, err)
 		assert.True(t, keeper.IsNotFound(err))
 	})
@@ -149,34 +147,32 @@ func TestClient_GetCard(t *testing.T) {
 
 	setupAccount(t, client)
 
-	err := client.CreateCard(ctx, keeper.Card{
+	expected := keeper.Card{
 		HolderName:  "Test McTest",
 		Number:      "4111 1111 1111 1111",
 		ExpiryMonth: time.March,
 		ExpiryYear:  2027,
 		CVV:         "123",
-	})
+	}
+
+	id, err := client.CreateCard(ctx, expected)
 	require.NoError(t, err)
 
-	cards, err := client.ListCards(ctx)
-	require.NoError(t, err)
-	require.Len(t, cards, 1)
-	expected := cards[0]
-	
 	t.Run("error if card does not exist", func(t *testing.T) {
 		_, err = client.GetCard(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
 		assert.True(t, keeper.IsNotFound(err))
 	})
-	
+
 	t.Run("gets card", func(t *testing.T) {
-		actual, err := client.GetCard(ctx, expected.ID)
+		actual, err := client.GetCard(ctx, id)
 		require.NoError(t, err)
-		
-		assert.Equal(t, expected.CVV, actual.CVV)
-		assert.Equal(t, expected.HolderName, actual.HolderName)
-		assert.Equal(t, expected.Number, actual.Number)
-		assert.Equal(t, expected.ExpiryMonth, actual.ExpiryMonth)
-		assert.Equal(t, expected.ExpiryYear, actual.ExpiryYear)
+
+		assert.EqualValues(t, id, actual.ID)
+		assert.EqualValues(t, expected.CVV, actual.CVV)
+		assert.EqualValues(t, expected.HolderName, actual.HolderName)
+		assert.EqualValues(t, expected.Number, actual.Number)
+		assert.EqualValues(t, expected.ExpiryMonth, actual.ExpiryMonth)
+		assert.EqualValues(t, expected.ExpiryYear, actual.ExpiryYear)
 	})
 }

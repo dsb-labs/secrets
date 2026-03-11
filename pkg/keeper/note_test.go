@@ -15,7 +15,7 @@ func TestClient_CreateNote(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		err := client.CreateNote(ctx, keeper.Note{})
+		_, err := client.CreateNote(ctx, keeper.Note{})
 		require.Error(t, err)
 		assert.True(t, keeper.IsUnauthorized(err))
 	})
@@ -28,13 +28,14 @@ func TestClient_CreateNote(t *testing.T) {
 			Content: "test",
 		}
 
-		err := client.CreateNote(ctx, note)
+		id, err := client.CreateNote(ctx, note)
 		require.NoError(t, err)
+		require.NoError(t, uuid.Validate(id))
 	})
 
 	t.Run("error if note is invalid", func(t *testing.T) {
 		note := keeper.Note{}
-		err := client.CreateNote(ctx, note)
+		_, err := client.CreateNote(ctx, note)
 		require.Error(t, err)
 		assert.True(t, keeper.IsBadRequest(err))
 	})
@@ -63,7 +64,7 @@ func TestClient_ListNotes(t *testing.T) {
 		Content: "test",
 	}
 
-	err := client.CreateNote(ctx, expected)
+	noteID, err := client.CreateNote(ctx, expected)
 	require.NoError(t, err)
 
 	t.Run("lists notes", func(t *testing.T) {
@@ -71,8 +72,9 @@ func TestClient_ListNotes(t *testing.T) {
 		require.NoError(t, err)
 		if assert.Len(t, notes, 1) {
 			actual := notes[0]
-			assert.Equal(t, expected.Content, actual.Content)
-			assert.Equal(t, expected.Name, actual.Name)
+			assert.EqualValues(t, noteID, actual.ID)
+			assert.EqualValues(t, expected.Content, actual.Content)
+			assert.EqualValues(t, expected.Name, actual.Name)
 		}
 	})
 
@@ -81,8 +83,9 @@ func TestClient_ListNotes(t *testing.T) {
 		require.NoError(t, err)
 		if assert.Len(t, notes, 1) {
 			actual := notes[0]
-			assert.Equal(t, expected.Content, actual.Content)
-			assert.Equal(t, expected.Name, actual.Name)
+			assert.EqualValues(t, noteID, actual.ID)
+			assert.EqualValues(t, expected.Content, actual.Content)
+			assert.EqualValues(t, expected.Name, actual.Name)
 		}
 	})
 }
@@ -99,15 +102,11 @@ func TestClient_DeleteNote(t *testing.T) {
 
 	setupAccount(t, client)
 
-	err := client.CreateNote(ctx, keeper.Note{
+	noteID, err := client.CreateNote(ctx, keeper.Note{
 		Name:    "test",
 		Content: "test",
 	})
 	require.NoError(t, err)
-
-	notes, err := client.ListNotes(ctx, "")
-	require.NoError(t, err)
-	require.Len(t, notes, 1)
 
 	t.Run("error if note does not exist", func(t *testing.T) {
 		err = client.DeleteNote(ctx, uuid.NameSpaceDNS.String())
@@ -116,12 +115,12 @@ func TestClient_DeleteNote(t *testing.T) {
 	})
 
 	t.Run("deletes note", func(t *testing.T) {
-		err = client.DeleteNote(ctx, notes[0].ID)
+		err = client.DeleteNote(ctx, noteID)
 		require.NoError(t, err)
 	})
 
 	t.Run("note does not exist", func(t *testing.T) {
-		_, err = client.GetNote(ctx, notes[0].ID)
+		_, err = client.GetNote(ctx, noteID)
 		require.Error(t, err)
 		assert.True(t, keeper.IsNotFound(err))
 	})
@@ -139,16 +138,14 @@ func TestClient_GetNote(t *testing.T) {
 
 	setupAccount(t, client)
 
-	err := client.CreateNote(ctx, keeper.Note{
+	expected := keeper.Note{
 		Name:    "test",
 		Content: "test",
-	})
+	}
+	
+	noteID, err := client.CreateNote(ctx, expected)
 	require.NoError(t, err)
-
-	notes, err := client.ListNotes(ctx, "")
-	require.NoError(t, err)
-	require.Len(t, notes, 1)
-	expected := notes[0]
+	
 
 	t.Run("error if note does not exist", func(t *testing.T) {
 		_, err = client.GetNote(ctx, uuid.NameSpaceDNS.String())
@@ -157,10 +154,11 @@ func TestClient_GetNote(t *testing.T) {
 	})
 
 	t.Run("gets note", func(t *testing.T) {
-		actual, err := client.GetNote(ctx, expected.ID)
+		actual, err := client.GetNote(ctx, noteID)
 		require.NoError(t, err)
 
-		assert.Equal(t, expected.Content, actual.Content)
-		assert.Equal(t, expected.Name, actual.Name)
+		assert.EqualValues(t, noteID, actual.ID)
+		assert.EqualValues(t, expected.Content, actual.Content)
+		assert.EqualValues(t, expected.Name, actual.Name)
 	})
 }

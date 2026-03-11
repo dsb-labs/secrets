@@ -1,6 +1,8 @@
 package note
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/davidsbond/keeper/internal/cli"
@@ -21,10 +23,12 @@ func create() *cobra.Command {
 				Content: args[1],
 			}
 
-			if err := client.CreateNote(ctx, note); err != nil {
+			id, err := client.CreateNote(ctx, note)
+			if err != nil {
 				return err
 			}
 
+			fmt.Println(id)
 			return nil
 		},
 	}

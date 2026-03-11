@@ -22,21 +22,22 @@ type (
 	}
 )
 
-// CreateNote attempts to create a new note record for the authenticated user.
-func (c *Client) CreateNote(ctx context.Context, note Note) error {
+// CreateNote attempts to create a new note record for the authenticated user, returning its identifier on success.
+func (c *Client) CreateNote(ctx context.Context, note Note) (string, error) {
 	request, err := c.buildRequest(ctx, http.MethodPost, "/api/v1/note", api.CreateNoteRequest{
 		Name:    note.Name,
 		Content: note.Content,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	if _, err = doRequest[api.CreateNoteResponse](c.client, request); err != nil {
-		return err
+	response, err := doRequest[api.CreateNoteResponse](c.client, request)
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	return response.ID, nil
 }
 
 // ListNotes attempts to return all note records stored for the authenticated user. If the "query" parameter is set,

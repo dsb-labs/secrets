@@ -49,9 +49,14 @@ func TestClient_Export(t *testing.T) {
 		Content: "test",
 	}
 
-	require.NoError(t, client.CreateNote(ctx, expectedNote))
-	require.NoError(t, client.CreateLogin(ctx, expectedLogin))
-	require.NoError(t, client.CreateCard(ctx, expectedCard))
+	noteID, err := client.CreateNote(ctx, expectedNote)
+	require.NoError(t, err)
+
+	loginID, err := client.CreateLogin(ctx, expectedLogin)
+	require.NoError(t, err)
+
+	cardID, err := client.CreateCard(ctx, expectedCard)
+	require.NoError(t, err)
 
 	t.Run("export contains everything", func(t *testing.T) {
 		export, err := client.Export(ctx)
@@ -65,22 +70,25 @@ func TestClient_Export(t *testing.T) {
 		actualNote := export.Notes[0]
 
 		t.Run("note matches", func(t *testing.T) {
-			assert.Equal(t, expectedNote.Content, actualNote.Content)
-			assert.Equal(t, expectedNote.Name, actualNote.Name)
+			assert.EqualValues(t, noteID, actualNote.ID)
+			assert.EqualValues(t, expectedNote.Content, actualNote.Content)
+			assert.EqualValues(t, expectedNote.Name, actualNote.Name)
 		})
 
 		t.Run("card matches", func(t *testing.T) {
-			assert.Equal(t, expectedCard.CVV, actualCard.CVV)
-			assert.Equal(t, expectedCard.HolderName, actualCard.HolderName)
-			assert.Equal(t, expectedCard.Number, actualCard.Number)
-			assert.Equal(t, expectedCard.ExpiryMonth, actualCard.ExpiryMonth)
-			assert.Equal(t, expectedCard.ExpiryYear, actualCard.ExpiryYear)
+			assert.EqualValues(t, cardID, actualCard.ID)
+			assert.EqualValues(t, expectedCard.CVV, actualCard.CVV)
+			assert.EqualValues(t, expectedCard.HolderName, actualCard.HolderName)
+			assert.EqualValues(t, expectedCard.Number, actualCard.Number)
+			assert.EqualValues(t, expectedCard.ExpiryMonth, actualCard.ExpiryMonth)
+			assert.EqualValues(t, expectedCard.ExpiryYear, actualCard.ExpiryYear)
 		})
 
 		t.Run("login matches", func(t *testing.T) {
-			assert.Equal(t, expectedLogin.Username, actualLogin.Username)
-			assert.Equal(t, expectedLogin.Password, actualLogin.Password)
-			assert.Equal(t, expectedLogin.Domains, actualLogin.Domains)
+			assert.EqualValues(t, loginID, actualLogin.ID)
+			assert.EqualValues(t, expectedLogin.Username, actualLogin.Username)
+			assert.EqualValues(t, expectedLogin.Password, actualLogin.Password)
+			assert.EqualValues(t, expectedLogin.Domains, actualLogin.Domains)
 		})
 	})
 }

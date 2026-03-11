@@ -29,8 +29,8 @@ type (
 	}
 )
 
-// CreateCard attempts to create a new card record for the authenticated user.
-func (c *Client) CreateCard(ctx context.Context, card Card) error {
+// CreateCard attempts to create a new card record for the authenticated user, returning its identifier on success.
+func (c *Client) CreateCard(ctx context.Context, card Card) (string, error) {
 	request, err := c.buildRequest(ctx, http.MethodPost, "/api/v1/card", api.CreateCardRequest{
 		HolderName:  card.HolderName,
 		Number:      card.Number,
@@ -39,14 +39,15 @@ func (c *Client) CreateCard(ctx context.Context, card Card) error {
 		CVV:         card.CVV,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	if _, err = doRequest[api.CreateCardResponse](c.client, request); err != nil {
-		return err
+	response, err := doRequest[api.CreateCardResponse](c.client, request)
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	return response.ID, nil
 }
 
 // ListCards attempts to return all card records stored for the authenticated user.

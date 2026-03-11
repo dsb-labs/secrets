@@ -33,10 +33,12 @@ func create() *cobra.Command {
 				Domains:  domains,
 			}
 
-			if err = client.CreateLogin(ctx, login); err != nil {
+			id, err := client.CreateLogin(ctx, login)
+			if err != nil {
 				return err
 			}
 
+			fmt.Println(id)
 			return nil
 		},
 	}

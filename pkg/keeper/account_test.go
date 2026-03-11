@@ -50,8 +50,8 @@ func TestClient_GetAccount(t *testing.T) {
 	t.Run("gets current account", func(t *testing.T) {
 		account, err := client.GetAccount(ctx)
 		require.NoError(t, err)
-		assert.Equal(t, "test@test.com", account.Email)
-		assert.Equal(t, "Test McTest", account.DisplayName)
+		assert.EqualValues(t, "test@test.com", account.Email)
+		assert.EqualValues(t, "Test McTest", account.DisplayName)
 	})
 }
 

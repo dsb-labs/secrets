@@ -24,22 +24,23 @@ type (
 	}
 )
 
-// CreateLogin attempts to create a new login record for the authenticated user.
-func (c *Client) CreateLogin(ctx context.Context, login Login) error {
+// CreateLogin attempts to create a new login record for the authenticated user, returning its identifier on success.
+func (c *Client) CreateLogin(ctx context.Context, login Login) (string, error) {
 	request, err := c.buildRequest(ctx, http.MethodPost, "/api/v1/login", api.CreateLoginRequest{
 		Username: login.Username,
 		Password: login.Password,
 		Domains:  login.Domains,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	if _, err = doRequest[api.CreateLoginResponse](c.client, request); err != nil {
-		return err
+	response, err := doRequest[api.CreateLoginResponse](c.client, request)
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	return response.ID, nil
 }
 
 // ListLogins attempts to return all login records stored for the authenticated user. If the "domain" parameter is set,
