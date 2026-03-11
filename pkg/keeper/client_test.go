@@ -17,6 +17,13 @@ import (
 )
 
 func setupTest(t *testing.T) *keeper.Client {
+	t.Parallel()
+
+	if testing.Short() {
+		t.Skip()
+		return nil
+	}
+
 	t.Helper()
 
 	dir, err := os.MkdirTemp(os.TempDir(), t.Name())
@@ -49,6 +56,26 @@ func setupTest(t *testing.T) *keeper.Client {
 		require.NoError(t, group.Wait())
 	})
 
-	<-time.After(time.Second)
+	<-time.After(time.Second / 2)
 	return keeper.NewClient(fmt.Sprintf("http://0.0.0.0:%d", port))
+}
+
+func setupAccount(t *testing.T, client *keeper.Client) {
+	t.Helper()
+
+	const (
+		email       = "test@test.com"
+		password    = "test"
+		displayName = "Test McTest"
+	)
+
+	err := client.CreateAccount(t.Context(), keeper.Account{
+		Email:       email,
+		DisplayName: displayName,
+		Password:    password,
+	})
+	require.NoError(t, err)
+
+	err = client.Login(t.Context(), email, password)
+	require.NoError(t, err)
 }

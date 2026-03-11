@@ -109,7 +109,7 @@ func (svc *NoteService) List(userID uuid.UUID, filters ...filter.Filter[Note]) (
 			Content: in.Content,
 		}
 	})
-	
+
 	if len(filters) == 0 {
 		return notes, nil
 	}

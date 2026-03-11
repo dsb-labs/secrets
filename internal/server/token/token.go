@@ -134,7 +134,7 @@ func NewParser(config ParserConfig) *Parser {
 // Parse the provided token string, returning an instance of the Token type.
 func (p *Parser) Parse(tokenString string) (Token, error) {
 	var claims jwt.RegisteredClaims
-	token, err := p.parser.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := p.parser.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (any, error) {
 		return p.signingKey, nil
 	})
 	switch {
