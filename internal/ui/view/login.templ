@@ -20,16 +20,18 @@ templ Login(model LoginViewModel) {
 }
 
 templ login(model LoginViewModel) {
-	<form action="/login" method="POST">
-		<label>
-			Email Address:
-			<input type="email" name="email" placeholder="Email Address" required value={ model.Email }/>
-		</label>
-		<label>
-			Password:
-			<input type="password" name="password" placeholder="Password" required value={ model.Password }/>
-		</label>
-		<button type="submit">Login</button>
-		<p>{ model.Error }</p>
-	</form>
+	<section class="w-full h-full p-64">
+		<form action="/login" method="POST">
+			<label>
+				Email Address:
+				<input type="email" name="email" placeholder="Email Address" required value={ model.Email }/>
+			</label>
+			<label>
+				Password:
+				<input type="password" name="password" placeholder="Password" required value={ model.Password }/>
+			</label>
+			<button type="submit">Login</button>
+			<p>{ model.Error }</p>
+		</form>
+	</section>
 }
