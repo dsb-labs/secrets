@@ -31,8 +31,9 @@ type (
 		// if the account does not exist.
 		Delete(uuid.UUID) error
 		// ChangePassword should update the account's password to the new value if the old password provided is
-		// correct.
-		ChangePassword(uuid.UUID, string, string) error
+		// correct, returning the restore key to be used should the user enter a disaster recovery scenario and need to
+		// manually decrypt their data.
+		ChangePassword(uuid.UUID, string, string) ([]byte, error)
 	}
 
 	// The Account type represents an individual user account as returned by the API.
@@ -179,7 +180,10 @@ type (
 	}
 
 	// The UpdatePasswordResponse type represents the response body returned when calling AccountAPI.UpdatePassword
-	UpdatePasswordResponse struct{}
+	UpdatePasswordResponse struct {
+		// The key to use if manual data decryption is required.
+		RestoreKey []byte `json:"restoreKey"`
+	}
 )
 
 // Validate the request.
@@ -200,7 +204,7 @@ func (api *AccountAPI) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = api.accounts.ChangePassword(tkn.ID(), request.OldPassword, request.NewPassword)
+	restoreKey, err := api.accounts.ChangePassword(tkn.ID(), request.OldPassword, request.NewPassword)
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
 		writeError(w, http.StatusNotFound, "account not found")
@@ -213,5 +217,7 @@ func (api *AccountAPI) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	write(w, http.StatusOK, UpdatePasswordResponse{})
+	write(w, http.StatusOK, UpdatePasswordResponse{
+		RestoreKey: restoreKey,
+	})
 }

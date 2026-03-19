@@ -414,13 +414,14 @@ func TestAccountService_ChangePassword(t *testing.T) {
 			}
 
 			svc := service.NewAccountService(accounts, databases)
-			err := svc.ChangePassword(tc.ID, tc.OldPassword, tc.NewPassword)
+			restoreKey, err := svc.ChangePassword(tc.ID, tc.OldPassword, tc.NewPassword)
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return
 			}
 
 			require.NoError(t, err)
+			require.NotNil(t, restoreKey)
 		})
 	}
 }

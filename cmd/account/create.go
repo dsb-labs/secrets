@@ -47,9 +47,12 @@ func create() *cobra.Command {
 				Password:    password,
 			}
 
-			if err = client.CreateAccount(ctx, account); err != nil {
+			restoreKey, err := client.CreateAccount(ctx, account)
+			if err != nil {
 				return fmt.Errorf("failed to create account: %w", err)
 			}
+
+			fmt.Printf("Created account for %q. Please store the following key for account recovery:\n\n%s\n", account.Email, restoreKey)
 
 			return nil
 		},

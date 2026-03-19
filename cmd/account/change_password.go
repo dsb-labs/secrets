@@ -41,9 +41,12 @@ func changePassword() *cobra.Command {
 				return errors.New("new passwords do not match")
 			}
 
-			if err = client.ChangePassword(ctx, oldPassword, newPassword); err != nil {
+			restoreKey, err := client.ChangePassword(ctx, oldPassword, newPassword)
+			if err != nil {
 				return fmt.Errorf("failed to change password: %w", err)
 			}
+
+			fmt.Printf("Password updated. Please store the following key for account recovery:\n\n%s\n", restoreKey)
 
 			return nil
 		},

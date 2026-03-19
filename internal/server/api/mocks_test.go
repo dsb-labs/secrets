@@ -111,20 +111,31 @@ func (_m *MockAccountService) EXPECT() *MockAccountService_Expecter {
 }
 
 // ChangePassword provides a mock function for the type MockAccountService
-func (_mock *MockAccountService) ChangePassword(uUID uuid.UUID, s string, s1 string) error {
+func (_mock *MockAccountService) ChangePassword(uUID uuid.UUID, s string, s1 string) ([]byte, error) {
 	ret := _mock.Called(uUID, s, s1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ChangePassword")
 	}
 
-	var r0 error
-	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, string, string) error); ok {
+	var r0 []byte
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, string, string) ([]byte, error)); ok {
+		return returnFunc(uUID, s, s1)
+	}
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, string, string) []byte); ok {
 		r0 = returnFunc(uUID, s, s1)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]byte)
+		}
 	}
-	return r0
+	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, string, string) error); ok {
+		r1 = returnFunc(uUID, s, s1)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
 }
 
 // MockAccountService_ChangePassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ChangePassword'
@@ -163,12 +174,12 @@ func (_c *MockAccountService_ChangePassword_Call) Run(run func(uUID uuid.UUID, s
 	return _c
 }
 
-func (_c *MockAccountService_ChangePassword_Call) Return(err error) *MockAccountService_ChangePassword_Call {
-	_c.Call.Return(err)
+func (_c *MockAccountService_ChangePassword_Call) Return(bytes []byte, err error) *MockAccountService_ChangePassword_Call {
+	_c.Call.Return(bytes, err)
 	return _c
 }
 
-func (_c *MockAccountService_ChangePassword_Call) RunAndReturn(run func(uUID uuid.UUID, s string, s1 string) error) *MockAccountService_ChangePassword_Call {
+func (_c *MockAccountService_ChangePassword_Call) RunAndReturn(run func(uUID uuid.UUID, s string, s1 string) ([]byte, error)) *MockAccountService_ChangePassword_Call {
 	_c.Call.Return(run)
 	return _c
 }

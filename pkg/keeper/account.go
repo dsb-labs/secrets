@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/base64"
 	"net/http"
 
 	"github.com/davidsbond/keeper/internal/server/api"
@@ -17,24 +18,34 @@ type (
 		// The user's password, only set when calling Client.CreateAccount.
 		Password string `json:"-"`
 	}
+
+	// The RestoreKey type represents a key that can be used to recover an account should the user forget their
+	// password or in a data recovery scenario.
+	RestoreKey []byte
 )
 
-// CreateAccount attempts to create a new account.
-func (c *Client) CreateAccount(ctx context.Context, account Account) error {
+func (k RestoreKey) String() string {
+	return base64.StdEncoding.EncodeToString(k)
+}
+
+// CreateAccount attempts to create a new account, returning the account's restore key on success. This restore key
+// must be saved by the caller to decrypt their database should they forget their password.
+func (c *Client) CreateAccount(ctx context.Context, account Account) (RestoreKey, error) {
 	request, err := c.buildRequest(ctx, http.MethodPost, "/api/v1/account", api.CreateAccountRequest{
 		Email:       account.Email,
 		Password:    account.Password,
 		DisplayName: account.DisplayName,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if _, err = doRequest[api.CreateAccountResponse](c.client, request); err != nil {
-		return err
+	response, err := doRequest[api.CreateAccountResponse](c.client, request)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return response.RestoreKey, nil
 }
 
 // GetAccount attempts to return the account details for the authenticated user.
@@ -56,21 +67,23 @@ func (c *Client) GetAccount(ctx context.Context) (Account, error) {
 }
 
 // ChangePassword attempts to update the caller's password to the new one. The old password must match the user's
-// existing password.
-func (c *Client) ChangePassword(ctx context.Context, oldPassword, newPassword string) error {
+// existing password. On success, returns the user's updated restore key which must be stored for disaster recovery
+// purposes or if they forget their password.
+func (c *Client) ChangePassword(ctx context.Context, oldPassword, newPassword string) (RestoreKey, error) {
 	request, err := c.buildRequest(ctx, http.MethodPut, "/api/v1/account/password", api.UpdatePasswordRequest{
 		OldPassword: oldPassword,
 		NewPassword: newPassword,
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if _, err = doRequest[api.UpdatePasswordResponse](c.client, request); err != nil {
-		return err
+	response, err := doRequest[api.UpdatePasswordResponse](c.client, request)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	return response.RestoreKey, nil
 }
 
 // DeleteAccount attempts to delete the caller's account.

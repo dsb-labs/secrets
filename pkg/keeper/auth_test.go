@@ -29,7 +29,7 @@ func TestClient_Login(t *testing.T) {
 		assert.True(t, keeper.IsNotFound(err))
 	})
 
-	err := client.CreateAccount(ctx, keeper.Account{
+	_, err := client.CreateAccount(ctx, keeper.Account{
 		Email:       email,
 		DisplayName: displayName,
 		Password:    password,

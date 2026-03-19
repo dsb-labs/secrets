@@ -69,7 +69,7 @@ func setupAccount(t *testing.T, client *keeper.Client) {
 		displayName = "Test McTest"
 	)
 
-	err := client.CreateAccount(t.Context(), keeper.Account{
+	_, err := client.CreateAccount(t.Context(), keeper.Account{
 		Email:       email,
 		DisplayName: displayName,
 		Password:    password,

@@ -14,17 +14,18 @@ func TestClient_CreateAccount(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("creates new account", func(t *testing.T) {
-		err := client.CreateAccount(ctx, keeper.Account{
+		restoreKey, err := client.CreateAccount(ctx, keeper.Account{
 			Email:       "test@test.com",
 			DisplayName: "Test McTest",
 			Password:    "test",
 		})
 
 		require.NoError(t, err)
+		require.NotNil(t, restoreKey)
 	})
 
 	t.Run("error if account already exists", func(t *testing.T) {
-		err := client.CreateAccount(ctx, keeper.Account{
+		_, err := client.CreateAccount(ctx, keeper.Account{
 			Email:       "test@test.com",
 			DisplayName: "Test McTest",
 			Password:    "test",
@@ -60,7 +61,7 @@ func TestClient_ChangePassword(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		err := client.ChangePassword(ctx, "test", "test2")
+		_, err := client.ChangePassword(ctx, "test", "test2")
 		require.Error(t, err)
 		assert.True(t, keeper.IsUnauthorized(err))
 	})
@@ -68,8 +69,9 @@ func TestClient_ChangePassword(t *testing.T) {
 	setupAccount(t, client)
 
 	t.Run("changes password", func(t *testing.T) {
-		err := client.ChangePassword(ctx, "test", "test2")
+		restoreKey, err := client.ChangePassword(ctx, "test", "test2")
 		require.NoError(t, err)
+		require.NotNil(t, restoreKey)
 	})
 
 	t.Run("is now unauthenticated", func(t *testing.T) {

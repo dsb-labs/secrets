@@ -134,27 +134,27 @@ func (svc *AccountService) Delete(id uuid.UUID) error {
 // ChangePassword attempts to replace the user's current password with the new one. This causes the derived key that
 // encrypts the user's personal database to change, effectively logging them out on all platforms in which they
 // are authenticated. Returns ErrAccountNotFound if the specified user does not exist or ErrInvalidPassword if the
-// provided old password does not match that of the user's.
-func (svc *AccountService) ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) error {
+// provided old password does not match that of the user's. On success, returns the user's updated restore key.
+func (svc *AccountService) ChangePassword(userID uuid.UUID, oldPassword string, newPassword string) ([]byte, error) {
 	account, err := svc.accounts.FindByID(userID)
 	switch {
 	case errors.Is(err, database.ErrAccountNotFound):
-		return ErrAccountNotFound
+		return nil, ErrAccountNotFound
 	case err != nil:
-		return fmt.Errorf("failed to query account: %w", err)
+		return nil, fmt.Errorf("failed to query account: %w", err)
 	}
 
 	err = bcrypt.CompareHashAndPassword(account.PasswordHash, []byte(oldPassword))
 	switch {
 	case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
-		return ErrInvalidPassword
+		return nil, ErrInvalidPassword
 	case err != nil:
-		return fmt.Errorf("failed to compare password: %w", err)
+		return nil, fmt.Errorf("failed to compare password: %w", err)
 	}
 
 	account.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
-		return fmt.Errorf("failed to hash password: %w", err)
+		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
 	// TODO(davidsbond): this feels a little fragile, we probably need some undo/redo mechanism here to avoid a
@@ -162,9 +162,9 @@ func (svc *AccountService) ChangePassword(userID uuid.UUID, oldPassword string, 
 	err = svc.accounts.Update(account)
 	switch {
 	case errors.Is(err, database.ErrAccountNotFound):
-		return ErrAccountNotFound
+		return nil, ErrAccountNotFound
 	case err != nil:
-		return fmt.Errorf("failed to update account: %w", err)
+		return nil, fmt.Errorf("failed to update account: %w", err)
 	}
 
 	salt := account.ID[:]
@@ -172,8 +172,8 @@ func (svc *AccountService) ChangePassword(userID uuid.UUID, oldPassword string, 
 	newKey := deriveKey(newPassword, salt)
 
 	if err = svc.databases.RotateKey(account.ID, oldKey, newKey); err != nil {
-		return fmt.Errorf("failed to rotate encryption key: %w", err)
+		return nil, fmt.Errorf("failed to rotate encryption key: %w", err)
 	}
 
-	return nil
+	return newKey, nil
 }

@@ -337,7 +337,7 @@ func TestAccountAPI_ChangePassword(t *testing.T) {
 			Setup: func(svc *MockAccountService) {
 				svc.EXPECT().
 					ChangePassword(mock.Anything, "old", "new").
-					Return(service.ErrAccountNotFound).
+					Return(nil, service.ErrAccountNotFound).
 					Once()
 			},
 		},
@@ -353,7 +353,7 @@ func TestAccountAPI_ChangePassword(t *testing.T) {
 			Setup: func(svc *MockAccountService) {
 				svc.EXPECT().
 					ChangePassword(mock.Anything, "old", "new").
-					Return(service.ErrInvalidPassword).
+					Return(nil, service.ErrInvalidPassword).
 					Once()
 			},
 		},
@@ -369,7 +369,7 @@ func TestAccountAPI_ChangePassword(t *testing.T) {
 			Setup: func(svc *MockAccountService) {
 				svc.EXPECT().
 					ChangePassword(mock.Anything, "old", "new").
-					Return(io.EOF).
+					Return(nil, io.EOF).
 					Once()
 			},
 		},
@@ -377,6 +377,9 @@ func TestAccountAPI_ChangePassword(t *testing.T) {
 			Name:         "success",
 			Token:        token.TestToken(t, "test"),
 			ExpectedCode: http.StatusOK,
+			Expected: api.UpdatePasswordResponse{
+				RestoreKey: []byte("test-key"),
+			},
 			Request: api.UpdatePasswordRequest{
 				NewPassword: "new",
 				OldPassword: "old",
@@ -384,7 +387,7 @@ func TestAccountAPI_ChangePassword(t *testing.T) {
 			Setup: func(svc *MockAccountService) {
 				svc.EXPECT().
 					ChangePassword(mock.Anything, "old", "new").
-					Return(nil).
+					Return([]byte("test-key"), nil).
 					Once()
 			},
 		},
