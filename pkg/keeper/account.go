@@ -99,3 +99,23 @@ func (c *Client) DeleteAccount(ctx context.Context) error {
 
 	return nil
 }
+
+// RestoreAccount attempts to update the account's password to the new one using their restore key. On success, returns
+// the user's updated restore key which must be stored for disaster recovery purposes or if they forget their password.
+func (c *Client) RestoreAccount(ctx context.Context, email string, restoreKey RestoreKey, newPassword string) (RestoreKey, error) {
+	request, err := c.buildRequest(ctx, http.MethodPost, "/api/v1/account/restore", api.RestoreAccountRequest{
+		Email:       email,
+		RestoreKey:  restoreKey,
+		NewPassword: newPassword,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := doRequest[api.RestoreAccountResponse](c.client, request)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.RestoreKey, nil
+}

@@ -60,7 +60,7 @@ func setupTest(t *testing.T) *keeper.Client {
 	return keeper.NewClient(fmt.Sprintf("http://0.0.0.0:%d", port))
 }
 
-func setupAccount(t *testing.T, client *keeper.Client) {
+func setupAccount(t *testing.T, client *keeper.Client) keeper.RestoreKey {
 	t.Helper()
 
 	const (
@@ -69,7 +69,7 @@ func setupAccount(t *testing.T, client *keeper.Client) {
 		displayName = "Test McTest"
 	)
 
-	_, err := client.CreateAccount(t.Context(), keeper.Account{
+	restoreKey, err := client.CreateAccount(t.Context(), keeper.Account{
 		Email:       email,
 		DisplayName: displayName,
 		Password:    password,
@@ -78,4 +78,6 @@ func setupAccount(t *testing.T, client *keeper.Client) {
 
 	err = client.Login(t.Context(), email, password)
 	require.NoError(t, err)
+
+	return restoreKey
 }

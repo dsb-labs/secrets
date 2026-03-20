@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -107,5 +108,35 @@ func TestClient_DeleteAccount(t *testing.T) {
 		err := client.Login(ctx, "test@test.com", "test")
 		require.Error(t, err)
 		assert.True(t, keeper.IsNotFound(err))
+	})
+}
+
+func TestClient_RestoreAccount(t *testing.T) {
+	client := setupTest(t)
+	ctx := t.Context()
+
+	restoreKey := setupAccount(t, client)
+
+	t.Run("error if not account does not exist", func(t *testing.T) {
+		_, err := client.RestoreAccount(ctx, "nope@nope.com", restoreKey, "something")
+		require.Error(t, err)
+		assert.True(t, keeper.IsNotFound(err))
+	})
+
+	t.Run("error if restore key is invalid", func(t *testing.T) {
+		_, err := client.RestoreAccount(ctx, "test@test.com", bytes.Repeat([]byte{0}, 32), "something")
+		require.Error(t, err)
+		assert.True(t, keeper.IsBadRequest(err))
+	})
+
+	t.Run("changes password", func(t *testing.T) {
+		newKey, err := client.RestoreAccount(ctx, "test@test.com", restoreKey, "test2")
+		require.NoError(t, err)
+		require.NotNil(t, newKey)
+	})
+
+	t.Run("authenticates with new password", func(t *testing.T) {
+		err := client.Login(ctx, "test@test.com", "test2")
+		require.NoError(t, err)
 	})
 }
