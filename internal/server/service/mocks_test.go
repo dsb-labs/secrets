@@ -127,9 +127,66 @@ func (_m *MockDatabaseManager) EXPECT() *MockDatabaseManager_Expecter {
 	return &MockDatabaseManager_Expecter{mock: &_m.Mock}
 }
 
+// Create provides a mock function for the type MockDatabaseManager
+func (_mock *MockDatabaseManager) Create(accountID uuid.UUID, key []byte) error {
+	ret := _mock.Called(accountID, key)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Create")
+	}
+
+	var r0 error
+	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, []byte) error); ok {
+		r0 = returnFunc(accountID, key)
+	} else {
+		r0 = ret.Error(0)
+	}
+	return r0
+}
+
+// MockDatabaseManager_Create_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Create'
+type MockDatabaseManager_Create_Call struct {
+	*mock.Call
+}
+
+// Create is a helper method to define mock.On call
+//   - accountID uuid.UUID
+//   - key []byte
+func (_e *MockDatabaseManager_Expecter) Create(accountID interface{}, key interface{}) *MockDatabaseManager_Create_Call {
+	return &MockDatabaseManager_Create_Call{Call: _e.mock.On("Create", accountID, key)}
+}
+
+func (_c *MockDatabaseManager_Create_Call) Run(run func(accountID uuid.UUID, key []byte)) *MockDatabaseManager_Create_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 uuid.UUID
+		if args[0] != nil {
+			arg0 = args[0].(uuid.UUID)
+		}
+		var arg1 []byte
+		if args[1] != nil {
+			arg1 = args[1].([]byte)
+		}
+		run(
+			arg0,
+			arg1,
+		)
+	})
+	return _c
+}
+
+func (_c *MockDatabaseManager_Create_Call) Return(err error) *MockDatabaseManager_Create_Call {
+	_c.Call.Return(err)
+	return _c
+}
+
+func (_c *MockDatabaseManager_Create_Call) RunAndReturn(run func(accountID uuid.UUID, key []byte) error) *MockDatabaseManager_Create_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Delete provides a mock function for the type MockDatabaseManager
-func (_mock *MockDatabaseManager) Delete(uUID uuid.UUID) error {
-	ret := _mock.Called(uUID)
+func (_mock *MockDatabaseManager) Delete(accountID uuid.UUID) error {
+	ret := _mock.Called(accountID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
@@ -137,7 +194,7 @@ func (_mock *MockDatabaseManager) Delete(uUID uuid.UUID) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) error); ok {
-		r0 = returnFunc(uUID)
+		r0 = returnFunc(accountID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -150,12 +207,12 @@ type MockDatabaseManager_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//   - uUID uuid.UUID
-func (_e *MockDatabaseManager_Expecter) Delete(uUID interface{}) *MockDatabaseManager_Delete_Call {
-	return &MockDatabaseManager_Delete_Call{Call: _e.mock.On("Delete", uUID)}
+//   - accountID uuid.UUID
+func (_e *MockDatabaseManager_Expecter) Delete(accountID interface{}) *MockDatabaseManager_Delete_Call {
+	return &MockDatabaseManager_Delete_Call{Call: _e.mock.On("Delete", accountID)}
 }
 
-func (_c *MockDatabaseManager_Delete_Call) Run(run func(uUID uuid.UUID)) *MockDatabaseManager_Delete_Call {
+func (_c *MockDatabaseManager_Delete_Call) Run(run func(accountID uuid.UUID)) *MockDatabaseManager_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -173,14 +230,14 @@ func (_c *MockDatabaseManager_Delete_Call) Return(err error) *MockDatabaseManage
 	return _c
 }
 
-func (_c *MockDatabaseManager_Delete_Call) RunAndReturn(run func(uUID uuid.UUID) error) *MockDatabaseManager_Delete_Call {
+func (_c *MockDatabaseManager_Delete_Call) RunAndReturn(run func(accountID uuid.UUID) error) *MockDatabaseManager_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Lock provides a mock function for the type MockDatabaseManager
-func (_mock *MockDatabaseManager) Lock(uUID uuid.UUID) error {
-	ret := _mock.Called(uUID)
+func (_mock *MockDatabaseManager) Lock(accountID uuid.UUID) error {
+	ret := _mock.Called(accountID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Lock")
@@ -188,7 +245,7 @@ func (_mock *MockDatabaseManager) Lock(uUID uuid.UUID) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) error); ok {
-		r0 = returnFunc(uUID)
+		r0 = returnFunc(accountID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -201,12 +258,12 @@ type MockDatabaseManager_Lock_Call struct {
 }
 
 // Lock is a helper method to define mock.On call
-//   - uUID uuid.UUID
-func (_e *MockDatabaseManager_Expecter) Lock(uUID interface{}) *MockDatabaseManager_Lock_Call {
-	return &MockDatabaseManager_Lock_Call{Call: _e.mock.On("Lock", uUID)}
+//   - accountID uuid.UUID
+func (_e *MockDatabaseManager_Expecter) Lock(accountID interface{}) *MockDatabaseManager_Lock_Call {
+	return &MockDatabaseManager_Lock_Call{Call: _e.mock.On("Lock", accountID)}
 }
 
-func (_c *MockDatabaseManager_Lock_Call) Run(run func(uUID uuid.UUID)) *MockDatabaseManager_Lock_Call {
+func (_c *MockDatabaseManager_Lock_Call) Run(run func(accountID uuid.UUID)) *MockDatabaseManager_Lock_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -224,14 +281,14 @@ func (_c *MockDatabaseManager_Lock_Call) Return(err error) *MockDatabaseManager_
 	return _c
 }
 
-func (_c *MockDatabaseManager_Lock_Call) RunAndReturn(run func(uUID uuid.UUID) error) *MockDatabaseManager_Lock_Call {
+func (_c *MockDatabaseManager_Lock_Call) RunAndReturn(run func(accountID uuid.UUID) error) *MockDatabaseManager_Lock_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // RotateKey provides a mock function for the type MockDatabaseManager
-func (_mock *MockDatabaseManager) RotateKey(uUID uuid.UUID, bytes []byte, bytes1 []byte) error {
-	ret := _mock.Called(uUID, bytes, bytes1)
+func (_mock *MockDatabaseManager) RotateKey(accountID uuid.UUID, oldKey []byte, newKey []byte) error {
+	ret := _mock.Called(accountID, oldKey, newKey)
 
 	if len(ret) == 0 {
 		panic("no return value specified for RotateKey")
@@ -239,7 +296,7 @@ func (_mock *MockDatabaseManager) RotateKey(uUID uuid.UUID, bytes []byte, bytes1
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, []byte, []byte) error); ok {
-		r0 = returnFunc(uUID, bytes, bytes1)
+		r0 = returnFunc(accountID, oldKey, newKey)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -252,14 +309,14 @@ type MockDatabaseManager_RotateKey_Call struct {
 }
 
 // RotateKey is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - bytes []byte
-//   - bytes1 []byte
-func (_e *MockDatabaseManager_Expecter) RotateKey(uUID interface{}, bytes interface{}, bytes1 interface{}) *MockDatabaseManager_RotateKey_Call {
-	return &MockDatabaseManager_RotateKey_Call{Call: _e.mock.On("RotateKey", uUID, bytes, bytes1)}
+//   - accountID uuid.UUID
+//   - oldKey []byte
+//   - newKey []byte
+func (_e *MockDatabaseManager_Expecter) RotateKey(accountID interface{}, oldKey interface{}, newKey interface{}) *MockDatabaseManager_RotateKey_Call {
+	return &MockDatabaseManager_RotateKey_Call{Call: _e.mock.On("RotateKey", accountID, oldKey, newKey)}
 }
 
-func (_c *MockDatabaseManager_RotateKey_Call) Run(run func(uUID uuid.UUID, bytes []byte, bytes1 []byte)) *MockDatabaseManager_RotateKey_Call {
+func (_c *MockDatabaseManager_RotateKey_Call) Run(run func(accountID uuid.UUID, oldKey []byte, newKey []byte)) *MockDatabaseManager_RotateKey_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -287,14 +344,14 @@ func (_c *MockDatabaseManager_RotateKey_Call) Return(err error) *MockDatabaseMan
 	return _c
 }
 
-func (_c *MockDatabaseManager_RotateKey_Call) RunAndReturn(run func(uUID uuid.UUID, bytes []byte, bytes1 []byte) error) *MockDatabaseManager_RotateKey_Call {
+func (_c *MockDatabaseManager_RotateKey_Call) RunAndReturn(run func(accountID uuid.UUID, oldKey []byte, newKey []byte) error) *MockDatabaseManager_RotateKey_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Unlock provides a mock function for the type MockDatabaseManager
-func (_mock *MockDatabaseManager) Unlock(uUID uuid.UUID, bytes []byte) error {
-	ret := _mock.Called(uUID, bytes)
+func (_mock *MockDatabaseManager) Unlock(accountID uuid.UUID, key []byte) error {
+	ret := _mock.Called(accountID, key)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Unlock")
@@ -302,7 +359,7 @@ func (_mock *MockDatabaseManager) Unlock(uUID uuid.UUID, bytes []byte) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, []byte) error); ok {
-		r0 = returnFunc(uUID, bytes)
+		r0 = returnFunc(accountID, key)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -315,13 +372,13 @@ type MockDatabaseManager_Unlock_Call struct {
 }
 
 // Unlock is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - bytes []byte
-func (_e *MockDatabaseManager_Expecter) Unlock(uUID interface{}, bytes interface{}) *MockDatabaseManager_Unlock_Call {
-	return &MockDatabaseManager_Unlock_Call{Call: _e.mock.On("Unlock", uUID, bytes)}
+//   - accountID uuid.UUID
+//   - key []byte
+func (_e *MockDatabaseManager_Expecter) Unlock(accountID interface{}, key interface{}) *MockDatabaseManager_Unlock_Call {
+	return &MockDatabaseManager_Unlock_Call{Call: _e.mock.On("Unlock", accountID, key)}
 }
 
-func (_c *MockDatabaseManager_Unlock_Call) Run(run func(uUID uuid.UUID, bytes []byte)) *MockDatabaseManager_Unlock_Call {
+func (_c *MockDatabaseManager_Unlock_Call) Run(run func(accountID uuid.UUID, key []byte)) *MockDatabaseManager_Unlock_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -344,7 +401,7 @@ func (_c *MockDatabaseManager_Unlock_Call) Return(err error) *MockDatabaseManage
 	return _c
 }
 
-func (_c *MockDatabaseManager_Unlock_Call) RunAndReturn(run func(uUID uuid.UUID, bytes []byte) error) *MockDatabaseManager_Unlock_Call {
+func (_c *MockDatabaseManager_Unlock_Call) RunAndReturn(run func(accountID uuid.UUID, key []byte) error) *MockDatabaseManager_Unlock_Call {
 	_c.Call.Return(run)
 	return _c
 }

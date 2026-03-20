@@ -13,14 +13,17 @@ type (
 	// The DatabaseManager interface describes types that manage individual user databases.
 	DatabaseManager interface {
 		// Unlock should open and decrypt the user database associated with the given user identifier.
-		Unlock(uuid.UUID, []byte) error
+		Unlock(accountID uuid.UUID, key []byte) error
 		// Lock should close the user database associated with the given user identifier.
-		Lock(uuid.UUID) error
+		Lock(accountID uuid.UUID) error
 		// Delete should delete the user database associated with the given user identifier.
-		Delete(uuid.UUID) error
+		Delete(accountID uuid.UUID) error
 		// RotateKey should replace the first encryption key with the second encryption key for the
-		// given user identifier.
-		RotateKey(uuid.UUID, []byte, []byte) error
+		// given user identifier, returning database.ErrInvalidKey if the old encryption key is invalid.
+		RotateKey(accountID uuid.UUID, oldKey []byte, newKey []byte) error
+		// Create should create a new user database, returning database.ErrDatabaseExists if one already exists at
+		// for the given account.
+		Create(accountID uuid.UUID, key []byte) error
 	}
 )
 

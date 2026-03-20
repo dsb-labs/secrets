@@ -47,6 +47,19 @@ func TestAccountService_Create(t *testing.T) {
 			},
 		},
 		{
+			Name:         "error if database creation fails",
+			ExpectsError: true,
+			Account: service.Account{
+				Email:       "test@test.com",
+				Password:    "test",
+				DisplayName: "test",
+			},
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().Create(mock.Anything).Return(nil).Once()
+				databases.EXPECT().Create(mock.Anything, mock.Anything).Return(io.EOF).Once()
+			},
+		},
+		{
 			Name: "returns restore key on success",
 			Account: service.Account{
 				Email:       "test@test.com",
@@ -55,6 +68,7 @@ func TestAccountService_Create(t *testing.T) {
 			},
 			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
 				accounts.EXPECT().Create(mock.Anything).Return(nil).Once()
+				databases.EXPECT().Create(mock.Anything, mock.Anything).Return(nil).Once()
 			},
 		},
 	}
@@ -566,10 +580,10 @@ func TestAccountService_Restore(t *testing.T) {
 			},
 		},
 		{
-			Name:         "success",
-			Email:        "test@test.com",
-			RestoreKey:   []byte("test"),
-			NewPassword:  "test1",
+			Name:        "success",
+			Email:       "test@test.com",
+			RestoreKey:  []byte("test"),
+			NewPassword: "test1",
 			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
 				account := database.Account{
 					ID:    uuid.NameSpaceDNS,

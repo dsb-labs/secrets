@@ -35,6 +35,9 @@ var (
 	// ErrInvalidKey is the error given when attempting to decrypt an individual account database with an invalid
 	// key.
 	ErrInvalidKey = errors.New("invalid key")
+	// ErrDatabaseExists is the error given when attempting to create an individual account database where one already
+	// exists.
+	ErrDatabaseExists = errors.New("database exists")
 )
 
 // NewManager returns a new instance of the Manager type that will manage individual user databases within the specified
@@ -46,6 +49,36 @@ func NewManager(dir string, state State, expiration time.Duration) *Manager {
 		state:      state,
 		expiration: expiration,
 	}
+}
+
+// Create a database for a given account identifier. This database is closed upon return of this method and is not
+// placed into the state.
+func (m *Manager) Create(id uuid.UUID, key []byte) error {
+	path := filepath.Join(m.dir, id.String())
+
+	if _, err := os.Stat(path); err == nil {
+		return ErrDatabaseExists
+	}
+
+	if err := os.MkdirAll(path, 0700); err != nil {
+		return fmt.Errorf("failed to create user directory %q: %w", path, err)
+	}
+
+	opts := badger.DefaultOptions(path).
+		WithEncryptionKey(key).
+		WithLoggingLevel(badger.ERROR).
+		WithIndexCacheSize(100 << 20).
+		WithNumVersionsToKeep(1)
+
+	db, err := badger.Open(opts)
+	switch {
+	case errors.Is(err, badger.ErrEncryptionKeyMismatch):
+		return ErrDatabaseExists
+	case err != nil:
+		return fmt.Errorf("failed to open database: %w", err)
+	}
+
+	return db.Close()
 }
 
 // Unlock opens a user's encrypted database using their encryption key. Each database remains open for the amount
@@ -108,16 +141,12 @@ func (m *Manager) Delete(id uuid.UUID) error {
 	return nil
 }
 
-// RotateKey updates the master encryption key used to encrypt individual user databases.
+// RotateKey updates the master encryption key used to encrypt individual user databases. Returns ErrInvalidKey if the
+// old encryption key is invalid.
 func (m *Manager) RotateKey(id uuid.UUID, oldKey, newKey []byte) error {
 	// The path may not exist yet if the user has never logged in before. So we can just do nothing here.
 	path := filepath.Join(m.dir, id.String())
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		// TODO(davidsbond): fairly certain this opens an attack vector whereby an account that has never logged in
-		// can have its password changed arbitrarily by anyone as there's no key to check. However, is that a big
-		// deal if the user definitely won't have any sensitive data they're storing? At worst it can be used to
-		// annoy someone who has just made their account. Might want to make it so that we immediately create a
-		// database upon creating an account to mitigate this.
 		return nil
 	}
 

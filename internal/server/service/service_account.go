@@ -95,6 +95,10 @@ func (svc *AccountService) Create(account Account) ([]byte, error) {
 	// account.
 	restoreKey := deriveKey(account.Password, record.ID[:])
 
+	if err = svc.databases.Create(record.ID, restoreKey); err != nil {
+		return nil, fmt.Errorf("failed to create account database: %w", err)
+	}
+
 	return restoreKey, nil
 }
 

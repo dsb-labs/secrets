@@ -27,6 +27,16 @@ func TestManager(t *testing.T) {
 
 	key := bytes.Repeat([]byte{0}, 32)
 
+	t.Run("creates a new database", func(t *testing.T) {
+		err := manager.Create(uuid.NameSpaceDNS, key)
+		require.NoError(t, err)
+	})
+
+	t.Run("error for existing database", func(t *testing.T) {
+		err := manager.Create(uuid.NameSpaceDNS, key)
+		require.Error(t, err)
+	})
+
 	t.Run("opens new database", func(t *testing.T) {
 		err := manager.Unlock(uuid.NameSpaceDNS, key)
 		require.NoError(t, err)
