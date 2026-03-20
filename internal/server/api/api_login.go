@@ -22,15 +22,15 @@ type (
 	// The LoginService interface describes types that manage user logins.
 	LoginService interface {
 		// Create should create a new login record for the given user id.
-		Create(uuid.UUID, service.Login) error
+		Create(accountID uuid.UUID, login service.Login) error
 		// List should return all logins associated with the given user id.
-		List(uuid.UUID, ...filter.Filter[service.Login]) ([]service.Login, error)
+		List(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)
 		// Delete should remove the login record associated with the given user and login id. Returning
 		// service.ErrLoginNotFound if it does not exist.
-		Delete(uuid.UUID, uuid.UUID) error
+		Delete(accountID uuid.UUID, loginID uuid.UUID) error
 		// Get should return the login record associated with the given user and login id. Returning
 		// service.ErrLoginNotFound if it does not exist.
-		Get(uuid.UUID, uuid.UUID) (service.Login, error)
+		Get(accountID uuid.UUID, loginID uuid.UUID) (service.Login, error)
 	}
 
 	// The Login type represents a single username/password combination.

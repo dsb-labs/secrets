@@ -24,11 +24,17 @@ type (
 	// The State interface describes types that store references to individual badgerdb instances wrapped within
 	// a lifetime.
 	State interface {
-		Get(uuid.UUID) (*lifetime.Lifetime[*badger.DB], bool)
-		Put(uuid.UUID, *lifetime.Lifetime[*badger.DB])
+		Get(id uuid.UUID) (*lifetime.Lifetime[*badger.DB], bool)
+		Put(id uuid.UUID, db *lifetime.Lifetime[*badger.DB])
 		Range() iter.Seq2[uuid.UUID, *lifetime.Lifetime[*badger.DB]]
-		Remove(uuid.UUID)
+		Remove(id uuid.UUID)
 	}
+)
+
+var (
+	// ErrInvalidKey is the error given when attempting to decrypt an individual account database with an invalid
+	// key.
+	ErrInvalidKey = errors.New("invalid key")
 )
 
 // NewManager returns a new instance of the Manager type that will manage individual user databases within the specified
@@ -104,16 +110,14 @@ func (m *Manager) Delete(id uuid.UUID) error {
 
 // RotateKey updates the master encryption key used to encrypt individual user databases.
 func (m *Manager) RotateKey(id uuid.UUID, oldKey, newKey []byte) error {
-	// The badger database must be offline to perform a key rotation. This will effectively force a logout for all
-	// devices the user is authenticated on when they change their password.
-	lt, ok := m.state.Get(id)
-	if ok && !lt.Expired() {
-		lt.Expire()
-	}
-
 	// The path may not exist yet if the user has never logged in before. So we can just do nothing here.
 	path := filepath.Join(m.dir, id.String())
 	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// TODO(davidsbond): fairly certain this opens an attack vector whereby an account that has never logged in
+		// can have its password changed arbitrarily by anyone as there's no key to check. However, is that a big
+		// deal if the user definitely won't have any sensitive data they're storing? At worst it can be used to
+		// annoy someone who has just made their account. Might want to make it so that we immediately create a
+		// database upon creating an account to mitigate this.
 		return nil
 	}
 
@@ -125,9 +129,21 @@ func (m *Manager) RotateKey(id uuid.UUID, oldKey, newKey []byte) error {
 	}
 
 	registry, err := badger.OpenKeyRegistry(opt)
-	if err != nil {
+	switch {
+	case errors.Is(err, badger.ErrEncryptionKeyMismatch):
+		return ErrInvalidKey
+	case err != nil:
 		return err
 	}
+
+	// The badger database must be offline to perform a key rotation. This will effectively force a logout for all
+	// devices the user is authenticated on when they change their password. We perform this check after opening
+	// the key registry to ensure the old key is correct before we log the user out.
+	lt, ok := m.state.Get(id)
+	if ok && !lt.Expired() {
+		lt.Expire()
+	}
+
 	defer registry.Close()
 
 	opt.EncryptionKey = newKey

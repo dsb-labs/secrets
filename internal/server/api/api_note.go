@@ -22,15 +22,15 @@ type (
 	// The NoteService interface describes types that manage user notes.
 	NoteService interface {
 		// Create should create a new note record for the given user id.
-		Create(uuid.UUID, service.Note) error
+		Create(accountID uuid.UUID, note service.Note) error
 		// List should return all notes associated with the given user id.
-		List(uuid.UUID, ...filter.Filter[service.Note]) ([]service.Note, error)
+		List(accountID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error)
 		// Delete should remove the note record associated with the given user and note id. Returning
 		// service.ErrNoteNotFound if it does not exist.
-		Delete(uuid.UUID, uuid.UUID) error
+		Delete(accountID uuid.UUID, noteID uuid.UUID) error
 		// Get should return the note record associated with the given user and note id. Returning
 		// service.ErrNoteNotFound if it does not exist.
-		Get(uuid.UUID, uuid.UUID) (service.Note, error)
+		Get(accountID uuid.UUID, noteID uuid.UUID) (service.Note, error)
 	}
 
 	// The Note type represents a single password.

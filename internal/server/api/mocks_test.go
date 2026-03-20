@@ -111,8 +111,8 @@ func (_m *MockAccountService) EXPECT() *MockAccountService_Expecter {
 }
 
 // ChangePassword provides a mock function for the type MockAccountService
-func (_mock *MockAccountService) ChangePassword(uUID uuid.UUID, s string, s1 string) ([]byte, error) {
-	ret := _mock.Called(uUID, s, s1)
+func (_mock *MockAccountService) ChangePassword(id uuid.UUID, oldPassword string, newPassword string) ([]byte, error) {
+	ret := _mock.Called(id, oldPassword, newPassword)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ChangePassword")
@@ -121,17 +121,17 @@ func (_mock *MockAccountService) ChangePassword(uUID uuid.UUID, s string, s1 str
 	var r0 []byte
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, string, string) ([]byte, error)); ok {
-		return returnFunc(uUID, s, s1)
+		return returnFunc(id, oldPassword, newPassword)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, string, string) []byte); ok {
-		r0 = returnFunc(uUID, s, s1)
+		r0 = returnFunc(id, oldPassword, newPassword)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]byte)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, string, string) error); ok {
-		r1 = returnFunc(uUID, s, s1)
+		r1 = returnFunc(id, oldPassword, newPassword)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -144,14 +144,14 @@ type MockAccountService_ChangePassword_Call struct {
 }
 
 // ChangePassword is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - s string
-//   - s1 string
-func (_e *MockAccountService_Expecter) ChangePassword(uUID interface{}, s interface{}, s1 interface{}) *MockAccountService_ChangePassword_Call {
-	return &MockAccountService_ChangePassword_Call{Call: _e.mock.On("ChangePassword", uUID, s, s1)}
+//   - id uuid.UUID
+//   - oldPassword string
+//   - newPassword string
+func (_e *MockAccountService_Expecter) ChangePassword(id interface{}, oldPassword interface{}, newPassword interface{}) *MockAccountService_ChangePassword_Call {
+	return &MockAccountService_ChangePassword_Call{Call: _e.mock.On("ChangePassword", id, oldPassword, newPassword)}
 }
 
-func (_c *MockAccountService_ChangePassword_Call) Run(run func(uUID uuid.UUID, s string, s1 string)) *MockAccountService_ChangePassword_Call {
+func (_c *MockAccountService_ChangePassword_Call) Run(run func(id uuid.UUID, oldPassword string, newPassword string)) *MockAccountService_ChangePassword_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -179,7 +179,7 @@ func (_c *MockAccountService_ChangePassword_Call) Return(bytes []byte, err error
 	return _c
 }
 
-func (_c *MockAccountService_ChangePassword_Call) RunAndReturn(run func(uUID uuid.UUID, s string, s1 string) ([]byte, error)) *MockAccountService_ChangePassword_Call {
+func (_c *MockAccountService_ChangePassword_Call) RunAndReturn(run func(id uuid.UUID, oldPassword string, newPassword string) ([]byte, error)) *MockAccountService_ChangePassword_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -247,8 +247,8 @@ func (_c *MockAccountService_Create_Call) RunAndReturn(run func(account service.
 }
 
 // Delete provides a mock function for the type MockAccountService
-func (_mock *MockAccountService) Delete(uUID uuid.UUID) error {
-	ret := _mock.Called(uUID)
+func (_mock *MockAccountService) Delete(id uuid.UUID) error {
+	ret := _mock.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
@@ -256,7 +256,7 @@ func (_mock *MockAccountService) Delete(uUID uuid.UUID) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) error); ok {
-		r0 = returnFunc(uUID)
+		r0 = returnFunc(id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -269,12 +269,12 @@ type MockAccountService_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//   - uUID uuid.UUID
-func (_e *MockAccountService_Expecter) Delete(uUID interface{}) *MockAccountService_Delete_Call {
-	return &MockAccountService_Delete_Call{Call: _e.mock.On("Delete", uUID)}
+//   - id uuid.UUID
+func (_e *MockAccountService_Expecter) Delete(id interface{}) *MockAccountService_Delete_Call {
+	return &MockAccountService_Delete_Call{Call: _e.mock.On("Delete", id)}
 }
 
-func (_c *MockAccountService_Delete_Call) Run(run func(uUID uuid.UUID)) *MockAccountService_Delete_Call {
+func (_c *MockAccountService_Delete_Call) Run(run func(id uuid.UUID)) *MockAccountService_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -292,14 +292,14 @@ func (_c *MockAccountService_Delete_Call) Return(err error) *MockAccountService_
 	return _c
 }
 
-func (_c *MockAccountService_Delete_Call) RunAndReturn(run func(uUID uuid.UUID) error) *MockAccountService_Delete_Call {
+func (_c *MockAccountService_Delete_Call) RunAndReturn(run func(id uuid.UUID) error) *MockAccountService_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Get provides a mock function for the type MockAccountService
-func (_mock *MockAccountService) Get(uUID uuid.UUID) (service.Account, error) {
-	ret := _mock.Called(uUID)
+func (_mock *MockAccountService) Get(id uuid.UUID) (service.Account, error) {
+	ret := _mock.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -308,15 +308,15 @@ func (_mock *MockAccountService) Get(uUID uuid.UUID) (service.Account, error) {
 	var r0 service.Account
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) (service.Account, error)); ok {
-		return returnFunc(uUID)
+		return returnFunc(id)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) service.Account); ok {
-		r0 = returnFunc(uUID)
+		r0 = returnFunc(id)
 	} else {
 		r0 = ret.Get(0).(service.Account)
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID) error); ok {
-		r1 = returnFunc(uUID)
+		r1 = returnFunc(id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -329,12 +329,12 @@ type MockAccountService_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - uUID uuid.UUID
-func (_e *MockAccountService_Expecter) Get(uUID interface{}) *MockAccountService_Get_Call {
-	return &MockAccountService_Get_Call{Call: _e.mock.On("Get", uUID)}
+//   - id uuid.UUID
+func (_e *MockAccountService_Expecter) Get(id interface{}) *MockAccountService_Get_Call {
+	return &MockAccountService_Get_Call{Call: _e.mock.On("Get", id)}
 }
 
-func (_c *MockAccountService_Get_Call) Run(run func(uUID uuid.UUID)) *MockAccountService_Get_Call {
+func (_c *MockAccountService_Get_Call) Run(run func(id uuid.UUID)) *MockAccountService_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -352,7 +352,81 @@ func (_c *MockAccountService_Get_Call) Return(account service.Account, err error
 	return _c
 }
 
-func (_c *MockAccountService_Get_Call) RunAndReturn(run func(uUID uuid.UUID) (service.Account, error)) *MockAccountService_Get_Call {
+func (_c *MockAccountService_Get_Call) RunAndReturn(run func(id uuid.UUID) (service.Account, error)) *MockAccountService_Get_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Restore provides a mock function for the type MockAccountService
+func (_mock *MockAccountService) Restore(email string, restoreKey []byte, newPassword string) ([]byte, error) {
+	ret := _mock.Called(email, restoreKey, newPassword)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Restore")
+	}
+
+	var r0 []byte
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(string, []byte, string) ([]byte, error)); ok {
+		return returnFunc(email, restoreKey, newPassword)
+	}
+	if returnFunc, ok := ret.Get(0).(func(string, []byte, string) []byte); ok {
+		r0 = returnFunc(email, restoreKey, newPassword)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]byte)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(string, []byte, string) error); ok {
+		r1 = returnFunc(email, restoreKey, newPassword)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockAccountService_Restore_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Restore'
+type MockAccountService_Restore_Call struct {
+	*mock.Call
+}
+
+// Restore is a helper method to define mock.On call
+//   - email string
+//   - restoreKey []byte
+//   - newPassword string
+func (_e *MockAccountService_Expecter) Restore(email interface{}, restoreKey interface{}, newPassword interface{}) *MockAccountService_Restore_Call {
+	return &MockAccountService_Restore_Call{Call: _e.mock.On("Restore", email, restoreKey, newPassword)}
+}
+
+func (_c *MockAccountService_Restore_Call) Run(run func(email string, restoreKey []byte, newPassword string)) *MockAccountService_Restore_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 string
+		if args[0] != nil {
+			arg0 = args[0].(string)
+		}
+		var arg1 []byte
+		if args[1] != nil {
+			arg1 = args[1].([]byte)
+		}
+		var arg2 string
+		if args[2] != nil {
+			arg2 = args[2].(string)
+		}
+		run(
+			arg0,
+			arg1,
+			arg2,
+		)
+	})
+	return _c
+}
+
+func (_c *MockAccountService_Restore_Call) Return(bytes []byte, err error) *MockAccountService_Restore_Call {
+	_c.Call.Return(bytes, err)
+	return _c
+}
+
+func (_c *MockAccountService_Restore_Call) RunAndReturn(run func(email string, restoreKey []byte, newPassword string) ([]byte, error)) *MockAccountService_Restore_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -385,8 +459,8 @@ func (_m *MockAuthService) EXPECT() *MockAuthService_Expecter {
 }
 
 // Login provides a mock function for the type MockAuthService
-func (_mock *MockAuthService) Login(s string, s1 string) (token.Token, error) {
-	ret := _mock.Called(s, s1)
+func (_mock *MockAuthService) Login(email string, password string) (token.Token, error) {
+	ret := _mock.Called(email, password)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Login")
@@ -395,15 +469,15 @@ func (_mock *MockAuthService) Login(s string, s1 string) (token.Token, error) {
 	var r0 token.Token
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(string, string) (token.Token, error)); ok {
-		return returnFunc(s, s1)
+		return returnFunc(email, password)
 	}
 	if returnFunc, ok := ret.Get(0).(func(string, string) token.Token); ok {
-		r0 = returnFunc(s, s1)
+		r0 = returnFunc(email, password)
 	} else {
 		r0 = ret.Get(0).(token.Token)
 	}
 	if returnFunc, ok := ret.Get(1).(func(string, string) error); ok {
-		r1 = returnFunc(s, s1)
+		r1 = returnFunc(email, password)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -416,13 +490,13 @@ type MockAuthService_Login_Call struct {
 }
 
 // Login is a helper method to define mock.On call
-//   - s string
-//   - s1 string
-func (_e *MockAuthService_Expecter) Login(s interface{}, s1 interface{}) *MockAuthService_Login_Call {
-	return &MockAuthService_Login_Call{Call: _e.mock.On("Login", s, s1)}
+//   - email string
+//   - password string
+func (_e *MockAuthService_Expecter) Login(email interface{}, password interface{}) *MockAuthService_Login_Call {
+	return &MockAuthService_Login_Call{Call: _e.mock.On("Login", email, password)}
 }
 
-func (_c *MockAuthService_Login_Call) Run(run func(s string, s1 string)) *MockAuthService_Login_Call {
+func (_c *MockAuthService_Login_Call) Run(run func(email string, password string)) *MockAuthService_Login_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 string
 		if args[0] != nil {
@@ -445,14 +519,14 @@ func (_c *MockAuthService_Login_Call) Return(token1 token.Token, err error) *Moc
 	return _c
 }
 
-func (_c *MockAuthService_Login_Call) RunAndReturn(run func(s string, s1 string) (token.Token, error)) *MockAuthService_Login_Call {
+func (_c *MockAuthService_Login_Call) RunAndReturn(run func(email string, password string) (token.Token, error)) *MockAuthService_Login_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Logout provides a mock function for the type MockAuthService
-func (_mock *MockAuthService) Logout(uUID uuid.UUID) error {
-	ret := _mock.Called(uUID)
+func (_mock *MockAuthService) Logout(id uuid.UUID) error {
+	ret := _mock.Called(id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Logout")
@@ -460,7 +534,7 @@ func (_mock *MockAuthService) Logout(uUID uuid.UUID) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) error); ok {
-		r0 = returnFunc(uUID)
+		r0 = returnFunc(id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -473,12 +547,12 @@ type MockAuthService_Logout_Call struct {
 }
 
 // Logout is a helper method to define mock.On call
-//   - uUID uuid.UUID
-func (_e *MockAuthService_Expecter) Logout(uUID interface{}) *MockAuthService_Logout_Call {
-	return &MockAuthService_Logout_Call{Call: _e.mock.On("Logout", uUID)}
+//   - id uuid.UUID
+func (_e *MockAuthService_Expecter) Logout(id interface{}) *MockAuthService_Logout_Call {
+	return &MockAuthService_Logout_Call{Call: _e.mock.On("Logout", id)}
 }
 
-func (_c *MockAuthService_Logout_Call) Run(run func(uUID uuid.UUID)) *MockAuthService_Logout_Call {
+func (_c *MockAuthService_Logout_Call) Run(run func(id uuid.UUID)) *MockAuthService_Logout_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -496,7 +570,7 @@ func (_c *MockAuthService_Logout_Call) Return(err error) *MockAuthService_Logout
 	return _c
 }
 
-func (_c *MockAuthService_Logout_Call) RunAndReturn(run func(uUID uuid.UUID) error) *MockAuthService_Logout_Call {
+func (_c *MockAuthService_Logout_Call) RunAndReturn(run func(id uuid.UUID) error) *MockAuthService_Logout_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -529,8 +603,8 @@ func (_m *MockCardService) EXPECT() *MockCardService_Expecter {
 }
 
 // Create provides a mock function for the type MockCardService
-func (_mock *MockCardService) Create(uUID uuid.UUID, card service.Card) error {
-	ret := _mock.Called(uUID, card)
+func (_mock *MockCardService) Create(accountID uuid.UUID, card service.Card) error {
+	ret := _mock.Called(accountID, card)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -538,7 +612,7 @@ func (_mock *MockCardService) Create(uUID uuid.UUID, card service.Card) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, service.Card) error); ok {
-		r0 = returnFunc(uUID, card)
+		r0 = returnFunc(accountID, card)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -551,13 +625,13 @@ type MockCardService_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - uUID uuid.UUID
+//   - accountID uuid.UUID
 //   - card service.Card
-func (_e *MockCardService_Expecter) Create(uUID interface{}, card interface{}) *MockCardService_Create_Call {
-	return &MockCardService_Create_Call{Call: _e.mock.On("Create", uUID, card)}
+func (_e *MockCardService_Expecter) Create(accountID interface{}, card interface{}) *MockCardService_Create_Call {
+	return &MockCardService_Create_Call{Call: _e.mock.On("Create", accountID, card)}
 }
 
-func (_c *MockCardService_Create_Call) Run(run func(uUID uuid.UUID, card service.Card)) *MockCardService_Create_Call {
+func (_c *MockCardService_Create_Call) Run(run func(accountID uuid.UUID, card service.Card)) *MockCardService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -580,14 +654,14 @@ func (_c *MockCardService_Create_Call) Return(err error) *MockCardService_Create
 	return _c
 }
 
-func (_c *MockCardService_Create_Call) RunAndReturn(run func(uUID uuid.UUID, card service.Card) error) *MockCardService_Create_Call {
+func (_c *MockCardService_Create_Call) RunAndReturn(run func(accountID uuid.UUID, card service.Card) error) *MockCardService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Delete provides a mock function for the type MockCardService
-func (_mock *MockCardService) Delete(uUID uuid.UUID, uUID1 uuid.UUID) error {
-	ret := _mock.Called(uUID, uUID1)
+func (_mock *MockCardService) Delete(accountID uuid.UUID, cardID uuid.UUID) error {
+	ret := _mock.Called(accountID, cardID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
@@ -595,7 +669,7 @@ func (_mock *MockCardService) Delete(uUID uuid.UUID, uUID1 uuid.UUID) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) error); ok {
-		r0 = returnFunc(uUID, uUID1)
+		r0 = returnFunc(accountID, cardID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -608,13 +682,13 @@ type MockCardService_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - uUID1 uuid.UUID
-func (_e *MockCardService_Expecter) Delete(uUID interface{}, uUID1 interface{}) *MockCardService_Delete_Call {
-	return &MockCardService_Delete_Call{Call: _e.mock.On("Delete", uUID, uUID1)}
+//   - accountID uuid.UUID
+//   - cardID uuid.UUID
+func (_e *MockCardService_Expecter) Delete(accountID interface{}, cardID interface{}) *MockCardService_Delete_Call {
+	return &MockCardService_Delete_Call{Call: _e.mock.On("Delete", accountID, cardID)}
 }
 
-func (_c *MockCardService_Delete_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockCardService_Delete_Call {
+func (_c *MockCardService_Delete_Call) Run(run func(accountID uuid.UUID, cardID uuid.UUID)) *MockCardService_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -637,14 +711,14 @@ func (_c *MockCardService_Delete_Call) Return(err error) *MockCardService_Delete
 	return _c
 }
 
-func (_c *MockCardService_Delete_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) error) *MockCardService_Delete_Call {
+func (_c *MockCardService_Delete_Call) RunAndReturn(run func(accountID uuid.UUID, cardID uuid.UUID) error) *MockCardService_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Get provides a mock function for the type MockCardService
-func (_mock *MockCardService) Get(uUID uuid.UUID, uUID1 uuid.UUID) (service.Card, error) {
-	ret := _mock.Called(uUID, uUID1)
+func (_mock *MockCardService) Get(accountID uuid.UUID, cardID uuid.UUID) (service.Card, error) {
+	ret := _mock.Called(accountID, cardID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -653,15 +727,15 @@ func (_mock *MockCardService) Get(uUID uuid.UUID, uUID1 uuid.UUID) (service.Card
 	var r0 service.Card
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) (service.Card, error)); ok {
-		return returnFunc(uUID, uUID1)
+		return returnFunc(accountID, cardID)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) service.Card); ok {
-		r0 = returnFunc(uUID, uUID1)
+		r0 = returnFunc(accountID, cardID)
 	} else {
 		r0 = ret.Get(0).(service.Card)
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, uuid.UUID) error); ok {
-		r1 = returnFunc(uUID, uUID1)
+		r1 = returnFunc(accountID, cardID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -674,13 +748,13 @@ type MockCardService_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - uUID1 uuid.UUID
-func (_e *MockCardService_Expecter) Get(uUID interface{}, uUID1 interface{}) *MockCardService_Get_Call {
-	return &MockCardService_Get_Call{Call: _e.mock.On("Get", uUID, uUID1)}
+//   - accountID uuid.UUID
+//   - cardID uuid.UUID
+func (_e *MockCardService_Expecter) Get(accountID interface{}, cardID interface{}) *MockCardService_Get_Call {
+	return &MockCardService_Get_Call{Call: _e.mock.On("Get", accountID, cardID)}
 }
 
-func (_c *MockCardService_Get_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockCardService_Get_Call {
+func (_c *MockCardService_Get_Call) Run(run func(accountID uuid.UUID, cardID uuid.UUID)) *MockCardService_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -703,18 +777,18 @@ func (_c *MockCardService_Get_Call) Return(card service.Card, err error) *MockCa
 	return _c
 }
 
-func (_c *MockCardService_Get_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) (service.Card, error)) *MockCardService_Get_Call {
+func (_c *MockCardService_Get_Call) RunAndReturn(run func(accountID uuid.UUID, cardID uuid.UUID) (service.Card, error)) *MockCardService_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // List provides a mock function for the type MockCardService
-func (_mock *MockCardService) List(uUID uuid.UUID, filters ...filter.Filter[service.Card]) ([]service.Card, error) {
+func (_mock *MockCardService) List(accountID uuid.UUID, filters ...filter.Filter[service.Card]) ([]service.Card, error) {
 	var tmpRet mock.Arguments
 	if len(filters) > 0 {
-		tmpRet = _mock.Called(uUID, filters)
+		tmpRet = _mock.Called(accountID, filters)
 	} else {
-		tmpRet = _mock.Called(uUID)
+		tmpRet = _mock.Called(accountID)
 	}
 	ret := tmpRet
 
@@ -725,17 +799,17 @@ func (_mock *MockCardService) List(uUID uuid.UUID, filters ...filter.Filter[serv
 	var r0 []service.Card
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Card]) ([]service.Card, error)); ok {
-		return returnFunc(uUID, filters...)
+		return returnFunc(accountID, filters...)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Card]) []service.Card); ok {
-		r0 = returnFunc(uUID, filters...)
+		r0 = returnFunc(accountID, filters...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]service.Card)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, ...filter.Filter[service.Card]) error); ok {
-		r1 = returnFunc(uUID, filters...)
+		r1 = returnFunc(accountID, filters...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -748,14 +822,14 @@ type MockCardService_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - uUID uuid.UUID
+//   - accountID uuid.UUID
 //   - filters ...filter.Filter[service.Card]
-func (_e *MockCardService_Expecter) List(uUID interface{}, filters ...interface{}) *MockCardService_List_Call {
+func (_e *MockCardService_Expecter) List(accountID interface{}, filters ...interface{}) *MockCardService_List_Call {
 	return &MockCardService_List_Call{Call: _e.mock.On("List",
-		append([]interface{}{uUID}, filters...)...)}
+		append([]interface{}{accountID}, filters...)...)}
 }
 
-func (_c *MockCardService_List_Call) Run(run func(uUID uuid.UUID, filters ...filter.Filter[service.Card])) *MockCardService_List_Call {
+func (_c *MockCardService_List_Call) Run(run func(accountID uuid.UUID, filters ...filter.Filter[service.Card])) *MockCardService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -780,7 +854,7 @@ func (_c *MockCardService_List_Call) Return(cards []service.Card, err error) *Mo
 	return _c
 }
 
-func (_c *MockCardService_List_Call) RunAndReturn(run func(uUID uuid.UUID, filters ...filter.Filter[service.Card]) ([]service.Card, error)) *MockCardService_List_Call {
+func (_c *MockCardService_List_Call) RunAndReturn(run func(accountID uuid.UUID, filters ...filter.Filter[service.Card]) ([]service.Card, error)) *MockCardService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -813,8 +887,8 @@ func (_m *MockLoginService) EXPECT() *MockLoginService_Expecter {
 }
 
 // Create provides a mock function for the type MockLoginService
-func (_mock *MockLoginService) Create(uUID uuid.UUID, login service.Login) error {
-	ret := _mock.Called(uUID, login)
+func (_mock *MockLoginService) Create(accountID uuid.UUID, login service.Login) error {
+	ret := _mock.Called(accountID, login)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -822,7 +896,7 @@ func (_mock *MockLoginService) Create(uUID uuid.UUID, login service.Login) error
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, service.Login) error); ok {
-		r0 = returnFunc(uUID, login)
+		r0 = returnFunc(accountID, login)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -835,13 +909,13 @@ type MockLoginService_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - uUID uuid.UUID
+//   - accountID uuid.UUID
 //   - login service.Login
-func (_e *MockLoginService_Expecter) Create(uUID interface{}, login interface{}) *MockLoginService_Create_Call {
-	return &MockLoginService_Create_Call{Call: _e.mock.On("Create", uUID, login)}
+func (_e *MockLoginService_Expecter) Create(accountID interface{}, login interface{}) *MockLoginService_Create_Call {
+	return &MockLoginService_Create_Call{Call: _e.mock.On("Create", accountID, login)}
 }
 
-func (_c *MockLoginService_Create_Call) Run(run func(uUID uuid.UUID, login service.Login)) *MockLoginService_Create_Call {
+func (_c *MockLoginService_Create_Call) Run(run func(accountID uuid.UUID, login service.Login)) *MockLoginService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -864,14 +938,14 @@ func (_c *MockLoginService_Create_Call) Return(err error) *MockLoginService_Crea
 	return _c
 }
 
-func (_c *MockLoginService_Create_Call) RunAndReturn(run func(uUID uuid.UUID, login service.Login) error) *MockLoginService_Create_Call {
+func (_c *MockLoginService_Create_Call) RunAndReturn(run func(accountID uuid.UUID, login service.Login) error) *MockLoginService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Delete provides a mock function for the type MockLoginService
-func (_mock *MockLoginService) Delete(uUID uuid.UUID, uUID1 uuid.UUID) error {
-	ret := _mock.Called(uUID, uUID1)
+func (_mock *MockLoginService) Delete(accountID uuid.UUID, loginID uuid.UUID) error {
+	ret := _mock.Called(accountID, loginID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
@@ -879,7 +953,7 @@ func (_mock *MockLoginService) Delete(uUID uuid.UUID, uUID1 uuid.UUID) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) error); ok {
-		r0 = returnFunc(uUID, uUID1)
+		r0 = returnFunc(accountID, loginID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -892,13 +966,13 @@ type MockLoginService_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - uUID1 uuid.UUID
-func (_e *MockLoginService_Expecter) Delete(uUID interface{}, uUID1 interface{}) *MockLoginService_Delete_Call {
-	return &MockLoginService_Delete_Call{Call: _e.mock.On("Delete", uUID, uUID1)}
+//   - accountID uuid.UUID
+//   - loginID uuid.UUID
+func (_e *MockLoginService_Expecter) Delete(accountID interface{}, loginID interface{}) *MockLoginService_Delete_Call {
+	return &MockLoginService_Delete_Call{Call: _e.mock.On("Delete", accountID, loginID)}
 }
 
-func (_c *MockLoginService_Delete_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockLoginService_Delete_Call {
+func (_c *MockLoginService_Delete_Call) Run(run func(accountID uuid.UUID, loginID uuid.UUID)) *MockLoginService_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -921,14 +995,14 @@ func (_c *MockLoginService_Delete_Call) Return(err error) *MockLoginService_Dele
 	return _c
 }
 
-func (_c *MockLoginService_Delete_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) error) *MockLoginService_Delete_Call {
+func (_c *MockLoginService_Delete_Call) RunAndReturn(run func(accountID uuid.UUID, loginID uuid.UUID) error) *MockLoginService_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Get provides a mock function for the type MockLoginService
-func (_mock *MockLoginService) Get(uUID uuid.UUID, uUID1 uuid.UUID) (service.Login, error) {
-	ret := _mock.Called(uUID, uUID1)
+func (_mock *MockLoginService) Get(accountID uuid.UUID, loginID uuid.UUID) (service.Login, error) {
+	ret := _mock.Called(accountID, loginID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -937,15 +1011,15 @@ func (_mock *MockLoginService) Get(uUID uuid.UUID, uUID1 uuid.UUID) (service.Log
 	var r0 service.Login
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) (service.Login, error)); ok {
-		return returnFunc(uUID, uUID1)
+		return returnFunc(accountID, loginID)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) service.Login); ok {
-		r0 = returnFunc(uUID, uUID1)
+		r0 = returnFunc(accountID, loginID)
 	} else {
 		r0 = ret.Get(0).(service.Login)
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, uuid.UUID) error); ok {
-		r1 = returnFunc(uUID, uUID1)
+		r1 = returnFunc(accountID, loginID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -958,13 +1032,13 @@ type MockLoginService_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - uUID1 uuid.UUID
-func (_e *MockLoginService_Expecter) Get(uUID interface{}, uUID1 interface{}) *MockLoginService_Get_Call {
-	return &MockLoginService_Get_Call{Call: _e.mock.On("Get", uUID, uUID1)}
+//   - accountID uuid.UUID
+//   - loginID uuid.UUID
+func (_e *MockLoginService_Expecter) Get(accountID interface{}, loginID interface{}) *MockLoginService_Get_Call {
+	return &MockLoginService_Get_Call{Call: _e.mock.On("Get", accountID, loginID)}
 }
 
-func (_c *MockLoginService_Get_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockLoginService_Get_Call {
+func (_c *MockLoginService_Get_Call) Run(run func(accountID uuid.UUID, loginID uuid.UUID)) *MockLoginService_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -987,18 +1061,18 @@ func (_c *MockLoginService_Get_Call) Return(login service.Login, err error) *Moc
 	return _c
 }
 
-func (_c *MockLoginService_Get_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) (service.Login, error)) *MockLoginService_Get_Call {
+func (_c *MockLoginService_Get_Call) RunAndReturn(run func(accountID uuid.UUID, loginID uuid.UUID) (service.Login, error)) *MockLoginService_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // List provides a mock function for the type MockLoginService
-func (_mock *MockLoginService) List(uUID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error) {
+func (_mock *MockLoginService) List(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error) {
 	var tmpRet mock.Arguments
 	if len(filters) > 0 {
-		tmpRet = _mock.Called(uUID, filters)
+		tmpRet = _mock.Called(accountID, filters)
 	} else {
-		tmpRet = _mock.Called(uUID)
+		tmpRet = _mock.Called(accountID)
 	}
 	ret := tmpRet
 
@@ -1009,17 +1083,17 @@ func (_mock *MockLoginService) List(uUID uuid.UUID, filters ...filter.Filter[ser
 	var r0 []service.Login
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Login]) ([]service.Login, error)); ok {
-		return returnFunc(uUID, filters...)
+		return returnFunc(accountID, filters...)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Login]) []service.Login); ok {
-		r0 = returnFunc(uUID, filters...)
+		r0 = returnFunc(accountID, filters...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]service.Login)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, ...filter.Filter[service.Login]) error); ok {
-		r1 = returnFunc(uUID, filters...)
+		r1 = returnFunc(accountID, filters...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1032,14 +1106,14 @@ type MockLoginService_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - uUID uuid.UUID
+//   - accountID uuid.UUID
 //   - filters ...filter.Filter[service.Login]
-func (_e *MockLoginService_Expecter) List(uUID interface{}, filters ...interface{}) *MockLoginService_List_Call {
+func (_e *MockLoginService_Expecter) List(accountID interface{}, filters ...interface{}) *MockLoginService_List_Call {
 	return &MockLoginService_List_Call{Call: _e.mock.On("List",
-		append([]interface{}{uUID}, filters...)...)}
+		append([]interface{}{accountID}, filters...)...)}
 }
 
-func (_c *MockLoginService_List_Call) Run(run func(uUID uuid.UUID, filters ...filter.Filter[service.Login])) *MockLoginService_List_Call {
+func (_c *MockLoginService_List_Call) Run(run func(accountID uuid.UUID, filters ...filter.Filter[service.Login])) *MockLoginService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -1064,7 +1138,7 @@ func (_c *MockLoginService_List_Call) Return(logins []service.Login, err error) 
 	return _c
 }
 
-func (_c *MockLoginService_List_Call) RunAndReturn(run func(uUID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)) *MockLoginService_List_Call {
+func (_c *MockLoginService_List_Call) RunAndReturn(run func(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)) *MockLoginService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1097,8 +1171,8 @@ func (_m *MockNoteService) EXPECT() *MockNoteService_Expecter {
 }
 
 // Create provides a mock function for the type MockNoteService
-func (_mock *MockNoteService) Create(uUID uuid.UUID, note service.Note) error {
-	ret := _mock.Called(uUID, note)
+func (_mock *MockNoteService) Create(accountID uuid.UUID, note service.Note) error {
+	ret := _mock.Called(accountID, note)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Create")
@@ -1106,7 +1180,7 @@ func (_mock *MockNoteService) Create(uUID uuid.UUID, note service.Note) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, service.Note) error); ok {
-		r0 = returnFunc(uUID, note)
+		r0 = returnFunc(accountID, note)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -1119,13 +1193,13 @@ type MockNoteService_Create_Call struct {
 }
 
 // Create is a helper method to define mock.On call
-//   - uUID uuid.UUID
+//   - accountID uuid.UUID
 //   - note service.Note
-func (_e *MockNoteService_Expecter) Create(uUID interface{}, note interface{}) *MockNoteService_Create_Call {
-	return &MockNoteService_Create_Call{Call: _e.mock.On("Create", uUID, note)}
+func (_e *MockNoteService_Expecter) Create(accountID interface{}, note interface{}) *MockNoteService_Create_Call {
+	return &MockNoteService_Create_Call{Call: _e.mock.On("Create", accountID, note)}
 }
 
-func (_c *MockNoteService_Create_Call) Run(run func(uUID uuid.UUID, note service.Note)) *MockNoteService_Create_Call {
+func (_c *MockNoteService_Create_Call) Run(run func(accountID uuid.UUID, note service.Note)) *MockNoteService_Create_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -1148,14 +1222,14 @@ func (_c *MockNoteService_Create_Call) Return(err error) *MockNoteService_Create
 	return _c
 }
 
-func (_c *MockNoteService_Create_Call) RunAndReturn(run func(uUID uuid.UUID, note service.Note) error) *MockNoteService_Create_Call {
+func (_c *MockNoteService_Create_Call) RunAndReturn(run func(accountID uuid.UUID, note service.Note) error) *MockNoteService_Create_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Delete provides a mock function for the type MockNoteService
-func (_mock *MockNoteService) Delete(uUID uuid.UUID, uUID1 uuid.UUID) error {
-	ret := _mock.Called(uUID, uUID1)
+func (_mock *MockNoteService) Delete(accountID uuid.UUID, noteID uuid.UUID) error {
+	ret := _mock.Called(accountID, noteID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Delete")
@@ -1163,7 +1237,7 @@ func (_mock *MockNoteService) Delete(uUID uuid.UUID, uUID1 uuid.UUID) error {
 
 	var r0 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) error); ok {
-		r0 = returnFunc(uUID, uUID1)
+		r0 = returnFunc(accountID, noteID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -1176,13 +1250,13 @@ type MockNoteService_Delete_Call struct {
 }
 
 // Delete is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - uUID1 uuid.UUID
-func (_e *MockNoteService_Expecter) Delete(uUID interface{}, uUID1 interface{}) *MockNoteService_Delete_Call {
-	return &MockNoteService_Delete_Call{Call: _e.mock.On("Delete", uUID, uUID1)}
+//   - accountID uuid.UUID
+//   - noteID uuid.UUID
+func (_e *MockNoteService_Expecter) Delete(accountID interface{}, noteID interface{}) *MockNoteService_Delete_Call {
+	return &MockNoteService_Delete_Call{Call: _e.mock.On("Delete", accountID, noteID)}
 }
 
-func (_c *MockNoteService_Delete_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockNoteService_Delete_Call {
+func (_c *MockNoteService_Delete_Call) Run(run func(accountID uuid.UUID, noteID uuid.UUID)) *MockNoteService_Delete_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -1205,14 +1279,14 @@ func (_c *MockNoteService_Delete_Call) Return(err error) *MockNoteService_Delete
 	return _c
 }
 
-func (_c *MockNoteService_Delete_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) error) *MockNoteService_Delete_Call {
+func (_c *MockNoteService_Delete_Call) RunAndReturn(run func(accountID uuid.UUID, noteID uuid.UUID) error) *MockNoteService_Delete_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Get provides a mock function for the type MockNoteService
-func (_mock *MockNoteService) Get(uUID uuid.UUID, uUID1 uuid.UUID) (service.Note, error) {
-	ret := _mock.Called(uUID, uUID1)
+func (_mock *MockNoteService) Get(accountID uuid.UUID, noteID uuid.UUID) (service.Note, error) {
+	ret := _mock.Called(accountID, noteID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Get")
@@ -1221,15 +1295,15 @@ func (_mock *MockNoteService) Get(uUID uuid.UUID, uUID1 uuid.UUID) (service.Note
 	var r0 service.Note
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) (service.Note, error)); ok {
-		return returnFunc(uUID, uUID1)
+		return returnFunc(accountID, noteID)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, uuid.UUID) service.Note); ok {
-		r0 = returnFunc(uUID, uUID1)
+		r0 = returnFunc(accountID, noteID)
 	} else {
 		r0 = ret.Get(0).(service.Note)
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, uuid.UUID) error); ok {
-		r1 = returnFunc(uUID, uUID1)
+		r1 = returnFunc(accountID, noteID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1242,13 +1316,13 @@ type MockNoteService_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - uUID uuid.UUID
-//   - uUID1 uuid.UUID
-func (_e *MockNoteService_Expecter) Get(uUID interface{}, uUID1 interface{}) *MockNoteService_Get_Call {
-	return &MockNoteService_Get_Call{Call: _e.mock.On("Get", uUID, uUID1)}
+//   - accountID uuid.UUID
+//   - noteID uuid.UUID
+func (_e *MockNoteService_Expecter) Get(accountID interface{}, noteID interface{}) *MockNoteService_Get_Call {
+	return &MockNoteService_Get_Call{Call: _e.mock.On("Get", accountID, noteID)}
 }
 
-func (_c *MockNoteService_Get_Call) Run(run func(uUID uuid.UUID, uUID1 uuid.UUID)) *MockNoteService_Get_Call {
+func (_c *MockNoteService_Get_Call) Run(run func(accountID uuid.UUID, noteID uuid.UUID)) *MockNoteService_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -1271,18 +1345,18 @@ func (_c *MockNoteService_Get_Call) Return(note service.Note, err error) *MockNo
 	return _c
 }
 
-func (_c *MockNoteService_Get_Call) RunAndReturn(run func(uUID uuid.UUID, uUID1 uuid.UUID) (service.Note, error)) *MockNoteService_Get_Call {
+func (_c *MockNoteService_Get_Call) RunAndReturn(run func(accountID uuid.UUID, noteID uuid.UUID) (service.Note, error)) *MockNoteService_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // List provides a mock function for the type MockNoteService
-func (_mock *MockNoteService) List(uUID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error) {
+func (_mock *MockNoteService) List(accountID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error) {
 	var tmpRet mock.Arguments
 	if len(filters) > 0 {
-		tmpRet = _mock.Called(uUID, filters)
+		tmpRet = _mock.Called(accountID, filters)
 	} else {
-		tmpRet = _mock.Called(uUID)
+		tmpRet = _mock.Called(accountID)
 	}
 	ret := tmpRet
 
@@ -1293,17 +1367,17 @@ func (_mock *MockNoteService) List(uUID uuid.UUID, filters ...filter.Filter[serv
 	var r0 []service.Note
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Note]) ([]service.Note, error)); ok {
-		return returnFunc(uUID, filters...)
+		return returnFunc(accountID, filters...)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID, ...filter.Filter[service.Note]) []service.Note); ok {
-		r0 = returnFunc(uUID, filters...)
+		r0 = returnFunc(accountID, filters...)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]service.Note)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID, ...filter.Filter[service.Note]) error); ok {
-		r1 = returnFunc(uUID, filters...)
+		r1 = returnFunc(accountID, filters...)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1316,14 +1390,14 @@ type MockNoteService_List_Call struct {
 }
 
 // List is a helper method to define mock.On call
-//   - uUID uuid.UUID
+//   - accountID uuid.UUID
 //   - filters ...filter.Filter[service.Note]
-func (_e *MockNoteService_Expecter) List(uUID interface{}, filters ...interface{}) *MockNoteService_List_Call {
+func (_e *MockNoteService_Expecter) List(accountID interface{}, filters ...interface{}) *MockNoteService_List_Call {
 	return &MockNoteService_List_Call{Call: _e.mock.On("List",
-		append([]interface{}{uUID}, filters...)...)}
+		append([]interface{}{accountID}, filters...)...)}
 }
 
-func (_c *MockNoteService_List_Call) Run(run func(uUID uuid.UUID, filters ...filter.Filter[service.Note])) *MockNoteService_List_Call {
+func (_c *MockNoteService_List_Call) Run(run func(accountID uuid.UUID, filters ...filter.Filter[service.Note])) *MockNoteService_List_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -1348,7 +1422,7 @@ func (_c *MockNoteService_List_Call) Return(notes []service.Note, err error) *Mo
 	return _c
 }
 
-func (_c *MockNoteService_List_Call) RunAndReturn(run func(uUID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error)) *MockNoteService_List_Call {
+func (_c *MockNoteService_List_Call) RunAndReturn(run func(accountID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error)) *MockNoteService_List_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -1381,8 +1455,8 @@ func (_m *MockToolService) EXPECT() *MockToolService_Expecter {
 }
 
 // Export provides a mock function for the type MockToolService
-func (_mock *MockToolService) Export(uUID uuid.UUID) (service.Export, error) {
-	ret := _mock.Called(uUID)
+func (_mock *MockToolService) Export(accountID uuid.UUID) (service.Export, error) {
+	ret := _mock.Called(accountID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Export")
@@ -1391,15 +1465,15 @@ func (_mock *MockToolService) Export(uUID uuid.UUID) (service.Export, error) {
 	var r0 service.Export
 	var r1 error
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) (service.Export, error)); ok {
-		return returnFunc(uUID)
+		return returnFunc(accountID)
 	}
 	if returnFunc, ok := ret.Get(0).(func(uuid.UUID) service.Export); ok {
-		r0 = returnFunc(uUID)
+		r0 = returnFunc(accountID)
 	} else {
 		r0 = ret.Get(0).(service.Export)
 	}
 	if returnFunc, ok := ret.Get(1).(func(uuid.UUID) error); ok {
-		r1 = returnFunc(uUID)
+		r1 = returnFunc(accountID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -1412,12 +1486,12 @@ type MockToolService_Export_Call struct {
 }
 
 // Export is a helper method to define mock.On call
-//   - uUID uuid.UUID
-func (_e *MockToolService_Expecter) Export(uUID interface{}) *MockToolService_Export_Call {
-	return &MockToolService_Export_Call{Call: _e.mock.On("Export", uUID)}
+//   - accountID uuid.UUID
+func (_e *MockToolService_Expecter) Export(accountID interface{}) *MockToolService_Export_Call {
+	return &MockToolService_Export_Call{Call: _e.mock.On("Export", accountID)}
 }
 
-func (_c *MockToolService_Export_Call) Run(run func(uUID uuid.UUID)) *MockToolService_Export_Call {
+func (_c *MockToolService_Export_Call) Run(run func(accountID uuid.UUID)) *MockToolService_Export_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 uuid.UUID
 		if args[0] != nil {
@@ -1435,7 +1509,7 @@ func (_c *MockToolService_Export_Call) Return(export service.Export, err error) 
 	return _c
 }
 
-func (_c *MockToolService_Export_Call) RunAndReturn(run func(uUID uuid.UUID) (service.Export, error)) *MockToolService_Export_Call {
+func (_c *MockToolService_Export_Call) RunAndReturn(run func(accountID uuid.UUID) (service.Export, error)) *MockToolService_Export_Call {
 	_c.Call.Return(run)
 	return _c
 }

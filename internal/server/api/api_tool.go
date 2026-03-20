@@ -20,7 +20,7 @@ type (
 	// The ToolService interface describes types that provide user tool implementations.
 	ToolService interface {
 		// Export should return all the specified user's data as a service.Export type.
-		Export(uuid.UUID) (service.Export, error)
+		Export(accountID uuid.UUID) (service.Export, error)
 	}
 )
 

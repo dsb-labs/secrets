@@ -416,3 +416,145 @@ func TestAccountAPI_ChangePassword(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountAPI_Restore(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		Request      api.RestoreAccountRequest
+		Expected     api.RestoreAccountResponse
+		ExpectedCode int
+		ExpectsError bool
+		Setup        func(svc *MockAccountService)
+	}{
+		{
+			Name:         "error if missing email",
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.RestoreAccountRequest{
+				NewPassword: "test",
+				Email:       "",
+				RestoreKey:  []byte("test"),
+			},
+		},
+		{
+			Name:         "error if missing new password",
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.RestoreAccountRequest{
+				NewPassword: "",
+				Email:       "test@test.com",
+				RestoreKey:  []byte("test"),
+			},
+		},
+		{
+			Name:         "error if missing restore key",
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.RestoreAccountRequest{
+				NewPassword: "test",
+				Email:       "test@test.com",
+				RestoreKey:  nil,
+			},
+		},
+		{
+			Name:         "error if email is invalid",
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.RestoreAccountRequest{
+				NewPassword: "test",
+				Email:       "not-an-email",
+				RestoreKey:  []byte("test"),
+			},
+		},
+		{
+			Name:         "error if account does not exist",
+			ExpectsError: true,
+			ExpectedCode: http.StatusNotFound,
+			Request: api.RestoreAccountRequest{
+				NewPassword: "test",
+				Email:       "test@test.com",
+				RestoreKey:  []byte("test"),
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					Restore("test@test.com", []byte("test"), "test").
+					Return(nil, service.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error if restore key is incorrect",
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+			Request: api.RestoreAccountRequest{
+				NewPassword: "test",
+				Email:       "test@test.com",
+				RestoreKey:  []byte("test"),
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					Restore("test@test.com", []byte("test"), "test").
+					Return(nil, service.ErrInvalidRestoreKey).
+					Once()
+			},
+		},
+		{
+			Name:         "error restoring account",
+			ExpectsError: true,
+			ExpectedCode: http.StatusInternalServerError,
+			Request: api.RestoreAccountRequest{
+				NewPassword: "test",
+				Email:       "test@test.com",
+				RestoreKey:  []byte("test"),
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					Restore("test@test.com", []byte("test"), "test").
+					Return(nil, io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "success",
+			ExpectedCode: http.StatusOK,
+			Expected: api.RestoreAccountResponse{
+				RestoreKey: []byte("test-key"),
+			},
+			Request: api.RestoreAccountRequest{
+				NewPassword: "test",
+				Email:       "test@test.com",
+				RestoreKey:  []byte("test"),
+			},
+			Setup: func(svc *MockAccountService) {
+				svc.EXPECT().
+					Restore("test@test.com", []byte("test"), "test").
+					Return([]byte("test-key"), nil).
+					Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			svc := NewMockAccountService(t)
+			if tc.Setup != nil {
+				tc.Setup(svc)
+			}
+
+			w := httptest.NewRecorder()
+			r := request(t, http.MethodPut, "/api/v1/account/password", tc.Request)
+
+			api.NewAccountAPI(svc).Restore(w, r)
+
+			require.Equal(t, tc.ExpectedCode, w.Code)
+			if tc.ExpectsError {
+				assertAPIError(t, w)
+				return
+			}
+
+			assertResponse(t, w, tc.Expected)
+		})
+	}
+}

@@ -22,9 +22,9 @@ type (
 	AuthService interface {
 		// Login should return a token.Token if the provided email and password combination is correct. This Token should
 		// be given to the user for subsequent API calls.
-		Login(string, string) (token.Token, error)
+		Login(email string, password string) (token.Token, error)
 		// Logout should close any account databases associated with the given UUID.
-		Logout(uuid.UUID) error
+		Logout(id uuid.UUID) error
 	}
 )
 

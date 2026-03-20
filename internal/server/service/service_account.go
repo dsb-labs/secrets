@@ -53,6 +53,8 @@ var (
 	ErrAccountExists = errors.New("account exists")
 	// ErrAccountNotFound is the error given when trying to perform an operation on an account that does not exist.
 	ErrAccountNotFound = errors.New("account not found")
+	// ErrInvalidRestoreKey is the error given when trying to restore an account with an incorrect restore key
+	ErrInvalidRestoreKey = errors.New("invalid restore key")
 )
 
 // NewAccountService returns a new instance of the AccountService type that will manage account data via the provided
@@ -173,6 +175,45 @@ func (svc *AccountService) ChangePassword(userID uuid.UUID, oldPassword string, 
 
 	if err = svc.databases.RotateKey(account.ID, oldKey, newKey); err != nil {
 		return nil, fmt.Errorf("failed to rotate encryption key: %w", err)
+	}
+
+	return newKey, nil
+}
+
+// Restore an account that has forgotten their password using their restore key and desired new password. Returns
+// ErrAccountNotFound if an account with the provided email does not exist, or ErrInvalidRestoreKey if the provided
+// restore key does not match. On success, returns the user's new restore key.
+func (svc *AccountService) Restore(email string, restoreKey []byte, newPassword string) ([]byte, error) {
+	account, err := svc.accounts.FindByEmail(email)
+	switch {
+	case errors.Is(err, database.ErrAccountNotFound):
+		return nil, ErrAccountNotFound
+	case err != nil:
+		return nil, fmt.Errorf("failed to query account: %w", err)
+	}
+
+	salt := account.ID[:]
+	newKey := deriveKey(newPassword, salt)
+
+	err = svc.databases.RotateKey(account.ID, restoreKey, newKey)
+	switch {
+	case errors.Is(err, database.ErrInvalidKey):
+		return nil, ErrInvalidRestoreKey
+	case err != nil:
+		return nil, fmt.Errorf("failed to rotate encryption key: %w", err)
+	}
+
+	account.PasswordHash, err = bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, fmt.Errorf("failed to hash password: %w", err)
+	}
+
+	err = svc.accounts.Update(account)
+	switch {
+	case errors.Is(err, database.ErrAccountNotFound):
+		return nil, ErrAccountNotFound
+	case err != nil:
+		return nil, fmt.Errorf("failed to update account: %w", err)
 	}
 
 	return newKey, nil

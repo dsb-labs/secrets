@@ -23,17 +23,23 @@ type (
 		// Create should create the given account, returning the restore key to be used should the user enter a
 		// disaster recovery scenario and need to manually decrypt their data. If an account with the given email
 		// already exists, service.ErrAccountExists should be returned.
-		Create(service.Account) ([]byte, error)
+		Create(account service.Account) ([]byte, error)
 		// Get should return the account associated with the given identifier. Returning service.ErrAccountNotFound
 		// if the account does not exist.
-		Get(uuid.UUID) (service.Account, error)
+		Get(id uuid.UUID) (service.Account, error)
 		// Delete should delete the account associated with the given identifier. Returning service.ErrAccountNotFound
 		// if the account does not exist.
-		Delete(uuid.UUID) error
+		Delete(id uuid.UUID) error
 		// ChangePassword should update the account's password to the new value if the old password provided is
 		// correct, returning the restore key to be used should the user enter a disaster recovery scenario and need to
 		// manually decrypt their data.
-		ChangePassword(uuid.UUID, string, string) ([]byte, error)
+		ChangePassword(id uuid.UUID, oldPassword string, newPassword string) ([]byte, error)
+		// Restore should update the account associated with the given email address' password after verifying the
+		// provided restore key is valid. Returning service.ErrAccountNotFound if the account does not exist or
+		// service.ErrInvalidRestoreKey if the given restore key is invalid. On success, it should return the new
+		// restore key to be used should the user enter a disaster recovery scenario and need to manually decrypt their
+		// data.
+		Restore(email string, restoreKey []byte, newPassword string) ([]byte, error)
 	}
 
 	// The Account type represents an individual user account as returned by the API.
@@ -59,6 +65,7 @@ func (api *AccountAPI) Register(mux *http.ServeMux) {
 	mux.Handle("GET /api/v1/account", requireToken(api.Get))
 	mux.Handle("DELETE /api/v1/account", requireToken(api.Delete))
 	mux.Handle("PUT /api/v1/account/password", requireToken(api.UpdatePassword))
+	mux.HandleFunc("POST /api/v1/account/restore", api.Restore)
 }
 
 type (
@@ -218,6 +225,60 @@ func (api *AccountAPI) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	write(w, http.StatusOK, UpdatePasswordResponse{
+		RestoreKey: restoreKey,
+	})
+}
+
+type (
+	// The RestoreAccountRequest type represents the request body given when calling AccountAPI.Restore.
+	RestoreAccountRequest struct {
+		// The account's email address.
+		Email string `json:"email"`
+		// The account's restore key.
+		RestoreKey []byte `json:"restoreKey"`
+		// The user's new password.
+		NewPassword string `json:"newPassword"`
+	}
+
+	// The RestoreAccountResponse type represents the response body returned when calling AccountAPI.Restore
+	RestoreAccountResponse struct {
+		// The account's new restore key.
+		RestoreKey []byte `json:"restoreKey"`
+	}
+)
+
+// Validate the request.
+func (r RestoreAccountRequest) Validate() error {
+	return validation.ValidateStruct(&r,
+		validation.Field(&r.Email, validation.Required, is.Email),
+		validation.Field(&r.RestoreKey, validation.Required),
+		validation.Field(&r.NewPassword, validation.Required),
+	)
+}
+
+// Restore handles an inbound HTTP request to change an account's password using its restore key. On success, it responds
+// with an http.StatusOK code and a JSON-encoded RestoreAccountResponse.
+func (api *AccountAPI) Restore(w http.ResponseWriter, r *http.Request) {
+	request, err := decode[RestoreAccountRequest](r.Body)
+	if err != nil {
+		writeErrorf(w, http.StatusBadRequest, "failed to decode request: %v", err)
+		return
+	}
+
+	restoreKey, err := api.accounts.Restore(request.Email, request.RestoreKey, request.NewPassword)
+	switch {
+	case errors.Is(err, service.ErrAccountNotFound):
+		writeError(w, http.StatusNotFound, "account not found")
+		return
+	case errors.Is(err, service.ErrInvalidRestoreKey):
+		writeError(w, http.StatusBadRequest, "invalid restore key for account")
+		return
+	case err != nil:
+		writeErrorf(w, http.StatusInternalServerError, "failed to restore account %v", err)
+		return
+	}
+
+	write(w, http.StatusOK, RestoreAccountResponse{
 		RestoreKey: restoreKey,
 	})
 }

@@ -24,15 +24,15 @@ type (
 	// The CardService interface describes types that manage payment cards.
 	CardService interface {
 		// Create should create a new payment card record for the given user id.
-		Create(uuid.UUID, service.Card) error
+		Create(accountID uuid.UUID, card service.Card) error
 		// List should return all cards associated with the given user id.
-		List(uuid.UUID, ...filter.Filter[service.Card]) ([]service.Card, error)
+		List(accountID uuid.UUID, filters ...filter.Filter[service.Card]) ([]service.Card, error)
 		// Delete should remove the payment card record associated with the given user and card id. Returning
 		// service.ErrCardNotFound if it does not exist.
-		Delete(uuid.UUID, uuid.UUID) error
+		Delete(accountID uuid.UUID, cardID uuid.UUID) error
 		// Get should return the payment card record associated with the given user and card id. Returning
 		// service.ErrCardNotFound if it does not exist.
-		Get(uuid.UUID, uuid.UUID) (service.Card, error)
+		Get(accountID uuid.UUID, cardID uuid.UUID) (service.Card, error)
 	}
 
 	// The Card type represents a single payment card.

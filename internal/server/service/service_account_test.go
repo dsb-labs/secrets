@@ -425,3 +425,193 @@ func TestAccountService_ChangePassword(t *testing.T) {
 		})
 	}
 }
+
+func TestAccountService_Restore(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		Email        string
+		RestoreKey   []byte
+		NewPassword  string
+		ExpectsError bool
+		Setup        func(accounts *MockAccountRepository, databases *MockDatabaseManager)
+	}{
+		{
+			Name:         "error if account does not exist",
+			Email:        "test@test.com",
+			ExpectsError: true,
+			RestoreKey:   []byte("test"),
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					FindByEmail("test@test.com").
+					Return(database.Account{}, database.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error querying account",
+			Email:        "test@test.com",
+			ExpectsError: true,
+			RestoreKey:   []byte("test"),
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				accounts.EXPECT().
+					FindByEmail("test@test.com").
+					Return(database.Account{}, io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "restore key does not match",
+			Email:        "test@test.com",
+			ExpectsError: true,
+			RestoreKey:   []byte("test"),
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:    uuid.NameSpaceDNS,
+					Email: "test@test.com",
+				}
+
+				accounts.EXPECT().
+					FindByEmail("test@test.com").
+					Return(account, nil).
+					Once()
+
+				databases.EXPECT().
+					RotateKey(uuid.NameSpaceDNS, []byte("test"), mock.Anything).
+					Return(database.ErrInvalidKey).
+					Once()
+			},
+		},
+		{
+			Name:         "error when rotating key",
+			Email:        "test@test.com",
+			ExpectsError: true,
+			RestoreKey:   []byte("test"),
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:    uuid.NameSpaceDNS,
+					Email: "test@test.com",
+				}
+
+				accounts.EXPECT().
+					FindByEmail("test@test.com").
+					Return(account, nil).
+					Once()
+
+				databases.EXPECT().
+					RotateKey(uuid.NameSpaceDNS, []byte("test"), mock.Anything).
+					Return(io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "account not found when updating",
+			Email:        "test@test.com",
+			ExpectsError: true,
+			RestoreKey:   []byte("test"),
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:    uuid.NameSpaceDNS,
+					Email: "test@test.com",
+				}
+
+				accounts.EXPECT().
+					FindByEmail("test@test.com").
+					Return(account, nil).
+					Once()
+
+				databases.EXPECT().
+					RotateKey(uuid.NameSpaceDNS, []byte("test"), mock.Anything).
+					Return(nil).
+					Once()
+
+				accounts.EXPECT().
+					Update(mock.Anything).
+					Return(database.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "account not found when updating",
+			Email:        "test@test.com",
+			ExpectsError: true,
+			RestoreKey:   []byte("test"),
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:    uuid.NameSpaceDNS,
+					Email: "test@test.com",
+				}
+
+				accounts.EXPECT().
+					FindByEmail("test@test.com").
+					Return(account, nil).
+					Once()
+
+				databases.EXPECT().
+					RotateKey(uuid.NameSpaceDNS, []byte("test"), mock.Anything).
+					Return(nil).
+					Once()
+
+				accounts.EXPECT().
+					Update(mock.Anything).
+					Return(io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "success",
+			Email:        "test@test.com",
+			RestoreKey:   []byte("test"),
+			NewPassword:  "test1",
+			Setup: func(accounts *MockAccountRepository, databases *MockDatabaseManager) {
+				account := database.Account{
+					ID:    uuid.NameSpaceDNS,
+					Email: "test@test.com",
+				}
+
+				accounts.EXPECT().
+					FindByEmail("test@test.com").
+					Return(account, nil).
+					Once()
+
+				databases.EXPECT().
+					RotateKey(uuid.NameSpaceDNS, []byte("test"), mock.Anything).
+					Return(nil).
+					Once()
+
+				accounts.EXPECT().
+					Update(mock.Anything).
+					Return(nil).
+					Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			accounts := NewMockAccountRepository(t)
+			databases := NewMockDatabaseManager(t)
+
+			if tc.Setup != nil {
+				tc.Setup(accounts, databases)
+			}
+
+			svc := service.NewAccountService(accounts, databases)
+			restoreKey, err := svc.Restore(tc.Email, tc.RestoreKey, tc.NewPassword)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			require.NotNil(t, restoreKey)
+		})
+	}
+}
