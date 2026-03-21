@@ -28,6 +28,16 @@ func (k RestoreKey) String() string {
 	return base64.StdEncoding.EncodeToString(k)
 }
 
+// ParseRestoreKey converts a given string into a RestoreKey type.
+func ParseRestoreKey(s string) (RestoreKey, error) {
+	b, err := base64.StdEncoding.DecodeString(s)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
 // CreateAccount attempts to create a new account, returning the account's restore key on success. This restore key
 // must be saved by the caller to decrypt their database should they forget their password.
 func (c *Client) CreateAccount(ctx context.Context, account Account) (RestoreKey, error) {

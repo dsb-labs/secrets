@@ -32,6 +32,7 @@ func Command() *cobra.Command {
 		info(),
 		changePassword(),
 		delete(),
+		restore(),
 	)
 
 	return cmd
