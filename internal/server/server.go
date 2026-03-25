@@ -87,7 +87,7 @@ func Run(ctx context.Context, config Config) error {
 	api.NewCardAPI(service.NewCardService(cardRepo)).Register(mux)
 
 	ui.NewAuthHandler(authSvc).Register(mux)
-	ui.NewDashboardHandler().Register(mux)
+	ui.NewDashboardHandler(accountSvc).Register(mux)
 	ui.NewAccountHandler(accountSvc).Register(mux)
 	ui.NewAssetHandler().Register(mux)
 

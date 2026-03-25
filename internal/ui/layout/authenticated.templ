@@ -1,0 +1,32 @@
+package layout
+
+import "github.com/davidsbond/keeper/internal/ui/component"
+
+type (
+	// The AuthenticatedViewModel type contains fields used to configure the authenticated page layout.
+	AuthenticatedViewModel struct {
+		// The page title, used in the HTML head.
+		Title string
+		// The current page identifier, used to highlight the active sidebar item.
+		CurrentPage string
+		// The display name of the authenticated user, shown at the bottom of the sidebar.
+		DisplayName string
+	}
+)
+
+// Authenticated returns a page layout for authenticated users, wrapping the provided view in a shell with a sidebar.
+templ Authenticated(model AuthenticatedViewModel, view templ.Component) {
+	@Main(model.Title, authenticatedShell(model, view))
+}
+
+templ authenticatedShell(model AuthenticatedViewModel, view templ.Component) {
+	<div class="flex h-full">
+		@component.Sidebar(component.SidebarProps{
+			CurrentPage: model.CurrentPage,
+			DisplayName: model.DisplayName,
+		})
+		<div class="flex-1 min-w-0 overflow-auto">
+			@view
+		</div>
+	</div>
+}
