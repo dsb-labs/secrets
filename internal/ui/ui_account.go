@@ -46,7 +46,7 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 	}
 
 	if password != confirmPassword {
-		model.Error = "Passwords do not match"
+		model.Message = "Passwords do not match"
 		render(ctx, w, auth.Register, model)
 		return
 	}
@@ -58,12 +58,12 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 	})
 	switch {
 	case errors.Is(err, service.ErrAccountExists):
-		model.Error = "An account with that email address already exists"
+		model.Message = "An account with that email address already exists"
 		render(ctx, w, auth.Register, model)
 		return
 	case err != nil:
-		model.Error = "An unexpected error occurred, please try again."
-		model.ErrorDetail = err.Error()
+		model.Message = "An unexpected error occurred, please try again."
+		model.Detail = err.Error()
 		render(ctx, w, auth.Register, model)
 		return
 	}

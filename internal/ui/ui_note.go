@@ -9,6 +9,7 @@ import (
 
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/davidsbond/keeper/internal/ui/component"
 	noteview "github.com/davidsbond/keeper/internal/ui/view/note"
 )
 
@@ -48,8 +49,10 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, noteview.List, noteview.ViewModel{
-			Error:       "Failed to load account, please try again.",
-			ErrorDetail: err.Error(),
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
 		})
 		return
 	}
@@ -61,9 +64,11 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	case err != nil:
 		render(ctx, w, noteview.List, noteview.ViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load notes, please try again.",
+				Detail:  err.Error(),
+			},
 			DisplayName: account.DisplayName,
-			Error:       "Failed to load notes, please try again.",
-			ErrorDetail: err.Error(),
 		})
 		return
 	}
@@ -90,8 +95,10 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	noteID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error:       "Invalid note identifier.",
-			ErrorDetail: err.Error(),
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Invalid note identifier.",
+				Detail:  err.Error(),
+			},
 		})
 		return
 	}
@@ -99,8 +106,10 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error:       "Failed to load account, please try again.",
-			ErrorDetail: err.Error(),
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
 		})
 		return
 	}
@@ -112,15 +121,17 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	case errors.Is(err, service.ErrNoteNotFound):
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			DisplayName: account.DisplayName,
-			Error:       "Note not found.",
+			ErrorBannerProps: component.ErrorBannerProps{Message: "Note not found."},
+			DisplayName:      account.DisplayName,
 		})
 		return
 	case err != nil:
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load note, please try again.",
+				Detail:  err.Error(),
+			},
 			DisplayName: account.DisplayName,
-			Error:       "Failed to load note, please try again.",
-			ErrorDetail: err.Error(),
 		})
 		return
 	}

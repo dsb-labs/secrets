@@ -15,12 +15,9 @@ import (
 type (
 	// The ViewModel type contains fields used to configure the dashboard view.
 	ViewModel struct {
+		component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
-		// Any error that occurred while loading the dashboard.
-		Error string
-		// The technical detail of the error, shown in a collapsible section.
-		ErrorDetail string
 	}
 )
 
@@ -83,11 +80,11 @@ func content(model ViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = component.ErrorBanner(component.ErrorBannerProps{Message: model.Error, Detail: model.ErrorDetail}).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = component.ErrorBanner(model.ErrorBannerProps).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if model.Error == "" {
+		if model.Message == "" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<h1 class=\"text-2xl font-bold text-gray-900 dark:text-white\">Welcome back, ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -95,7 +92,7 @@ func content(model ViewModel) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(model.DisplayName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/dashboard/dashboard.templ`, Line: 33, Col: 97}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/dashboard/dashboard.templ`, Line: 30, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {

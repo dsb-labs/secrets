@@ -55,16 +55,16 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	tkn, err := h.auth.Login(email, password)
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
-		model.Error = "Account not found"
+		model.Message = "Account not found"
 		render(ctx, w, auth.Login, model)
 		return
 	case errors.Is(err, service.ErrInvalidPassword):
-		model.Error = "Invalid password"
+		model.Message = "Invalid password"
 		render(ctx, w, auth.Login, model)
 		return
 	case err != nil:
-		model.Error = "An unexpected error occurred, please try again."
-		model.ErrorDetail = err.Error()
+		model.Message = "An unexpected error occurred, please try again."
+		model.Detail = err.Error()
 		render(ctx, w, auth.Login, model)
 		return
 	}

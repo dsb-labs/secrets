@@ -8,6 +8,7 @@ import (
 type (
 	// The DetailViewModel type contains fields used to configure the login detail view.
 	DetailViewModel struct {
+		component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The unique identifier of the login.
@@ -18,10 +19,6 @@ type (
 		Password string
 		// The domains this login can be used on.
 		Domains []string
-		// Any error that occurred while loading the login.
-		Error string
-		// The technical detail of the error, shown in a collapsible section.
-		ErrorDetail string
 	}
 )
 
@@ -36,8 +33,8 @@ templ Detail(model DetailViewModel) {
 
 templ detailContent(model DetailViewModel) {
 	<div class="p-8">
-		@component.ErrorBanner(component.ErrorBannerProps{Message: model.Error, Detail: model.ErrorDetail})
-		if model.Error == "" {
+		@component.ErrorBanner(model.ErrorBannerProps)
+		if model.Message == "" {
 			<div class="mb-6 max-w-2xl">
 				<a
 					href="/logins"
@@ -70,7 +67,7 @@ templ detailContent(model DetailViewModel) {
 							/>
 							<button
 								type="button"
-								onclick="togglePassword()"
+								onclick="togglePassword('password-field','eye-icon','eye-slash-icon')"
 								class="cursor-pointer shrink-0 flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 								aria-label="Toggle password visibility"
 							>
@@ -84,7 +81,7 @@ templ detailContent(model DetailViewModel) {
 							</button>
 							<button
 								type="button"
-								onclick="copyPassword()"
+								onclick="copyToClipboard('password-field','copy-icon','check-icon')"
 								class="cursor-pointer shrink-0 flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
 								aria-label="Copy password to clipboard"
 							>
@@ -117,35 +114,6 @@ templ detailContent(model DetailViewModel) {
 					}
 				</div>
 			</div>
-			<script>
-				function togglePassword() {
-					var field = document.getElementById('password-field');
-					var eyeIcon = document.getElementById('eye-icon');
-					var eyeSlashIcon = document.getElementById('eye-slash-icon');
-					if (field.type === 'password') {
-						field.type = 'text';
-						eyeIcon.style.display = 'none';
-						eyeSlashIcon.style.display = '';
-					} else {
-						field.type = 'password';
-						eyeIcon.style.display = '';
-						eyeSlashIcon.style.display = 'none';
-					}
-				}
-				function copyPassword() {
-					var value = document.getElementById('password-field').value;
-					var copyIcon = document.getElementById('copy-icon');
-					var checkIcon = document.getElementById('check-icon');
-					navigator.clipboard.writeText(value).then(function() {
-						copyIcon.style.display = 'none';
-						checkIcon.style.display = '';
-						setTimeout(function() {
-							copyIcon.style.display = '';
-							checkIcon.style.display = 'none';
-						}, 2000);
-					});
-				}
-			</script>
 		}
 	</div>
 }

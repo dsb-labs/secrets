@@ -8,14 +8,11 @@ import (
 type (
 	// The ViewModel type contains fields used to configure the note list view.
 	ViewModel struct {
+		component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The list of notes stored for the authenticated user.
 		Notes []Item
-		// Any error that occurred while loading the list.
-		Error string
-		// The technical detail of the error, shown in a collapsible section.
-		ErrorDetail string
 	}
 
 	// The Item type represents a single note as displayed in the note list view.
@@ -38,7 +35,7 @@ templ List(model ViewModel) {
 
 templ listContent(model ViewModel) {
 	<div class="p-8">
-		@component.ErrorBanner(component.ErrorBannerProps{Message: model.Error, Detail: model.ErrorDetail})
+		@component.ErrorBanner(model.ErrorBannerProps)
 		<div class="flex items-center justify-between mb-6">
 			<div>
 				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Notes</h1>
@@ -54,7 +51,7 @@ templ listContent(model ViewModel) {
 				Add note
 			</a>
 		</div>
-		if model.Error == "" {
+		if model.Message == "" {
 			if len(model.Notes) == 0 {
 				@component.EmptyState(component.EmptyStateProps{
 					Title:       "No notes stored",

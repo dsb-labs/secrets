@@ -9,6 +9,7 @@ import (
 
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/davidsbond/keeper/internal/ui/component"
 	loginview "github.com/davidsbond/keeper/internal/ui/view/login"
 )
 
@@ -48,8 +49,10 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, loginview.List, loginview.ViewModel{
-			Error:       "Failed to load account, please try again.",
-			ErrorDetail: err.Error(),
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
 		})
 		return
 	}
@@ -61,9 +64,11 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	case err != nil:
 		render(ctx, w, loginview.List, loginview.ViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load logins, please try again.",
+				Detail:  err.Error(),
+			},
 			DisplayName: account.DisplayName,
-			Error:       "Failed to load logins, please try again.",
-			ErrorDetail: err.Error(),
 		})
 		return
 	}
@@ -91,8 +96,10 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	loginID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error:       "Invalid login identifier.",
-			ErrorDetail: err.Error(),
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Invalid login identifier.",
+				Detail:  err.Error(),
+			},
 		})
 		return
 	}
@@ -100,8 +107,10 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error:       "Failed to load account, please try again.",
-			ErrorDetail: err.Error(),
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
 		})
 		return
 	}
@@ -113,15 +122,17 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	case errors.Is(err, service.ErrLoginNotFound):
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			DisplayName: account.DisplayName,
-			Error:       "Login not found.",
+			ErrorBannerProps: component.ErrorBannerProps{Message: "Login not found."},
+			DisplayName:      account.DisplayName,
 		})
 		return
 	case err != nil:
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load login, please try again.",
+				Detail:  err.Error(),
+			},
 			DisplayName: account.DisplayName,
-			Error:       "Failed to load login, please try again.",
-			ErrorDetail: err.Error(),
 		})
 		return
 	}

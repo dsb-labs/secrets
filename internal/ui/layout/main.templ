@@ -1,5 +1,7 @@
 package layout
 
+import "github.com/davidsbond/keeper/internal/ui/component"
+
 // Main returns the main page layout.
 templ Main(title string, view templ.Component) {
 	<html lang="en" class="h-full">
@@ -13,6 +15,7 @@ templ Main(title string, view templ.Component) {
 			<main class="h-full">
 				@view
 			</main>
+			@component.Scripts()
 		</body>
 	</html>
 }

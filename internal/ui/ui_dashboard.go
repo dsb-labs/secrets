@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/view/dashboard"
 )
 
@@ -31,8 +32,10 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, dashboard.Dashboard, dashboard.ViewModel{
-			Error:       "Failed to load account, please try again.",
-			ErrorDetail: err.Error(),
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
 		})
 		return
 	}

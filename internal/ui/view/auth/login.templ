@@ -8,10 +8,7 @@ import (
 type (
 	// The LoginViewModel type contains fields used to configure the login view.
 	LoginViewModel struct {
-		// Any errors that occurred during authentication.
-		Error string
-		// The technical detail of the error, shown in a collapsible section.
-		ErrorDetail string
+		component.ErrorBannerProps
 		// The email the user has previously provided. This would typically only be set when reporting an error.
 		Email string
 		// The password the user has previously provided. This would typically only be set when reporting an error.
@@ -37,7 +34,7 @@ templ login(model LoginViewModel) {
 				<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Sign in to your account</p>
 			</div>
 			<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-				@component.ErrorBanner(component.ErrorBannerProps{Message: model.Error, Detail: model.ErrorDetail})
+				@component.ErrorBanner(model.ErrorBannerProps)
 				<form action="/login" method="POST" class="space-y-4">
 					<div>
 						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="email">

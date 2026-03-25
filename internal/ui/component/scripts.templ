@@ -1,0 +1,53 @@
+package component
+
+// Scripts renders shared JavaScript utility functions used across views.
+templ Scripts() {
+	<script>
+		function togglePassword(fieldId, eyeIconId, eyeSlashIconId) {
+			var field = document.getElementById(fieldId);
+			var eyeIcon = document.getElementById(eyeIconId);
+			var eyeSlashIcon = document.getElementById(eyeSlashIconId);
+			if (field.type === 'password') {
+				field.type = 'text';
+				eyeIcon.style.display = 'none';
+				eyeSlashIcon.style.display = '';
+			} else {
+				field.type = 'password';
+				eyeIcon.style.display = '';
+				eyeSlashIcon.style.display = 'none';
+			}
+		}
+		function toggleSecretField(fieldId, maskedId, eyeIconId, eyeSlashIconId) {
+			var field = document.getElementById(fieldId);
+			var masked = document.getElementById(maskedId);
+			var eyeIcon = document.getElementById(eyeIconId);
+			var eyeSlashIcon = document.getElementById(eyeSlashIconId);
+			if (field.style.display === 'none') {
+				field.style.display = '';
+				field.style.height = 'auto';
+				field.style.height = field.scrollHeight + 'px';
+				masked.style.display = 'none';
+				eyeIcon.style.display = 'none';
+				eyeSlashIcon.style.display = '';
+			} else {
+				field.style.display = 'none';
+				masked.style.display = '';
+				eyeIcon.style.display = '';
+				eyeSlashIcon.style.display = 'none';
+			}
+		}
+		function copyToClipboard(fieldId, copyIconId, checkIconId) {
+			var value = document.getElementById(fieldId).value;
+			var copyIcon = document.getElementById(copyIconId);
+			var checkIcon = document.getElementById(checkIconId);
+			navigator.clipboard.writeText(value).then(function() {
+				copyIcon.style.display = 'none';
+				checkIcon.style.display = '';
+				setTimeout(function() {
+					copyIcon.style.display = '';
+					checkIcon.style.display = 'none';
+				}, 2000);
+			});
+		}
+	</script>
+}
