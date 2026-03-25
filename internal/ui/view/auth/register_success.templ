@@ -1,6 +1,9 @@
 package auth
 
-import "github.com/davidsbond/keeper/internal/ui/layout"
+import (
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/layout"
+)
 
 type (
 	// The RegisterSuccessViewModel type contains fields used to configure the register success view.
@@ -22,9 +25,7 @@ templ registerSuccess(model RegisterSuccessViewModel) {
 		<div class="w-full max-w-lg">
 			<div class="text-center mb-8">
 				<div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-600 mb-4">
-					<svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-						<path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"></path>
-					</svg>
+					@component.IconCheck("w-6 h-6 text-white")
 				</div>
 				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Account created</h1>
 				<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Welcome, { model.DisplayName }</p>
@@ -32,9 +33,7 @@ templ registerSuccess(model RegisterSuccessViewModel) {
 			<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
 				<div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-4 py-3">
 					<div class="flex gap-3">
-						<svg class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"></path>
-						</svg>
+						@component.IconWarning("w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5")
 						<div>
 							<p class="text-sm font-semibold text-amber-800 dark:text-amber-300">Save your restore key</p>
 							<p class="text-sm text-amber-700 dark:text-amber-400 mt-0.5">
