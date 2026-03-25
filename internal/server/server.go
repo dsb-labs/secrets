@@ -93,6 +93,7 @@ func Run(ctx context.Context, config Config) error {
 	ui.NewDashboardHandler(accountSvc).Register(mux)
 	ui.NewAccountHandler(accountSvc).Register(mux)
 	ui.NewLoginHandler(accountSvc, loginSvc).Register(mux)
+	ui.NewNoteHandler(accountSvc, noteSvc).Register(mux)
 	ui.NewAssetHandler().Register(mux)
 
 	server := &http.Server{
