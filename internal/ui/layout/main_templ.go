@@ -29,7 +29,7 @@ func Main(title string, view templ.Component) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"en\" class=\"h-full bg-gray-100 dark:bg-gray-900\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<html lang=\"en\" class=\"h-full\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -42,20 +42,7 @@ func Main(title string, view templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Keeper</title><link href=\"/asset/styles.css\" rel=\"stylesheet\"></head><body class=\"w-screen h-screen\"><div class=\"min-h-full\"><div class=\"relative bg-gray-800 pb-32 dark:bg-gray-800/50\"><nav class=\"bg-gray-800 dark:bg-transparent\"><div class=\"mx-auto max-w-7xl sm:px-6 lg:px-8\"><div class=\"border-b border-white/10\"><div class=\"flex h-16 items-center justify-between px-4 sm:px-0\"><div class=\"flex items-center\"><div class=\"shrink-0\"><img src=\"https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500\" alt=\"Your Company\" class=\"size-8\"></div></div></div></div></div></nav><header class=\"py-10\"><div class=\"mx-auto max-w-7xl px-4 sm:px-6 lg:px-8\"><h1 class=\"text-3xl font-bold tracking-tight text-white\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/layout/main.templ`, Line: 30, Col: 71}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h1></div></header></div><main class=\"relative -mt-32\"><div class=\"mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8\"><div class=\"rounded-lg bg-white px-5 py-6 shadow sm:px-6 dark:bg-gray-800 dark:shadow-none dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-white/10\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Keeper</title><link href=\"/asset/styles.css\" rel=\"stylesheet\"></head><body class=\"h-full bg-gray-50 dark:bg-gray-900 antialiased\"><main class=\"h-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -63,7 +50,7 @@ func Main(title string, view templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div></main></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

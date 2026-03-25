@@ -2,43 +2,17 @@ package layout
 
 // Main returns the main page layout.
 templ Main(title string, view templ.Component) {
-	<html lang="en" class="h-full bg-gray-100 dark:bg-gray-900">
+	<html lang="en" class="h-full">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title } - Keeper</title>
 			<link href="/asset/styles.css" rel="stylesheet"/>
 		</head>
-		<body class="w-screen h-screen">
-			<div class="min-h-full">
-				<div class="relative bg-gray-800 pb-32 dark:bg-gray-800/50">
-					<nav class="bg-gray-800 dark:bg-transparent">
-						<div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-							<div class="border-b border-white/10">
-								<div class="flex h-16 items-center justify-between px-4 sm:px-0">
-									<div class="flex items-center">
-										<div class="shrink-0">
-											<img src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500" alt="Your Company" class="size-8"/>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</nav>
-					<header class="py-10">
-						<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-							<h1 class="text-3xl font-bold tracking-tight text-white">{ title }</h1>
-						</div>
-					</header>
-				</div>
-				<main class="relative -mt-32">
-					<div class="mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
-						<div class="rounded-lg bg-white px-5 py-6 shadow sm:px-6 dark:bg-gray-800 dark:shadow-none dark:outline dark:outline-1 dark:-outline-offset-1 dark:outline-white/10">
-							@view
-						</div>
-					</div>
-				</main>
-			</div>
+		<body class="h-full bg-gray-50 dark:bg-gray-900 antialiased">
+			<main class="h-full">
+				@view
+			</main>
 		</body>
 	</html>
 }
