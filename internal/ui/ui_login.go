@@ -23,6 +23,8 @@ type (
 	LoginService interface {
 		// List should return all logins associated with the given user id.
 		List(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)
+		// Get should return the login record associated with the given user and login identifiers.
+		Get(accountID uuid.UUID, loginID uuid.UUID) (service.Login, error)
 	}
 )
 
@@ -35,6 +37,7 @@ func NewLoginHandler(accounts AccountService, logins LoginService) *LoginHandler
 // Register HTTP endpoints onto the provided http.ServeMux.
 func (h *LoginHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /logins", requireToken(h.List))
+	mux.Handle("GET /logins/{id}", requireToken(h.Detail))
 }
 
 // List renders the login list view.
@@ -44,7 +47,10 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		http.Error(w, "failed to load account", http.StatusInternalServerError)
+		render(ctx, w, loginview.List, loginview.ViewModel{
+			Error:       "Failed to load account, please try again.",
+			ErrorDetail: err.Error(),
+		})
 		return
 	}
 
@@ -54,7 +60,11 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 		redirect(w, r, "/login")
 		return
 	case err != nil:
-		http.Error(w, "failed to load logins", http.StatusInternalServerError)
+		render(ctx, w, loginview.List, loginview.ViewModel{
+			DisplayName: account.DisplayName,
+			Error:       "Failed to load logins, please try again.",
+			ErrorDetail: err.Error(),
+		})
 		return
 	}
 
@@ -70,5 +80,57 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 	render(ctx, w, loginview.List, loginview.ViewModel{
 		DisplayName: account.DisplayName,
 		Logins:      items,
+	})
+}
+
+// Detail renders the login detail view for a single login record.
+func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	loginID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			Error:       "Invalid login identifier.",
+			ErrorDetail: err.Error(),
+		})
+		return
+	}
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			Error:       "Failed to load account, please try again.",
+			ErrorDetail: err.Error(),
+		})
+		return
+	}
+
+	login, err := h.logins.Get(tkn.ID(), loginID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirect(w, r, "/login")
+		return
+	case errors.Is(err, service.ErrLoginNotFound):
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			DisplayName: account.DisplayName,
+			Error:       "Login not found.",
+		})
+		return
+	case err != nil:
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			DisplayName: account.DisplayName,
+			Error:       "Failed to load login, please try again.",
+			ErrorDetail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+		DisplayName: account.DisplayName,
+		ID:          login.ID.String(),
+		Username:    login.Username,
+		Password:    login.Password,
+		Domains:     login.Domains,
 	})
 }

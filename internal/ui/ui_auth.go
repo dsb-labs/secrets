@@ -63,7 +63,8 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 		render(ctx, w, auth.Login, model)
 		return
 	case err != nil:
-		model.Error = err.Error()
+		model.Error = "An unexpected error occurred, please try again."
+		model.ErrorDetail = err.Error()
 		render(ctx, w, auth.Login, model)
 		return
 	}

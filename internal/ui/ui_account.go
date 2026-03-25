@@ -62,7 +62,8 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 		render(ctx, w, auth.Register, model)
 		return
 	case err != nil:
-		model.Error = err.Error()
+		model.Error = "An unexpected error occurred, please try again."
+		model.ErrorDetail = err.Error()
 		render(ctx, w, auth.Register, model)
 		return
 	}

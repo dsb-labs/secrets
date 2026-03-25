@@ -30,7 +30,10 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		http.Error(w, "failed to load account", http.StatusInternalServerError)
+		render(ctx, w, dashboard.Dashboard, dashboard.ViewModel{
+			Error:       "Failed to load account, please try again.",
+			ErrorDetail: err.Error(),
+		})
 		return
 	}
 

@@ -1,0 +1,27 @@
+package component
+
+type (
+	// The ErrorBannerProps type contains fields used to configure the ErrorBanner component.
+	ErrorBannerProps struct {
+		// The user-friendly error message to display. The banner is not rendered when empty.
+		Message string
+		// The technical error detail shown in a collapsible section. Optional.
+		Detail string
+	}
+)
+
+// ErrorBanner renders a red error banner. Nothing is rendered when Message is empty.
+// When Detail is set it is shown inside a collapsible <details> element.
+templ ErrorBanner(props ErrorBannerProps) {
+	if props.Message != "" {
+		<div class="mb-6 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-5 py-4">
+			<p class="text-sm text-red-700 dark:text-red-400">{ props.Message }</p>
+			if props.Detail != "" {
+				<details class="mt-2 text-red-600 dark:text-red-300">
+					<summary class="text-xs cursor-pointer select-none">Show details</summary>
+					<pre class="mt-1.5 text-xs whitespace-pre-wrap break-all">{ props.Detail }</pre>
+				</details>
+			}
+		</div>
+	}
+}
