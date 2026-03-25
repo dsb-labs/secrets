@@ -1,25 +1,25 @@
-package view
+package dashboard
 
 import "github.com/davidsbond/keeper/internal/ui/layout"
 
 type (
-	// The DashboardViewModel type contains fields used to configure the dashboard view.
-	DashboardViewModel struct {
+	// The ViewModel type contains fields used to configure the dashboard view.
+	ViewModel struct {
 		// The display name of the authenticated user.
 		DisplayName string
 	}
 )
 
 // Dashboard returns the dashboard view using the provided view model values.
-templ Dashboard(model DashboardViewModel) {
+templ Dashboard(model ViewModel) {
 	@layout.Authenticated(layout.AuthenticatedViewModel{
 		Title:       "Dashboard",
 		CurrentPage: "dashboard",
 		DisplayName: model.DisplayName,
-	}, dashboardContent(model))
+	}, content(model))
 }
 
-templ dashboardContent(model DashboardViewModel) {
+templ content(model ViewModel) {
 	<div class="p-8">
 		<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, { model.DisplayName }</h1>
 		<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Select a section from the sidebar to get started.</p>

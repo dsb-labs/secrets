@@ -3,29 +3,18 @@ package ui
 import (
 	"net/http"
 
-	"github.com/google/uuid"
-
-	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/view"
+	"github.com/davidsbond/keeper/internal/ui/view/dashboard"
 )
 
-type (
-	// The DashboardHandler type is responsible for serving web interface pages regarding the user dashboard.
-	DashboardHandler struct {
-		accounts DashboardAccountService
-	}
-
-	// The DashboardAccountService interface describes types that provide account details for the dashboard.
-	DashboardAccountService interface {
-		// Get should return the account associated with the given identifier.
-		Get(id uuid.UUID) (service.Account, error)
-	}
-)
+// The DashboardHandler type is responsible for serving web interface pages regarding the user dashboard.
+type DashboardHandler struct {
+	accounts AccountService
+}
 
 // NewDashboardHandler returns a new instance of the DashboardHandler type that will serve dashboard UIs using
-// the provided DashboardAccountService implementation.
-func NewDashboardHandler(accounts DashboardAccountService) *DashboardHandler {
+// the provided AccountService implementation.
+func NewDashboardHandler(accounts AccountService) *DashboardHandler {
 	return &DashboardHandler{accounts: accounts}
 }
 
@@ -45,7 +34,7 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render(ctx, w, view.Dashboard, view.DashboardViewModel{
+	render(ctx, w, dashboard.Dashboard, dashboard.ViewModel{
 		DisplayName: account.DisplayName,
 	})
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/view"
+	"github.com/davidsbond/keeper/internal/ui/view/auth"
 )
 
 type (
@@ -37,7 +37,7 @@ func (h *AuthHandler) Register(mux *http.ServeMux) {
 
 // Login renders the login view.
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	render(r.Context(), w, view.Login, view.LoginViewModel{})
+	render(r.Context(), w, auth.Login, auth.LoginViewModel{})
 }
 
 // LoginCallback handles a login attempt, rerendering the login view on error. On success, it redirects to the dashboard
@@ -47,7 +47,7 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
-	model := view.LoginViewModel{
+	model := auth.LoginViewModel{
 		Email:    email,
 		Password: password,
 	}
@@ -56,15 +56,15 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
 		model.Error = "Account not found"
-		render(ctx, w, view.Login, model)
+		render(ctx, w, auth.Login, model)
 		return
 	case errors.Is(err, service.ErrInvalidPassword):
 		model.Error = "Invalid password"
-		render(ctx, w, view.Login, model)
+		render(ctx, w, auth.Login, model)
 		return
 	case err != nil:
 		model.Error = err.Error()
-		render(ctx, w, view.Login, model)
+		render(ctx, w, auth.Login, model)
 		return
 	}
 

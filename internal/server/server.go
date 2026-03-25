@@ -78,17 +78,21 @@ func Run(ctx context.Context, config Config) error {
 
 	authSvc := service.NewAuthService(accountRepo, databaseManager, tokenGenerator)
 	accountSvc := service.NewAccountService(accountRepo, databaseManager)
+	loginSvc := service.NewLoginService(loginRepo)
+	noteSvc := service.NewNoteService(noteRepo)
+	cardSvc := service.NewCardService(cardRepo)
 
 	api.NewAuthAPI(authSvc).Register(mux)
 	api.NewAccountAPI(accountSvc).Register(mux)
-	api.NewLoginAPI(service.NewLoginService(loginRepo)).Register(mux)
-	api.NewNoteAPI(service.NewNoteService(noteRepo)).Register(mux)
+	api.NewLoginAPI(loginSvc).Register(mux)
+	api.NewNoteAPI(noteSvc).Register(mux)
 	api.NewToolAPI(service.NewToolService(loginRepo, noteRepo, cardRepo)).Register(mux)
-	api.NewCardAPI(service.NewCardService(cardRepo)).Register(mux)
+	api.NewCardAPI(cardSvc).Register(mux)
 
 	ui.NewAuthHandler(authSvc).Register(mux)
 	ui.NewDashboardHandler(accountSvc).Register(mux)
 	ui.NewAccountHandler(accountSvc).Register(mux)
+	ui.NewLoginHandler(accountSvc, loginSvc).Register(mux)
 	ui.NewAssetHandler().Register(mux)
 
 	server := &http.Server{
