@@ -26,6 +26,8 @@ type (
 		List(accountID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error)
 		// Get should return the note record associated with the given user and note identifiers.
 		Get(accountID uuid.UUID, noteID uuid.UUID) (service.Note, error)
+		// Delete should remove the note record associated with the given user and note identifiers.
+		Delete(accountID uuid.UUID, noteID uuid.UUID) error
 	}
 )
 
@@ -39,6 +41,7 @@ func NewNoteHandler(accounts AccountService, notes NoteService) *NoteHandler {
 func (h *NoteHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /notes", requireToken(h.List))
 	mux.Handle("GET /notes/{id}", requireToken(h.Detail))
+	mux.Handle("POST /notes/{id}/delete", requireToken(h.Delete))
 }
 
 // List renders the note list view.
@@ -142,4 +145,56 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		Name:        note.Name,
 		Content:     note.Content,
 	})
+}
+
+// Delete handles a note deletion request, redirecting to the note list on success.
+func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	noteID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Invalid note identifier.",
+				Detail:  err.Error(),
+			},
+		})
+		return
+	}
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
+		})
+		return
+	}
+
+	err = h.notes.Delete(tkn.ID(), noteID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case errors.Is(err, service.ErrNoteNotFound):
+		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{Message: "Note not found."},
+			DisplayName:      account.DisplayName,
+		})
+		return
+	case err != nil:
+		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to delete note, please try again.",
+				Detail:  err.Error(),
+			},
+			DisplayName: account.DisplayName,
+		})
+		return
+	}
+
+	redirect(w, r, "/notes")
 }
