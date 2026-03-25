@@ -60,7 +60,7 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 	results, err := h.notes.List(tkn.ID())
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
-		redirect(w, r, "/login")
+		redirectToLogin(w, r)
 		return
 	case err != nil:
 		render(ctx, w, noteview.List, noteview.ViewModel{
@@ -117,7 +117,7 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	note, err := h.notes.Get(tkn.ID(), noteID)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
-		redirect(w, r, "/login")
+		redirectToLogin(w, r)
 		return
 	case errors.Is(err, service.ErrNoteNotFound):
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{

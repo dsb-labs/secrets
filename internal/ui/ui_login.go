@@ -60,7 +60,7 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 	results, err := h.logins.List(tkn.ID())
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
-		redirect(w, r, "/login")
+		redirectToLogin(w, r)
 		return
 	case err != nil:
 		render(ctx, w, loginview.List, loginview.ViewModel{
@@ -118,7 +118,7 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	login, err := h.logins.Get(tkn.ID(), loginID)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
-		redirect(w, r, "/login")
+		redirectToLogin(w, r)
 		return
 	case errors.Is(err, service.ErrLoginNotFound):
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{

@@ -5,6 +5,7 @@ import (
 	"context"
 	"io"
 	"net/http"
+	"net/url"
 
 	"github.com/a-h/templ"
 	"github.com/google/uuid"
@@ -32,6 +33,11 @@ func redirect(w http.ResponseWriter, r *http.Request, path string) {
 	http.Redirect(w, r, path, http.StatusFound)
 }
 
+func redirectToLogin(w http.ResponseWriter, r *http.Request) {
+	target := r.URL.RequestURI()
+	redirect(w, r, "/login?redirect="+url.QueryEscape(target))
+}
+
 func render[T any](ctx context.Context, w io.Writer, view View[T], model T) {
 	err := view(model).Render(ctx, w)
 	if err != nil {
@@ -42,7 +48,7 @@ func render[T any](ctx context.Context, w io.Writer, view View[T], model T) {
 func requireToken(next http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !token.FromContext(r.Context()).Valid() {
-			redirect(w, r, "/login")
+			redirectToLogin(w, r)
 			return
 		}
 

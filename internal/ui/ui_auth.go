@@ -37,19 +37,23 @@ func (h *AuthHandler) Register(mux *http.ServeMux) {
 
 // Login renders the login view.
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	render(r.Context(), w, auth.Login, auth.LoginViewModel{})
+	render(r.Context(), w, auth.Login, auth.LoginViewModel{
+		Redirect: r.URL.Query().Get("redirect"),
+	})
 }
 
-// LoginCallback handles a login attempt, rerendering the login view on error. On success, it redirects to the dashboard
-// page.
+// LoginCallback handles a login attempt, rerendering the login view on error. On success, it redirects to the
+// originally requested page, or the dashboard if none was captured.
 func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	email := r.FormValue("email")
 	password := r.FormValue("password")
+	redirectTo := r.FormValue("redirect")
 
 	model := auth.LoginViewModel{
 		Email:    email,
 		Password: password,
+		Redirect: redirectTo,
 	}
 
 	tkn, err := h.auth.Login(email, password)
@@ -78,5 +82,10 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 	})
 
-	redirect(w, r, "/dashboard")
+	destination := "/dashboard"
+	if redirectTo != "" {
+		destination = redirectTo
+	}
+
+	redirect(w, r, destination)
 }
