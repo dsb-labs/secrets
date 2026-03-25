@@ -10,7 +10,7 @@
     "generate": "tailwindcss -i global.css -o asset/styles.css -m"
   },
   "devDependencies": {
-    "@tailwindcss/cli": "^4.2.1",
+    "@tailwindcss/cli": "^4.2.2",
     "tailwindcss": "^4.2.1"
   }
 }
