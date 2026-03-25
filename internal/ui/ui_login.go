@@ -26,6 +26,8 @@ type (
 		List(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)
 		// Get should return the login record associated with the given user and login identifiers.
 		Get(accountID uuid.UUID, loginID uuid.UUID) (service.Login, error)
+		// Delete should remove the login record associated with the given user and login identifiers.
+		Delete(accountID uuid.UUID, loginID uuid.UUID) error
 	}
 )
 
@@ -39,6 +41,7 @@ func NewLoginHandler(accounts AccountService, logins LoginService) *LoginHandler
 func (h *LoginHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /logins", requireToken(h.List))
 	mux.Handle("GET /logins/{id}", requireToken(h.Detail))
+	mux.Handle("POST /logins/{id}/delete", requireToken(h.Delete))
 }
 
 // List renders the login list view.
@@ -144,4 +147,56 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		Password:    login.Password,
 		Domains:     login.Domains,
 	})
+}
+
+// Delete handles a login deletion request, redirecting to the login list on success.
+func (h *LoginHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	loginID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Invalid login identifier.",
+				Detail:  err.Error(),
+			},
+		})
+		return
+	}
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
+		})
+		return
+	}
+
+	err = h.logins.Delete(tkn.ID(), loginID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case errors.Is(err, service.ErrLoginNotFound):
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{Message: "Login not found."},
+			DisplayName:      account.DisplayName,
+		})
+		return
+	case err != nil:
+		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to delete login, please try again.",
+				Detail:  err.Error(),
+			},
+			DisplayName: account.DisplayName,
+		})
+		return
+	}
+
+	redirect(w, r, "/logins")
 }

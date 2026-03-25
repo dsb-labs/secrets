@@ -36,6 +36,9 @@ templ Scripts() {
 				eyeSlashIcon.style.display = 'none';
 			}
 		}
+		function showConfirmDialog(id) {
+			document.getElementById(id).showModal();
+		}
 		function copyToClipboard(fieldId, copyIconId, checkIconId) {
 			var value = document.getElementById(fieldId).value;
 			var copyIcon = document.getElementById(copyIconId);

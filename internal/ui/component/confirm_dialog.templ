@@ -1,0 +1,52 @@
+package component
+
+// ConfirmDialogProps contains the fields used to configure a confirmation dialog.
+type ConfirmDialogProps struct {
+	// ID is the HTML id of the <dialog> element, used to open it from a button's onclick.
+	ID string
+	// Title is the heading shown inside the dialog.
+	Title string
+	// Message is the body text asking the user to confirm.
+	Message string
+	// ConfirmText is the label for the destructive confirm button. Defaults to "Confirm" when empty.
+	ConfirmText string
+	// Action is the POST URL submitted when the user confirms.
+	Action string
+}
+
+// ConfirmDialog renders a styled modal confirmation dialog. Open it by calling showConfirmDialog('<id>') from an
+// onclick handler.
+templ ConfirmDialog(props ConfirmDialogProps) {
+	{{
+		confirmText := props.ConfirmText
+		if confirmText == "" {
+			confirmText = "Confirm"
+		}
+	}}
+	<dialog
+		id={ props.ID }
+		class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-0 w-full max-w-sm backdrop:bg-black/50 backdrop:backdrop-blur-sm"
+	>
+		<div class="px-6 pt-6 pb-2">
+			<h2 class="text-base font-semibold text-gray-900 dark:text-white">{ props.Title }</h2>
+			<p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">{ props.Message }</p>
+		</div>
+		<div class="flex justify-end gap-2 px-6 py-4">
+			<button
+				type="button"
+				onclick={ templ.ComponentScript{Call: "document.getElementById('" + props.ID + "').close()"} }
+				class="cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+			>
+				Cancel
+			</button>
+			<form action={ templ.SafeURL(props.Action) } method="POST">
+				<button
+					type="submit"
+					class="cursor-pointer rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
+				>
+					{ confirmText }
+				</button>
+			</form>
+		</div>
+	</dialog>
+}
