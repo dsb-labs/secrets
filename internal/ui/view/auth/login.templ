@@ -9,6 +9,7 @@ type (
 	// The LoginViewModel type contains fields used to configure the login view.
 	LoginViewModel struct {
 		component.ErrorBannerProps
+		component.ValidationBannerProps
 		// The email the user has previously provided. This would typically only be set when reporting an error.
 		Email string
 		// The password the user has previously provided. This would typically only be set when reporting an error.
@@ -35,6 +36,7 @@ templ login(model LoginViewModel) {
 			</div>
 			<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
 				@component.ErrorBanner(model.ErrorBannerProps)
+				@component.ValidationBanner(model.ValidationBannerProps)
 				<form action="/login" method="POST" class="space-y-4">
 					if model.Redirect != "" {
 						<input type="hidden" name="redirect" value={ model.Redirect }/>

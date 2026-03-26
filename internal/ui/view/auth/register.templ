@@ -9,6 +9,7 @@ type (
 	// The RegisterViewModel type contains fields used to configure the register view.
 	RegisterViewModel struct {
 		component.ErrorBannerProps
+		component.ValidationBannerProps
 		// The display name the user has previously provided. This would typically only be set when reporting an error.
 		DisplayName string
 		// The email the user has previously provided. This would typically only be set when reporting an error.
@@ -33,6 +34,7 @@ templ register(model RegisterViewModel) {
 			</div>
 			<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
 				@component.ErrorBanner(model.ErrorBannerProps)
+				@component.ValidationBanner(model.ValidationBannerProps)
 				<form action="/register" method="POST" class="space-y-4">
 					<div>
 						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="displayName">

@@ -1,0 +1,26 @@
+package component
+
+type (
+	// The ValidationBannerProps type contains fields used to configure the ValidationBanner component.
+	ValidationBannerProps struct {
+		// Errors contains validation error messages keyed by field name. The banner is not rendered when empty.
+		Errors map[string]string
+	}
+)
+
+// ValidationBanner renders a yellow validation error banner listing all field errors. Nothing is rendered when Errors is empty.
+templ ValidationBanner(props ValidationBannerProps) {
+	if len(props.Errors) > 0 {
+		<div class="mb-6 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 px-5 py-4">
+			<p class="text-sm font-medium text-yellow-800 dark:text-yellow-300 mb-2">Please correct the following errors:</p>
+			<ul class="list-disc list-inside space-y-1">
+				for field, msg := range props.Errors {
+					<li class="text-sm text-yellow-700 dark:text-yellow-400">
+						<span class="font-medium">{ field }:</span>
+						{ msg }
+					</li>
+				}
+			</ul>
+		</div>
+	}
+}

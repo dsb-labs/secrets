@@ -8,6 +8,8 @@ import (
 	"net/url"
 
 	"github.com/a-h/templ"
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-playground/form/v4"
 	"github.com/google/uuid"
 
 	"github.com/davidsbond/keeper/internal/server/service"
@@ -27,6 +29,13 @@ type (
 		// account with the given email already exists, service.ErrAccountExists should be returned.
 		Create(account service.Account) ([]byte, error)
 	}
+
+	// The Validatable interface describes types that can validate their own fields, returning an error if any
+	// field values are invalid.
+	Validatable interface {
+		// Validate should return an error if any field values are invalid.
+		Validate() error
+	}
 )
 
 func redirect(w http.ResponseWriter, r *http.Request, path string) {
@@ -43,6 +52,33 @@ func render[T any](ctx context.Context, w io.Writer, view View[T], model T) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+var decoder = form.NewDecoder()
+
+func decode[T Validatable](r *http.Request) (T, error) {
+	var body T
+	if err := r.ParseForm(); err != nil {
+		return body, err
+	}
+
+	if err := decoder.Decode(&body, r.PostForm); err != nil {
+		return body, err
+	}
+	
+	if err := body.Validate(); err != nil {
+		return body, err
+	}
+
+	return body, nil
+}
+
+func validationErrors(ve validation.Errors) map[string]string {
+	out := make(map[string]string, len(ve))
+	for k, v := range ve {
+		out[k] = v.Error()
+	}
+	return out
 }
 
 func requireToken(next http.HandlerFunc) http.Handler {

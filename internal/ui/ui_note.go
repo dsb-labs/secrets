@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/davidsbond/x/filter"
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
 	"github.com/davidsbond/keeper/internal/server/service"
@@ -224,13 +225,26 @@ func (h *NoteHandler) Create(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// CreateCallback handles the note creation form submission, redirecting to the note list on success.
+// The CreateNoteForm type represents the form values submitted when calling NoteHandler.CreateCallback.
+type CreateNoteForm struct {
+	// The note's name.
+	Name string `form:"name"`
+	// The note's contents.
+	Content string `form:"content"`
+}
+
+// Validate the form.
+func (f CreateNoteForm) Validate() error {
+	return validation.ValidateStruct(&f,
+		validation.Field(&f.Name, validation.Required),
+		validation.Field(&f.Content, validation.Required),
+	)
+}
+
+// CreateCallback handles the note creation form submission, redirecting to the note detail view on success.
 func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tkn := token.FromContext(ctx)
-
-	name := r.FormValue("name")
-	content := r.FormValue("content")
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
@@ -239,32 +253,44 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
-			Name:    name,
-			Content: content,
 		})
+		return
+	}
+
+	form, err := decode[CreateNoteForm](r)
+	model := noteview.CreateViewModel{
+		DisplayName: account.DisplayName,
+		Name:        form.Name,
+		Content:     form.Content,
+	}
+
+	var ve validation.Errors
+	switch {
+	case errors.As(err, &ve):
+		model.Errors = validationErrors(ve)
+		render(ctx, w, noteview.Create, model)
+		return
+	case err != nil:
+		model.Message = "An unexpected error occurred, please try again."
+		model.Detail = err.Error()
+		render(ctx, w, noteview.Create, model)
 		return
 	}
 
 	noteID := uuid.New()
 	err = h.notes.Create(tkn.ID(), service.Note{
 		ID:      noteID,
-		Name:    name,
-		Content: content,
+		Name:    form.Name,
+		Content: form.Content,
 	})
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		render(ctx, w, noteview.Create, noteview.CreateViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
-				Message: "Failed to create note, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
-			Name:        name,
-			Content:     content,
-		})
+		model.Message = "Failed to create note, please try again."
+		model.Detail = err.Error()
+		render(ctx, w, noteview.Create, model)
 		return
 	}
 

@@ -9,6 +9,7 @@ type (
 	// The CreateViewModel type contains fields used to configure the note creation view.
 	CreateViewModel struct {
 		component.ErrorBannerProps
+		component.ValidationBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The name of the note, preserved on validation error.
@@ -44,6 +45,7 @@ templ createContent(model CreateViewModel) {
 				<h1 class="text-lg font-semibold text-gray-900 dark:text-white">New note</h1>
 			</div>
 			<form method="POST" action="/notes" class="px-6 py-6 space-y-5">
+				@component.ValidationBanner(model.ValidationBannerProps)
 				<div>
 					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="name">
 						Name

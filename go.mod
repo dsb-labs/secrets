@@ -8,6 +8,7 @@ require (
 	github.com/davidsbond/x v0.0.0-20260215184207-5496341f745e
 	github.com/dgraph-io/badger/v4 v4.9.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
+	github.com/go-playground/form/v4 v4.3.0
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/google/uuid v1.6.0
 	github.com/spf13/cobra v1.10.2

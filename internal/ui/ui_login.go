@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/davidsbond/x/filter"
+	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
 	"github.com/davidsbond/keeper/internal/server/service"
@@ -227,14 +228,28 @@ func (h *LoginHandler) Create(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// The CreateLoginForm type represents the form values submitted when calling LoginHandler.CreateCallback.
+type CreateLoginForm struct {
+	// The username.
+	Username string `form:"username"`
+	// The password.
+	Password string `form:"password"`
+	// The domains where this username/password combination can be used, as a comma-separated string.
+	Domains string `form:"domains"`
+}
+
+// Validate the form.
+func (f CreateLoginForm) Validate() error {
+	return validation.ValidateStruct(&f,
+		validation.Field(&f.Username, validation.Required),
+		validation.Field(&f.Password, validation.Required),
+	)
+}
+
 // CreateCallback handles the login creation form submission, redirecting to the login detail view on success.
 func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tkn := token.FromContext(ctx)
-
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	domainsRaw := r.FormValue("domains")
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
@@ -243,25 +258,45 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
-			Username: username,
-			Password: password,
-			Domains:  domainsRaw,
 		})
 		return
 	}
 
+	form, err := decode[CreateLoginForm](r)
+	model := loginview.CreateViewModel{
+		DisplayName: account.DisplayName,
+		Username:    form.Username,
+		Password:    form.Password,
+		Domains:     form.Domains,
+	}
+
+	var ve validation.Errors
+	switch {
+	case errors.As(err, &ve):
+		model.Errors = validationErrors(ve)
+		render(ctx, w, loginview.Create, model)
+		return
+	case err != nil:
+		model.Message = "An unexpected error occurred, please try again."
+		model.Detail = err.Error()
+		render(ctx, w, loginview.Create, model)
+		return
+	}
+
 	var domains []string
-	for d := range strings.SplitSeq(domainsRaw, ",") {
-		if d := strings.TrimSpace(d); d != "" {
-			domains = append(domains, d)
+	for d := range strings.SplitSeq(form.Domains, ",") {
+		if strings.TrimSpace(d) == "" {
+			continue
 		}
+
+		domains = append(domains, d)
 	}
 
 	loginID := uuid.New()
 	err = h.logins.Create(tkn.ID(), service.Login{
 		ID:       loginID,
-		Username: username,
-		Password: password,
+		Username: form.Username,
+		Password: form.Password,
 		Domains:  domains,
 	})
 	switch {
@@ -269,16 +304,9 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		render(ctx, w, loginview.Create, loginview.CreateViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
-				Message: "Failed to create login, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
-			Username:    username,
-			Password:    password,
-			Domains:     domainsRaw,
-		})
+		model.Message = "Failed to create login, please try again."
+		model.Detail = err.Error()
+		render(ctx, w, loginview.Create, model)
 		return
 	}
 

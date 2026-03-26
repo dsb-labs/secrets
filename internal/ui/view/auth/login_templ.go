@@ -16,6 +16,7 @@ type (
 	// The LoginViewModel type contains fields used to configure the login view.
 	LoginViewModel struct {
 		component.ErrorBannerProps
+		component.ValidationBannerProps
 		// The email the user has previously provided. This would typically only be set when reporting an error.
 		Email string
 		// The password the user has previously provided. This would typically only be set when reporting an error.
@@ -92,6 +93,10 @@ func login(model LoginViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = component.ValidationBanner(model.ValidationBannerProps).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form action=\"/login\" method=\"POST\" class=\"space-y-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -104,7 +109,7 @@ func login(model LoginViewModel) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(model.Redirect)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/login.templ`, Line: 40, Col: 65}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/login.templ`, Line: 42, Col: 65}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -122,7 +127,7 @@ func login(model LoginViewModel) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(model.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/login.templ`, Line: 52, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/login.templ`, Line: 54, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -135,7 +140,7 @@ func login(model LoginViewModel) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(model.Password)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/login.templ`, Line: 66, Col: 29}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/login.templ`, Line: 68, Col: 29}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {

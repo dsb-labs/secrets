@@ -16,6 +16,7 @@ type (
 	// The RegisterViewModel type contains fields used to configure the register view.
 	RegisterViewModel struct {
 		component.ErrorBannerProps
+		component.ValidationBannerProps
 		// The display name the user has previously provided. This would typically only be set when reporting an error.
 		DisplayName string
 		// The email the user has previously provided. This would typically only be set when reporting an error.
@@ -90,6 +91,10 @@ func register(model RegisterViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
+		templ_7745c5c3_Err = component.ValidationBanner(model.ValidationBannerProps).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
 		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form action=\"/register\" method=\"POST\" class=\"space-y-4\"><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"displayName\">Display name</label> <input id=\"displayName\" type=\"text\" name=\"displayName\" placeholder=\"Jane Doe\" required value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -97,7 +102,7 @@ func register(model RegisterViewModel) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(model.DisplayName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 47, Col: 32}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 49, Col: 32}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -110,7 +115,7 @@ func register(model RegisterViewModel) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(model.Email)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 61, Col: 26}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 63, Col: 26}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {

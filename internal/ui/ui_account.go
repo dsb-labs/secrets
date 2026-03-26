@@ -5,6 +5,9 @@ import (
 	"errors"
 	"net/http"
 
+	validation "github.com/go-ozzo/ozzo-validation"
+	"github.com/go-ozzo/ozzo-validation/is"
+
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/ui/view/auth"
 )
@@ -31,30 +34,62 @@ func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	render(r.Context(), w, auth.Register, auth.RegisterViewModel{})
 }
 
+// The CreateAccountForm type represents the form values submitted when calling AccountHandler.CreateAccountCallback.
+type CreateAccountForm struct {
+	// The user's display name.
+	DisplayName string `form:"displayName"`
+	// The user's email address.
+	Email string `form:"email"`
+	// The user's password.
+	Password string `form:"password"`
+	// The user's password, repeated for confirmation.
+	ConfirmPassword string `form:"confirmPassword"`
+}
+
+// Validate the form.
+func (f CreateAccountForm) Validate() error {
+	return validation.ValidateStruct(&f,
+		validation.Field(&f.DisplayName, validation.Required),
+		validation.Field(&f.Email, validation.Required, is.Email),
+		validation.Field(&f.Password, validation.Required),
+		validation.Field(&f.ConfirmPassword, validation.Required),
+	)
+}
+
 // CreateAccountCallback handles an account creation attempt, re-rendering the registration view on error. On success,
 // it renders the registration success view, presenting the user with their restore key.
 func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	displayName := r.FormValue("displayName")
-	email := r.FormValue("email")
-	password := r.FormValue("password")
-	confirmPassword := r.FormValue("confirmPassword")
+	form, err := decode[CreateAccountForm](r)
 
 	model := auth.RegisterViewModel{
-		DisplayName: displayName,
-		Email:       email,
+		DisplayName: form.DisplayName,
+		Email:       form.Email,
 	}
 
-	if password != confirmPassword {
+	var ve validation.Errors
+	switch {
+	case errors.As(err, &ve):
+		model.Errors = validationErrors(ve)
+		render(ctx, w, auth.Register, model)
+		return
+	case err != nil:
+		model.Message = "An unexpected error occurred, please try again."
+		model.Detail = err.Error()
+		render(ctx, w, auth.Register, model)
+		return
+	}
+
+	if form.Password != form.ConfirmPassword {
 		model.Message = "Passwords do not match"
 		render(ctx, w, auth.Register, model)
 		return
 	}
 
 	restoreKey, err := h.accounts.Create(service.Account{
-		DisplayName: displayName,
-		Email:       email,
-		Password:    password,
+		DisplayName: form.DisplayName,
+		Email:       form.Email,
+		Password:    form.Password,
 	})
 	switch {
 	case errors.Is(err, service.ErrAccountExists):
@@ -69,7 +104,7 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 	}
 
 	render(ctx, w, auth.RegisterSuccess, auth.RegisterSuccessViewModel{
-		DisplayName: displayName,
+		DisplayName: form.DisplayName,
 		RestoreKey:  base64.StdEncoding.EncodeToString(restoreKey),
 	})
 }
