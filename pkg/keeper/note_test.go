@@ -142,10 +142,9 @@ func TestClient_GetNote(t *testing.T) {
 		Name:    "test",
 		Content: "test",
 	}
-	
+
 	noteID, err := client.CreateNote(ctx, expected)
 	require.NoError(t, err)
-	
 
 	t.Run("error if note does not exist", func(t *testing.T) {
 		_, err = client.GetNote(ctx, uuid.NameSpaceDNS.String())

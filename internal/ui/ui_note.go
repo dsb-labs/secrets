@@ -22,6 +22,8 @@ type (
 
 	// The NoteService interface describes types that manage user note records.
 	NoteService interface {
+		// Create should store a new note record for the given user.
+		Create(accountID uuid.UUID, note service.Note) error
 		// List should return all notes associated with the given user id.
 		List(accountID uuid.UUID, filters ...filter.Filter[service.Note]) ([]service.Note, error)
 		// Get should return the note record associated with the given user and note identifiers.
@@ -40,6 +42,8 @@ func NewNoteHandler(accounts AccountService, notes NoteService) *NoteHandler {
 // Register HTTP endpoints onto the provided http.ServeMux.
 func (h *NoteHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /notes", requireToken(h.List))
+	mux.Handle("GET /notes/new", requireToken(h.Create))
+	mux.Handle("POST /notes", requireToken(h.CreateCallback))
 	mux.Handle("GET /notes/{id}", requireToken(h.Detail))
 	mux.Handle("POST /notes/{id}/delete", requireToken(h.Delete))
 }
@@ -197,4 +201,72 @@ func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redirect(w, r, "/notes")
+}
+
+// Create renders the note creation form.
+func (h *NoteHandler) Create(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, noteview.Create, noteview.CreateViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
+		})
+		return
+	}
+
+	render(ctx, w, noteview.Create, noteview.CreateViewModel{
+		DisplayName: account.DisplayName,
+	})
+}
+
+// CreateCallback handles the note creation form submission, redirecting to the note list on success.
+func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	name := r.FormValue("name")
+	content := r.FormValue("content")
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, noteview.Create, noteview.CreateViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
+			Name:    name,
+			Content: content,
+		})
+		return
+	}
+
+	noteID := uuid.New()
+	err = h.notes.Create(tkn.ID(), service.Note{
+		ID:      noteID,
+		Name:    name,
+		Content: content,
+	})
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, noteview.Create, noteview.CreateViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to create note, please try again.",
+				Detail:  err.Error(),
+			},
+			DisplayName: account.DisplayName,
+			Name:        name,
+			Content:     content,
+		})
+		return
+	}
+
+	redirect(w, r, "/notes/"+noteID.String())
 }
