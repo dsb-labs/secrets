@@ -3,6 +3,7 @@ package ui
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
@@ -22,6 +23,8 @@ type (
 
 	// The LoginService interface describes types that manage user login records.
 	LoginService interface {
+		// Create should store a new login record for the given user.
+		Create(accountID uuid.UUID, login service.Login) error
 		// List should return all logins associated with the given user id.
 		List(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)
 		// Get should return the login record associated with the given user and login identifiers.
@@ -40,6 +43,8 @@ func NewLoginHandler(accounts AccountService, logins LoginService) *LoginHandler
 // Register HTTP endpoints onto the provided http.ServeMux.
 func (h *LoginHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /logins", requireToken(h.List))
+	mux.Handle("GET /logins/new", requireToken(h.Create))
+	mux.Handle("POST /logins", requireToken(h.CreateCallback))
 	mux.Handle("GET /logins/{id}", requireToken(h.Detail))
 	mux.Handle("POST /logins/{id}/delete", requireToken(h.Delete))
 }
@@ -199,4 +204,83 @@ func (h *LoginHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	redirect(w, r, "/logins")
+}
+
+// Create renders the login creation form.
+func (h *LoginHandler) Create(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, loginview.Create, loginview.CreateViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
+		})
+		return
+	}
+
+	render(ctx, w, loginview.Create, loginview.CreateViewModel{
+		DisplayName: account.DisplayName,
+	})
+}
+
+// CreateCallback handles the login creation form submission, redirecting to the login detail view on success.
+func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+	domainsRaw := r.FormValue("domains")
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, loginview.Create, loginview.CreateViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to load account, please try again.",
+				Detail:  err.Error(),
+			},
+			Username: username,
+			Password: password,
+			Domains:  domainsRaw,
+		})
+		return
+	}
+
+	var domains []string
+	for d := range strings.SplitSeq(domainsRaw, ",") {
+		if d := strings.TrimSpace(d); d != "" {
+			domains = append(domains, d)
+		}
+	}
+
+	loginID := uuid.New()
+	err = h.logins.Create(tkn.ID(), service.Login{
+		ID:       loginID,
+		Username: username,
+		Password: password,
+		Domains:  domains,
+	})
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, loginview.Create, loginview.CreateViewModel{
+			ErrorBannerProps: component.ErrorBannerProps{
+				Message: "Failed to create login, please try again.",
+				Detail:  err.Error(),
+			},
+			DisplayName: account.DisplayName,
+			Username:    username,
+			Password:    password,
+			Domains:     domainsRaw,
+		})
+		return
+	}
+
+	redirect(w, r, "/logins/"+loginID.String())
 }
