@@ -49,6 +49,8 @@ func (h *CardHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /cards", requireToken(h.List))
 	mux.Handle("GET /cards/new", requireToken(h.Create))
 	mux.Handle("POST /cards", requireToken(h.CreateCallback))
+	mux.Handle("GET /cards/{id}", requireToken(h.Detail))
+	mux.Handle("POST /cards/{id}/delete", requireToken(h.Delete))
 }
 
 // List renders the card list view.
@@ -191,6 +193,80 @@ func (h *CardHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	redirect(w, r, "/cards")
+}
+
+// Detail renders the card detail view for a single card record.
+func (h *CardHandler) Detail(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	cardID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
+		return
+	}
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	card, err := h.cards.Get(tkn.ID(), cardID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case errors.Is(err, service.ErrCardNotFound):
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, http.StatusOK, cardview.Detail, cardview.DetailViewModel{
+		DisplayName:  account.DisplayName,
+		ID:           card.ID.String(),
+		HolderName:   card.HolderName,
+		Number:       card.Number,
+		MaskedNumber: maskCardNumber(card.Number),
+		Expiry:       fmt.Sprintf("%02d/%d", int(card.ExpiryMonth), card.ExpiryYear),
+		CVV:          card.CVV,
+	})
+}
+
+// Delete handles a card deletion request, redirecting to the card list on success.
+func (h *CardHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	cardID, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
+		return
+	}
+
+	err = h.cards.Delete(tkn.ID(), cardID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case errors.Is(err, service.ErrCardNotFound):
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	case err != nil:
 		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
