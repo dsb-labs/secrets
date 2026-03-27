@@ -1,0 +1,35 @@
+package component
+
+type (
+	// The ListItemProps type contains fields used to configure a list item row.
+	ListItemProps struct {
+		// Href is the URL the row navigates to when clicked.
+		Href string
+		// Title is the primary text displayed in the row.
+		Title string
+		// Subtitle is the optional secondary text displayed below the title. Omitted when empty.
+		Subtitle string
+		// TitleClass is an optional extra CSS class applied to the title element, e.g. "font-mono".
+		TitleClass string
+	}
+)
+
+// ListItem renders a full-row clickable link with an optional leading element (passed as children),
+// a title, an optional subtitle, and a trailing chevron.
+templ ListItem(props ListItemProps) {
+	<a
+		href={ templ.SafeURL(props.Href) }
+		class="flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+	>
+		<div class="flex items-center gap-3 min-w-0">
+			{ children... }
+			<div class="min-w-0">
+				<p class={ "text-sm font-medium text-gray-900 dark:text-white truncate", props.TitleClass }>{ props.Title }</p>
+				if props.Subtitle != "" {
+					<p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{ props.Subtitle }</p>
+				}
+			</div>
+		</div>
+		@IconChevronRight("w-4 h-4 shrink-0 text-gray-400 dark:text-gray-500")
+	</a>
+}

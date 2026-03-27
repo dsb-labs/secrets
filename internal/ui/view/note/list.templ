@@ -81,13 +81,8 @@ templ listContent(model ViewModel) {
 }
 
 templ row(item Item) {
-	<div class="flex items-center justify-between px-4 py-3.5">
-		<p class="text-sm font-medium text-gray-900 dark:text-white truncate">{ item.Name }</p>
-		<a
-			href={ templ.SafeURL("/notes/" + item.ID) }
-			class="ml-4 shrink-0 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
-		>
-			View
-		</a>
-	</div>
+	@component.ListItem(component.ListItemProps{
+		Href:  "/notes/" + item.ID,
+		Title: item.Name,
+	})
 }
