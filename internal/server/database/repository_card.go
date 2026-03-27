@@ -32,6 +32,8 @@ type (
 		ExpiryYear int
 		// The card's CVV.
 		CVV string
+		// When the card was created.
+		CreatedAt time.Time
 	}
 )
 

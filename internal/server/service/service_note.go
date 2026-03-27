@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
@@ -38,6 +39,8 @@ type (
 		Name string
 		// The note's contents
 		Content string
+		// When the note was created.
+		CreatedAt time.Time
 	}
 )
 
@@ -67,9 +70,10 @@ func (svc *NoteService) Create(userID uuid.UUID, note Note) error {
 	}
 
 	record := database.Note{
-		ID:      note.ID,
-		Name:    note.Name,
-		Content: note.Content,
+		ID:        note.ID,
+		Name:      note.Name,
+		Content:   note.Content,
+		CreatedAt: note.CreatedAt,
 	}
 
 	err = repo.Create(record)
@@ -104,9 +108,10 @@ func (svc *NoteService) List(userID uuid.UUID, filters ...filter.Filter[Note]) (
 
 	notes := convert.Slice(results, func(in database.Note) Note {
 		return Note{
-			ID:      in.ID,
-			Name:    in.Name,
-			Content: in.Content,
+			ID:        in.ID,
+			Name:      in.Name,
+			Content:   in.Content,
+			CreatedAt: in.CreatedAt,
 		}
 	})
 
@@ -165,8 +170,9 @@ func (svc *NoteService) Get(userID uuid.UUID, noteID uuid.UUID) (Note, error) {
 	}
 
 	return Note{
-		ID:      result.ID,
-		Name:    result.Name,
-		Content: result.Content,
+		ID:        result.ID,
+		Name:      result.Name,
+		Content:   result.Content,
+		CreatedAt: result.CreatedAt,
 	}, nil
 }

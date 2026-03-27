@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
@@ -41,6 +42,8 @@ type (
 		Name string `json:"name"`
 		// The note's contents
 		Content string `json:"content"`
+		// When the note was created.
+		CreatedAt time.Time `json:"createdAt"`
 	}
 )
 
@@ -92,9 +95,10 @@ func (api *NoteAPI) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	note := service.Note{
-		ID:      uuid.New(),
-		Name:    request.Name,
-		Content: request.Content,
+		ID:        uuid.New(),
+		Name:      request.Name,
+		Content:   request.Content,
+		CreatedAt: time.Now(),
 	}
 
 	err = api.notes.Create(tkn.ID(), note)
@@ -142,9 +146,10 @@ func (api *NoteAPI) List(w http.ResponseWriter, r *http.Request) {
 	write(w, http.StatusOK, ListNotesResponse{
 		Notes: convert.Slice(results, func(in service.Note) Note {
 			return Note{
-				ID:      in.ID.String(),
-				Name:    in.Name,
-				Content: in.Content,
+				ID:        in.ID.String(),
+				Name:      in.Name,
+				Content:   in.Content,
+				CreatedAt: in.CreatedAt,
 			}
 		}),
 	})
@@ -214,9 +219,10 @@ func (api *NoteAPI) Get(w http.ResponseWriter, r *http.Request) {
 
 	write(w, http.StatusOK, GetNoteResponse{
 		Note: Note{
-			ID:      result.ID.String(),
-			Name:    result.Name,
-			Content: result.Content,
+			ID:        result.ID.String(),
+			Name:      result.Name,
+			Content:   result.Content,
+			CreatedAt: result.CreatedAt,
 		},
 	})
 }

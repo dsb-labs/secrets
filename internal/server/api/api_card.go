@@ -49,6 +49,8 @@ type (
 		ExpiryYear int `json:"expiryYear"`
 		// The card's CVV.
 		CVV string `json:"cvv"`
+		// When the card was created.
+		CreatedAt time.Time `json:"createdAt"`
 	}
 )
 
@@ -114,6 +116,7 @@ func (api *CardAPI) Create(w http.ResponseWriter, r *http.Request) {
 		ExpiryMonth: request.ExpiryMonth,
 		ExpiryYear:  request.ExpiryYear,
 		CVV:         request.CVV,
+		CreatedAt:   time.Now(),
 	}
 
 	err = api.cards.Create(tkn.ID(), card)
@@ -162,6 +165,7 @@ func (api *CardAPI) List(w http.ResponseWriter, r *http.Request) {
 				ExpiryMonth: in.ExpiryMonth,
 				ExpiryYear:  in.ExpiryYear,
 				CVV:         in.CVV,
+				CreatedAt:   in.CreatedAt,
 			}
 		}),
 	})
@@ -237,6 +241,7 @@ func (api *CardAPI) Get(w http.ResponseWriter, r *http.Request) {
 			ExpiryMonth: result.ExpiryMonth,
 			ExpiryYear:  result.ExpiryYear,
 			CVV:         result.CVV,
+			CreatedAt:   result.CreatedAt,
 		},
 	})
 }

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/google/uuid"
@@ -25,6 +26,8 @@ type (
 		Name string
 		// The note's contents
 		Content string
+		// When the note was created.
+		CreatedAt time.Time
 	}
 )
 

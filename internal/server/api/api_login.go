@@ -3,6 +3,7 @@ package api
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
@@ -43,6 +44,8 @@ type (
 		Password string `json:"password"`
 		// The domains this password can be used.
 		Domains []string `json:"domains"`
+		// When the login was created.
+		CreatedAt time.Time `json:"createdAt"`
 	}
 )
 
@@ -96,10 +99,11 @@ func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	login := service.Login{
-		ID:       uuid.New(),
-		Username: request.Username,
-		Password: request.Password,
-		Domains:  request.Domains,
+		ID:        uuid.New(),
+		Username:  request.Username,
+		Password:  request.Password,
+		Domains:   request.Domains,
+		CreatedAt: time.Now(),
 	}
 
 	err = api.logins.Create(tkn.ID(), login)
@@ -147,10 +151,11 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 	write(w, http.StatusOK, ListLoginsResponse{
 		Logins: convert.Slice(results, func(in service.Login) Login {
 			return Login{
-				ID:       in.ID.String(),
-				Username: in.Username,
-				Password: in.Password,
-				Domains:  in.Domains,
+				ID:        in.ID.String(),
+				Username:  in.Username,
+				Password:  in.Password,
+				Domains:   in.Domains,
+				CreatedAt: in.CreatedAt,
 			}
 		}),
 	})
@@ -220,10 +225,11 @@ func (api *LoginAPI) Get(w http.ResponseWriter, r *http.Request) {
 
 	write(w, http.StatusOK, GetLoginResponse{
 		Login: Login{
-			ID:       result.ID.String(),
-			Username: result.Username,
-			Password: result.Password,
-			Domains:  result.Domains,
+			ID:        result.ID.String(),
+			Username:  result.Username,
+			Password:  result.Password,
+			Domains:   result.Domains,
+			CreatedAt: result.CreatedAt,
 		},
 	})
 }

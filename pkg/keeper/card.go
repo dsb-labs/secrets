@@ -26,6 +26,8 @@ type (
 		ExpiryYear int
 		// The card's CVV.
 		CVV string
+		// When the card was created.
+		CreatedAt time.Time
 	}
 )
 
@@ -70,6 +72,7 @@ func (c *Client) ListCards(ctx context.Context) ([]Card, error) {
 			ExpiryMonth: in.ExpiryMonth,
 			ExpiryYear:  in.ExpiryYear,
 			CVV:         in.CVV,
+			CreatedAt:   in.CreatedAt,
 		}
 	}), nil
 }
@@ -107,5 +110,6 @@ func (c *Client) GetCard(ctx context.Context, id string) (Card, error) {
 		ExpiryMonth: response.Card.ExpiryMonth,
 		ExpiryYear:  response.Card.ExpiryYear,
 		CVV:         response.Card.CVV,
+		CreatedAt:   response.Card.CreatedAt,
 	}, nil
 }

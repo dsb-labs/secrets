@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
@@ -40,6 +41,8 @@ type (
 		Password string
 		// The domains this username/password combination can be used.
 		Domains []string
+		// When the login was created.
+		CreatedAt time.Time
 	}
 )
 
@@ -69,10 +72,11 @@ func (svc *LoginService) Create(userID uuid.UUID, login Login) error {
 	}
 
 	record := database.Login{
-		ID:       login.ID,
-		Username: login.Username,
-		Password: login.Password,
-		Domains:  login.Domains,
+		ID:        login.ID,
+		Username:  login.Username,
+		Password:  login.Password,
+		Domains:   login.Domains,
+		CreatedAt: login.CreatedAt,
 	}
 
 	err = repo.Create(record)
@@ -107,10 +111,11 @@ func (svc *LoginService) List(userID uuid.UUID, filters ...filter.Filter[Login])
 
 	logins := convert.Slice(results, func(in database.Login) Login {
 		return Login{
-			ID:       in.ID,
-			Username: in.Username,
-			Password: in.Password,
-			Domains:  in.Domains,
+			ID:        in.ID,
+			Username:  in.Username,
+			Password:  in.Password,
+			Domains:   in.Domains,
+			CreatedAt: in.CreatedAt,
 		}
 	})
 
@@ -169,9 +174,10 @@ func (svc *LoginService) Get(userID uuid.UUID, loginID uuid.UUID) (Login, error)
 	}
 
 	return Login{
-		ID:       result.ID,
-		Username: result.Username,
-		Password: result.Password,
-		Domains:  result.Domains,
+		ID:        result.ID,
+		Username:  result.Username,
+		Password:  result.Password,
+		Domains:   result.Domains,
+		CreatedAt: result.CreatedAt,
 	}, nil
 }

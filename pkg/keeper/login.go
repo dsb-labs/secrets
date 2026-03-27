@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"path"
+	"time"
 
 	"github.com/davidsbond/x/convert"
 
@@ -21,6 +22,8 @@ type (
 		Password string
 		// Domains where this login can be used.
 		Domains []string
+		// When the login was created.
+		CreatedAt time.Time
 	}
 )
 
@@ -63,10 +66,11 @@ func (c *Client) ListLogins(ctx context.Context, domain string) ([]Login, error)
 
 	return convert.Slice(response.Logins, func(in api.Login) Login {
 		return Login{
-			ID:       in.ID,
-			Username: in.Username,
-			Password: in.Password,
-			Domains:  in.Domains,
+			ID:        in.ID,
+			Username:  in.Username,
+			Password:  in.Password,
+			Domains:   in.Domains,
+			CreatedAt: in.CreatedAt,
 		}
 	}), nil
 }
@@ -98,9 +102,10 @@ func (c *Client) GetLogin(ctx context.Context, id string) (Login, error) {
 	}
 
 	return Login{
-		ID:       response.Login.ID,
-		Username: response.Login.Username,
-		Password: response.Login.Password,
-		Domains:  response.Login.Domains,
+		ID:        response.Login.ID,
+		Username:  response.Login.Username,
+		Password:  response.Login.Password,
+		Domains:   response.Login.Domains,
+		CreatedAt: response.Login.CreatedAt,
 	}, nil
 }

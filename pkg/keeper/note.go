@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"path"
+	"time"
 
 	"github.com/davidsbond/x/convert"
 
@@ -19,6 +20,8 @@ type (
 		Name string
 		// The note's contents
 		Content string
+		// When the note was created.
+		CreatedAt time.Time
 	}
 )
 
@@ -63,6 +66,7 @@ func (c *Client) ListNotes(ctx context.Context, query string) ([]Note, error) {
 			ID:      in.ID,
 			Name:    in.Name,
 			Content: in.Content,
+			CreatedAt: in.CreatedAt,
 		}
 	}), nil
 }
@@ -97,5 +101,6 @@ func (c *Client) GetNote(ctx context.Context, id string) (Note, error) {
 		ID:      response.Note.ID,
 		Name:    response.Note.Name,
 		Content: response.Note.Content,
+		CreatedAt: response.Note.CreatedAt,
 	}, nil
 }

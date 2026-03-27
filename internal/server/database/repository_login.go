@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/google/uuid"
@@ -27,6 +28,8 @@ type (
 		Password string
 		// The domains where this username and login combination can be used.
 		Domains []string
+		// When the login was created.
+		CreatedAt time.Time
 	}
 )
 
