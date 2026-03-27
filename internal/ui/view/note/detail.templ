@@ -18,6 +18,8 @@ type (
 		Name string
 		// The content of the note.
 		Content string
+		// The formatted creation timestamp.
+		CreatedAt string
 	}
 )
 
@@ -81,6 +83,10 @@ templ detailContent(model DetailViewModel) {
 					style="display:none"
 					class="w-full text-sm text-gray-900 dark:text-white bg-transparent resize-none focus:outline-none"
 				>{ model.Content }</textarea>
+			</div>
+			<div class="px-6 py-4">
+				<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Created</label>
+				<p class="text-sm text-gray-500 dark:text-gray-400">{ model.CreatedAt }</p>
 			</div>
 		</div>
 		@component.ConfirmDialog(component.ConfirmDialogProps{

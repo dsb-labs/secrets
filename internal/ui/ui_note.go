@@ -3,6 +3,7 @@ package ui
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/davidsbond/x/filter"
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -134,6 +135,7 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		ID:          note.ID.String(),
 		Name:        note.Name,
 		Content:     note.Content,
+		CreatedAt:   note.CreatedAt.Format("2 January 2006 at 15:04"),
 	})
 }
 
@@ -235,9 +237,10 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 
 	noteID := uuid.New()
 	err = h.notes.Create(tkn.ID(), service.Note{
-		ID:      noteID,
-		Name:    form.Name,
-		Content: form.Content,
+		ID:        noteID,
+		Name:      form.Name,
+		Content:   form.Content,
+		CreatedAt: time.Now(),
 	})
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):

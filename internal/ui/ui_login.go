@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/davidsbond/x/filter"
 	validation "github.com/go-ozzo/ozzo-validation"
@@ -137,6 +138,7 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		Username:    login.Username,
 		Password:    login.Password,
 		Domains:     login.Domains,
+		CreatedAt:   login.CreatedAt.Format("2 January 2006 at 15:04"),
 	})
 }
 
@@ -250,10 +252,11 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 
 	loginID := uuid.New()
 	err = h.logins.Create(tkn.ID(), service.Login{
-		ID:       loginID,
-		Username: form.Username,
-		Password: form.Password,
-		Domains:  domains,
+		ID:        loginID,
+		Username:  form.Username,
+		Password:  form.Password,
+		Domains:   domains,
+		CreatedAt: time.Now(),
 	})
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):

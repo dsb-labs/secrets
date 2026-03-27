@@ -189,6 +189,7 @@ func (h *CardHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 		ExpiryMonth: form.ExpiryMonth,
 		ExpiryYear:  form.ExpiryYear,
 		CVV:         form.CVV,
+		CreatedAt:   time.Now(),
 	})
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
@@ -239,13 +240,13 @@ func (h *CardHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render(ctx, w, http.StatusOK, cardview.Detail, cardview.DetailViewModel{
-		DisplayName:  account.DisplayName,
-		ID:           card.ID.String(),
-		HolderName:   card.HolderName,
-		Number:       card.Number,
-		MaskedNumber: maskCardNumber(card.Number),
-		Expiry:       fmt.Sprintf("%02d/%d", int(card.ExpiryMonth), card.ExpiryYear),
-		CVV:          card.CVV,
+		DisplayName: account.DisplayName,
+		ID:          card.ID.String(),
+		HolderName:  card.HolderName,
+		Number:      card.Number,
+		Expiry:      fmt.Sprintf("%02d/%d", int(card.ExpiryMonth), card.ExpiryYear),
+		CVV:         card.CVV,
+		CreatedAt:   card.CreatedAt.Format("2 January 2006 at 15:04"),
 	})
 }
 

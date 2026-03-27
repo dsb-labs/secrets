@@ -18,12 +18,12 @@ type (
 		HolderName string
 		// The full card number, displayed in a hidden field.
 		Number string
-		// The masked card number, used as the page heading.
-		MaskedNumber string
 		// The formatted expiry date, e.g. "03/2026".
 		Expiry string
 		// The card's CVV, displayed in a hidden field.
 		CVV string
+		// The formatted creation timestamp.
+		CreatedAt string
 	}
 )
 
@@ -129,6 +129,10 @@ templ detailContent(model DetailViewModel) {
 							@component.IconCheckHidden("cvv-check-icon", "w-4 h-4")
 						</button>
 					</div>
+				</div>
+				<div>
+					<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Created</label>
+					<p class="text-sm text-gray-500 dark:text-gray-400">{ model.CreatedAt }</p>
 				</div>
 			</div>
 		</div>
