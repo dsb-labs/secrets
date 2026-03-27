@@ -15,7 +15,8 @@ import (
 type (
 	// The ViewModel type contains fields used to configure the note list view.
 	ViewModel struct {
-		component.ErrorBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The list of notes stored for the authenticated user.
@@ -90,7 +91,7 @@ func listContent(model ViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = component.ErrorBanner(model.ErrorBannerProps).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = component.ErrorBanner(model.Error).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -106,7 +107,7 @@ func listContent(model ViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if model.Message == "" {
+		if model.Error.Message == "" {
 			if len(model.Notes) == 0 {
 				templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 					templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -186,7 +187,7 @@ func row(item Item) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(item.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/list.templ`, Line: 73, Col: 83}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/list.templ`, Line: 74, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -199,7 +200,7 @@ func row(item Item) templ.Component {
 		var templ_7745c5c3_Var6 templ.SafeURL
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/notes/" + item.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/list.templ`, Line: 75, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/list.templ`, Line: 76, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {

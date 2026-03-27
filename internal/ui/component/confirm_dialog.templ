@@ -39,14 +39,14 @@ templ ConfirmDialog(props ConfirmDialogProps) {
 			>
 				Cancel
 			</button>
-			<form action={ templ.SafeURL(props.Action) } method="POST">
+			@Form(FormProps{Action: props.Action}) {
 				<button
 					type="submit"
 					class="cursor-pointer rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
 				>
 					{ confirmText }
 				</button>
-			</form>
+			}
 		</div>
 	</dialog>
 }

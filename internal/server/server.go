@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"filippo.io/csrf"
 	"github.com/davidsbond/x/closer"
 	"github.com/davidsbond/x/lifetime"
 	"github.com/davidsbond/x/syncmap"
@@ -96,9 +97,20 @@ func Run(ctx context.Context, config Config) error {
 	ui.NewNoteHandler(accountSvc, noteSvc).Register(mux)
 	ui.NewAssetHandler().Register(mux)
 
+	protection := csrf.New()
+
+	middlewares := []func(handler http.Handler) http.Handler{
+		protection.Handler,
+		token.Middleware(tokenParser),
+	}
+
 	server := &http.Server{
 		Addr:    config.HTTP.Bind,
-		Handler: token.Middleware(tokenParser, mux),
+		Handler: mux,
+	}
+
+	for _, middleware := range middlewares {
+		server.Handler = middleware(server.Handler)
 	}
 
 	group, ctx := errgroup.WithContext(ctx)

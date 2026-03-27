@@ -15,8 +15,10 @@ import (
 type (
 	// The RegisterViewModel type contains fields used to configure the register view.
 	RegisterViewModel struct {
-		component.ErrorBannerProps
-		component.ValidationBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
+		// Validation contains any validation errors to display above the form. Nothing is rendered when Errors is empty.
+		Validation component.ValidationBannerProps
 		// The display name the user has previously provided. This would typically only be set when reporting an error.
 		DisplayName string
 		// The email the user has previously provided. This would typically only be set when reporting an error.
@@ -87,41 +89,63 @@ func register(model RegisterViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = component.ErrorBanner(model.ErrorBannerProps).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = component.ErrorBanner(model.Error).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = component.ValidationBanner(model.ValidationBannerProps).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+			templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+			if !templ_7745c5c3_IsBuffer {
+				defer func() {
+					templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err == nil {
+						templ_7745c5c3_Err = templ_7745c5c3_BufErr
+					}
+				}()
+			}
+			ctx = templ.InitializeContext(ctx)
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"displayName\">Display name</label> <input id=\"displayName\" type=\"text\" name=\"displayName\" placeholder=\"Jane Doe\" required value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(model.DisplayName)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 54, Col: 32}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"email\">Email address</label> <input id=\"email\" type=\"email\" name=\"email\" placeholder=\"you@example.com\" required value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(model.Email)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 68, Col: 26}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"password\">Password</label> <input id=\"password\" type=\"password\" name=\"password\" placeholder=\"••••••••\" required class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"confirmPassword\">Confirm password</label> <input id=\"confirmPassword\" type=\"password\" name=\"confirmPassword\" placeholder=\"••••••••\" required class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><button type=\"submit\" class=\"w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Create account</button>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			return nil
+		})
+		templ_7745c5c3_Err = component.Form(component.FormProps{
+			Action:     "/register",
+			Class:      "space-y-4",
+			Validation: model.Validation,
+		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var3), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<form action=\"/register\" method=\"POST\" class=\"space-y-4\"><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"displayName\">Display name</label> <input id=\"displayName\" type=\"text\" name=\"displayName\" placeholder=\"Jane Doe\" required value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(model.DisplayName)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 49, Col: 32}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"email\">Email address</label> <input id=\"email\" type=\"email\" name=\"email\" placeholder=\"you@example.com\" required value=\"")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		var templ_7745c5c3_Var4 string
-		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(model.Email)
-		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register.templ`, Line: 63, Col: 26}
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"password\">Password</label> <input id=\"password\" type=\"password\" name=\"password\" placeholder=\"••••••••\" required class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"confirmPassword\">Confirm password</label> <input id=\"confirmPassword\" type=\"password\" name=\"confirmPassword\" placeholder=\"••••••••\" required class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><button type=\"submit\" class=\"w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Create account</button></form><p class=\"mt-4 text-center text-sm text-gray-500 dark:text-gray-400\">Already have an account?&#32; <a href=\"/login\" class=\"text-indigo-600 dark:text-indigo-400 hover:underline font-medium\">Sign in</a></p></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<p class=\"mt-4 text-center text-sm text-gray-500 dark:text-gray-400\">Already have an account?&#32; <a href=\"/login\" class=\"text-indigo-600 dark:text-indigo-400 hover:underline font-medium\">Sign in</a></p></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

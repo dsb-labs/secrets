@@ -58,7 +58,7 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, loginview.List, loginview.ViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -73,7 +73,7 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	case err != nil:
 		render(ctx, w, loginview.List, loginview.ViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load logins, please try again.",
 				Detail:  err.Error(),
 			},
@@ -105,7 +105,7 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	loginID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Invalid login identifier.",
 				Detail:  err.Error(),
 			},
@@ -116,7 +116,7 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -131,13 +131,13 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	case errors.Is(err, service.ErrLoginNotFound):
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{Message: "Login not found."},
+			Error: component.ErrorBannerProps{Message: "Login not found."},
 			DisplayName:      account.DisplayName,
 		})
 		return
 	case err != nil:
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load login, please try again.",
 				Detail:  err.Error(),
 			},
@@ -163,7 +163,7 @@ func (h *LoginHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	loginID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Invalid login identifier.",
 				Detail:  err.Error(),
 			},
@@ -174,7 +174,7 @@ func (h *LoginHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -189,13 +189,13 @@ func (h *LoginHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	case errors.Is(err, service.ErrLoginNotFound):
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{Message: "Login not found."},
+			Error: component.ErrorBannerProps{Message: "Login not found."},
 			DisplayName:      account.DisplayName,
 		})
 		return
 	case err != nil:
 		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to delete login, please try again.",
 				Detail:  err.Error(),
 			},
@@ -215,7 +215,7 @@ func (h *LoginHandler) Create(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, loginview.Create, loginview.CreateViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -254,7 +254,7 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, loginview.Create, loginview.CreateViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -273,12 +273,12 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	var ve validation.Errors
 	switch {
 	case errors.As(err, &ve):
-		model.Errors = validationErrors(ve)
+		model.Validation.Errors = validationErrors(ve)
 		render(ctx, w, loginview.Create, model)
 		return
 	case err != nil:
-		model.Message = "An unexpected error occurred, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "An unexpected error occurred, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, loginview.Create, model)
 		return
 	}
@@ -304,8 +304,8 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		model.Message = "Failed to create login, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "Failed to create login, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, loginview.Create, model)
 		return
 	}

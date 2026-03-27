@@ -17,7 +17,8 @@ import (
 type (
 	// The DetailViewModel type contains fields used to configure the note detail view.
 	DetailViewModel struct {
-		component.ErrorBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The unique identifier of the note.
@@ -88,11 +89,11 @@ func detailContent(model DetailViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = component.ErrorBanner(model.ErrorBannerProps).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = component.ErrorBanner(model.Error).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if model.Message == "" {
+		if model.Error.Message == "" {
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"mb-6 max-w-2xl\"><a href=\"/notes\" class=\"inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -108,7 +109,7 @@ func detailContent(model DetailViewModel) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(model.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/detail.templ`, Line: 49, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/detail.templ`, Line: 50, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -153,7 +154,7 @@ func detailContent(model DetailViewModel) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(model.Content)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/detail.templ`, Line: 86, Col: 21}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/note/detail.templ`, Line: 87, Col: 21}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {

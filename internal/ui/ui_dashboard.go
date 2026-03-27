@@ -32,7 +32,7 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, dashboard.Dashboard, dashboard.ViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},

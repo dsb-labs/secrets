@@ -17,7 +17,8 @@ import (
 type (
 	// The ViewModel type contains fields used to configure the login list view.
 	ViewModel struct {
-		component.ErrorBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The list of logins stored for the authenticated user.
@@ -94,7 +95,7 @@ func listContent(model ViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = component.ErrorBanner(model.ErrorBannerProps).Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = component.ErrorBanner(model.Error).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -110,7 +111,7 @@ func listContent(model ViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		if model.Message == "" {
+		if model.Error.Message == "" {
 			if len(model.Logins) == 0 {
 				templ_7745c5c3_Var3 := templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 					templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -190,7 +191,7 @@ func row(item Item) templ.Component {
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(item.Username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 78, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 79, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -208,7 +209,7 @@ func row(item Item) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(strings.Join(item.Domains, ", "))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 80, Col: 106}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 81, Col: 106}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -226,7 +227,7 @@ func row(item Item) templ.Component {
 		var templ_7745c5c3_Var7 templ.SafeURL
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(templ.SafeURL("/logins/" + item.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 84, Col: 45}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 85, Col: 45}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {

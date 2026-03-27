@@ -142,7 +142,7 @@ func TestMiddleware(t *testing.T) {
 			Audience:   "test.com",
 		})
 
-		handler := token.Middleware(parser, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler := token.Middleware(parser)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			tkn := token.FromContext(r.Context())
 			if tc.ExpectsToken {
 				assert.Equal(t, tc.ExpectedID, tkn.ID())

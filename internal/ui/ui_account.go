@@ -70,18 +70,18 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 	var ve validation.Errors
 	switch {
 	case errors.As(err, &ve):
-		model.Errors = validationErrors(ve)
+		model.Validation.Errors = validationErrors(ve)
 		render(ctx, w, auth.Register, model)
 		return
 	case err != nil:
-		model.Message = "An unexpected error occurred, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "An unexpected error occurred, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, auth.Register, model)
 		return
 	}
 
 	if form.Password != form.ConfirmPassword {
-		model.Message = "Passwords do not match"
+		model.Error.Message = "Passwords do not match"
 		render(ctx, w, auth.Register, model)
 		return
 	}
@@ -93,12 +93,12 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 	})
 	switch {
 	case errors.Is(err, service.ErrAccountExists):
-		model.Message = "An account with that email address already exists"
+		model.Error.Message = "An account with that email address already exists"
 		render(ctx, w, auth.Register, model)
 		return
 	case err != nil:
-		model.Message = "An unexpected error occurred, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "An unexpected error occurred, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, auth.Register, model)
 		return
 	}

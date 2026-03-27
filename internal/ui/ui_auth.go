@@ -77,12 +77,12 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	var ve validation.Errors
 	switch {
 	case errors.As(err, &ve):
-		model.Errors = validationErrors(ve)
+		model.Validation.Errors = validationErrors(ve)
 		render(ctx, w, auth.Login, model)
 		return
 	case err != nil:
-		model.Message = "An unexpected error occurred, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "An unexpected error occurred, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, auth.Login, model)
 		return
 	}
@@ -90,16 +90,16 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	tkn, err := h.auth.Login(form.Email, form.Password)
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
-		model.Message = "Account not found"
+		model.Error.Message = "Account not found"
 		render(ctx, w, auth.Login, model)
 		return
 	case errors.Is(err, service.ErrInvalidPassword):
-		model.Message = "Invalid password"
+		model.Error.Message = "Invalid password"
 		render(ctx, w, auth.Login, model)
 		return
 	case err != nil:
-		model.Message = "An unexpected error occurred, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "An unexpected error occurred, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, auth.Login, model)
 		return
 	}

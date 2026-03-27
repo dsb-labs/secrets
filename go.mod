@@ -3,9 +3,10 @@ module github.com/davidsbond/keeper
 go 1.26
 
 require (
+	filippo.io/csrf v0.2.1
 	github.com/BurntSushi/toml v1.6.0
 	github.com/a-h/templ v0.3.1001
-	github.com/davidsbond/x v0.0.0-20260215184207-5496341f745e
+	github.com/davidsbond/x v0.0.0-20260303171052-54ba0077d494
 	github.com/dgraph-io/badger/v4 v4.9.1
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-playground/form/v4 v4.3.0
@@ -43,7 +44,7 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jedib0t/go-pretty/v6 v6.6.7 // indirect
-	github.com/klauspost/compress v1.18.4 // indirect
+	github.com/klauspost/compress v1.18.5 // indirect
 	github.com/knadh/koanf/maps v0.1.2 // indirect
 	github.com/knadh/koanf/parsers/yaml v0.1.0 // indirect
 	github.com/knadh/koanf/providers/env v1.0.0 // indirect
@@ -70,9 +71,9 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
-	go.opentelemetry.io/otel v1.40.0 // indirect
-	go.opentelemetry.io/otel/metric v1.40.0 // indirect
-	go.opentelemetry.io/otel/trace v1.40.0 // indirect
+	go.opentelemetry.io/otel v1.42.0 // indirect
+	go.opentelemetry.io/otel/metric v1.42.0 // indirect
+	go.opentelemetry.io/otel/trace v1.42.0 // indirect
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20231108232855-2478ac86f678 // indirect
 	golang.org/x/mod v0.33.0 // indirect

@@ -8,8 +8,10 @@ import (
 type (
 	// The CreateViewModel type contains fields used to configure the login creation view.
 	CreateViewModel struct {
-		component.ErrorBannerProps
-		component.ValidationBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
+		// Validation contains any validation errors to display above the form. Nothing is rendered when Errors is empty.
+		Validation component.ValidationBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The username for the login, preserved on validation error.
@@ -32,7 +34,7 @@ templ Create(model CreateViewModel) {
 
 templ createContent(model CreateViewModel) {
 	<div class="p-8">
-		@component.ErrorBanner(model.ErrorBannerProps)
+		@component.ErrorBanner(model.Error)
 		<div class="mb-6 max-w-2xl">
 			<a
 				href="/logins"
@@ -46,8 +48,11 @@ templ createContent(model CreateViewModel) {
 			<div class="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
 				<h1 class="text-lg font-semibold text-gray-900 dark:text-white">New login</h1>
 			</div>
-			<form method="POST" action="/logins" class="px-6 py-6 space-y-5">
-				@component.ValidationBanner(model.ValidationBannerProps)
+			@component.Form(component.FormProps{
+				Action:     "/logins",
+				Class:      "px-6 py-6 space-y-5",
+				Validation: model.Validation,
+			}) {
 				<div>
 					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="username">
 						Username
@@ -96,7 +101,7 @@ templ createContent(model CreateViewModel) {
 				>
 					Create login
 				</button>
-			</form>
+			}
 		</div>
 	</div>
 }

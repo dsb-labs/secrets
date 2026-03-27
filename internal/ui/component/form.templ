@@ -1,0 +1,21 @@
+package component
+
+type (
+	// The FormProps type contains fields used to configure the Form component.
+	FormProps struct {
+		// Action is the URL the form submits to.
+		Action string
+		// Class is the CSS class string applied to the <form> element.
+		Class string
+		// Validation contains any validation errors to display above the form fields. Nothing is rendered when Errors is empty.
+		Validation ValidationBannerProps
+	}
+)
+
+// Form renders a POST form with an optional validation banner, with the provided children rendered inside.
+templ Form(props FormProps) {
+	<form action={ templ.SafeURL(props.Action) } method="POST" class={ props.Class }>
+		@ValidationBanner(props.Validation)
+		{ children... }
+	</form>
+}

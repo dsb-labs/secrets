@@ -10,7 +10,8 @@ import (
 type (
 	// The ViewModel type contains fields used to configure the login list view.
 	ViewModel struct {
-		component.ErrorBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The list of logins stored for the authenticated user.
@@ -39,7 +40,7 @@ templ List(model ViewModel) {
 
 templ listContent(model ViewModel) {
 	<div class="p-8">
-		@component.ErrorBanner(model.ErrorBannerProps)
+		@component.ErrorBanner(model.Error)
 		<div class="flex items-center justify-between mb-6">
 			<div>
 				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Logins</h1>
@@ -53,7 +54,7 @@ templ listContent(model ViewModel) {
 				Add login
 			</a>
 		</div>
-		if model.Message == "" {
+		if model.Error.Message == "" {
 			if len(model.Logins) == 0 {
 				@component.EmptyState(component.EmptyStateProps{
 					Title:       "No logins stored",

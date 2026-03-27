@@ -18,7 +18,7 @@ import (
 
 //go:generate go tool mockery
 //go:generate go tool templ generate -include-version=false
-//go:generate go tool go-licenses save --one_output --force --ignore "github.com/davidsbond/keeper" --save_path licenses .
+//go:generate go tool go-licenses save --one_output --force --ignore "github.com/davidsbond/keeper,filippo.io/csrf" --save_path licenses .
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()

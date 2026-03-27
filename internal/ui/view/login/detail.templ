@@ -10,7 +10,8 @@ import (
 type (
 	// The DetailViewModel type contains fields used to configure the login detail view.
 	DetailViewModel struct {
-		component.ErrorBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The unique identifier of the login.
@@ -35,8 +36,8 @@ templ Detail(model DetailViewModel) {
 
 templ detailContent(model DetailViewModel) {
 	<div class="p-8">
-		@component.ErrorBanner(model.ErrorBannerProps)
-		if model.Message == "" {
+		@component.ErrorBanner(model.Error)
+		if model.Error.Message == "" {
 			<div class="mb-6 max-w-2xl">
 				<a
 					href="/logins"

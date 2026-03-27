@@ -57,7 +57,7 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, noteview.List, noteview.ViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -72,7 +72,7 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	case err != nil:
 		render(ctx, w, noteview.List, noteview.ViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load notes, please try again.",
 				Detail:  err.Error(),
 			},
@@ -103,7 +103,7 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	noteID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Invalid note identifier.",
 				Detail:  err.Error(),
 			},
@@ -114,7 +114,7 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -129,13 +129,13 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	case errors.Is(err, service.ErrNoteNotFound):
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{Message: "Note not found."},
+			Error: component.ErrorBannerProps{Message: "Note not found."},
 			DisplayName:      account.DisplayName,
 		})
 		return
 	case err != nil:
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load note, please try again.",
 				Detail:  err.Error(),
 			},
@@ -160,7 +160,7 @@ func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	noteID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Invalid note identifier.",
 				Detail:  err.Error(),
 			},
@@ -171,7 +171,7 @@ func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -186,13 +186,13 @@ func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	case errors.Is(err, service.ErrNoteNotFound):
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{Message: "Note not found."},
+			Error: component.ErrorBannerProps{Message: "Note not found."},
 			DisplayName:      account.DisplayName,
 		})
 		return
 	case err != nil:
 		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to delete note, please try again.",
 				Detail:  err.Error(),
 			},
@@ -212,7 +212,7 @@ func (h *NoteHandler) Create(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, noteview.Create, noteview.CreateViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -249,7 +249,7 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
 		render(ctx, w, noteview.Create, noteview.CreateViewModel{
-			ErrorBannerProps: component.ErrorBannerProps{
+			Error: component.ErrorBannerProps{
 				Message: "Failed to load account, please try again.",
 				Detail:  err.Error(),
 			},
@@ -267,12 +267,12 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	var ve validation.Errors
 	switch {
 	case errors.As(err, &ve):
-		model.Errors = validationErrors(ve)
+		model.Validation.Errors = validationErrors(ve)
 		render(ctx, w, noteview.Create, model)
 		return
 	case err != nil:
-		model.Message = "An unexpected error occurred, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "An unexpected error occurred, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, noteview.Create, model)
 		return
 	}
@@ -288,8 +288,8 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		model.Message = "Failed to create note, please try again."
-		model.Detail = err.Error()
+		model.Error.Message = "Failed to create note, please try again."
+		model.Error.Detail = err.Error()
 		render(ctx, w, noteview.Create, model)
 		return
 	}

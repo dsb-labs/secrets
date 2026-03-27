@@ -8,8 +8,10 @@ import (
 type (
 	// The RegisterViewModel type contains fields used to configure the register view.
 	RegisterViewModel struct {
-		component.ErrorBannerProps
-		component.ValidationBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
+		// Validation contains any validation errors to display above the form. Nothing is rendered when Errors is empty.
+		Validation component.ValidationBannerProps
 		// The display name the user has previously provided. This would typically only be set when reporting an error.
 		DisplayName string
 		// The email the user has previously provided. This would typically only be set when reporting an error.
@@ -33,9 +35,12 @@ templ register(model RegisterViewModel) {
 				<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Create your account</p>
 			</div>
 			<div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-				@component.ErrorBanner(model.ErrorBannerProps)
-				@component.ValidationBanner(model.ValidationBannerProps)
-				<form action="/register" method="POST" class="space-y-4">
+				@component.ErrorBanner(model.Error)
+				@component.Form(component.FormProps{
+					Action:     "/register",
+					Class:      "space-y-4",
+					Validation: model.Validation,
+				}) {
 					<div>
 						<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="displayName">
 							Display name
@@ -96,7 +101,7 @@ templ register(model RegisterViewModel) {
 					>
 						Create account
 					</button>
-				</form>
+				}
 				<p class="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
 					Already have an account?&#32;
 					<a href="/login" class="text-indigo-600 dark:text-indigo-400 hover:underline font-medium">Sign in</a>

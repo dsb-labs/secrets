@@ -175,38 +175,41 @@ func ToContext(ctx context.Context, tkn Token) context.Context {
 // Middleware returns an http.Handler implementation that attempts to parse a Token from a request's Authorization
 // header as a bearer token. It does not prevent requests from continuing down to the next handler if a token is
 // not present or invalid, this must be handled by the respective HTTP handlers that care about tokens being present.
-func Middleware(p *Parser, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if cookie, _ := r.Cookie("keeper"); cookie != nil {
-			tkn, err := p.Parse(cookie.Value)
-			if err == nil {
-				ctx := ToContext(r.Context(), tkn)
-				next.ServeHTTP(w, r.WithContext(ctx))
+func Middleware(p *Parser) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if cookie, _ := r.Cookie("keeper"); cookie != nil {
+				tkn, err := p.Parse(cookie.Value)
+				if err == nil {
+					ctx := ToContext(r.Context(), tkn)
+					next.ServeHTTP(w, r.WithContext(ctx))
+					return
+				}
+			}
+
+			header := r.Header.Get("Authorization")
+			if header == "" {
+				next.ServeHTTP(w, r)
 				return
 			}
-		}
 
-		header := r.Header.Get("Authorization")
-		if header == "" {
-			next.ServeHTTP(w, r)
-			return
-		}
+			bearer := strings.TrimPrefix(header, "Bearer")
+			if bearer == "" {
+				next.ServeHTTP(w, r)
+				return
+			}
 
-		bearer := strings.TrimPrefix(header, "Bearer")
-		if bearer == "" {
-			next.ServeHTTP(w, r)
-			return
-		}
+			tkn, err := p.Parse(strings.TrimSpace(bearer))
+			if err != nil || !tkn.Valid() {
+				next.ServeHTTP(w, r)
+				return
+			}
 
-		tkn, err := p.Parse(strings.TrimSpace(bearer))
-		if err != nil || !tkn.Valid() {
-			next.ServeHTTP(w, r)
-			return
-		}
+			ctx := ToContext(r.Context(), tkn)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 
-		ctx := ToContext(r.Context(), tkn)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
 }
 
 // TestToken is a test helper function to create arbitrary Token instances.

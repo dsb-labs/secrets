@@ -8,7 +8,8 @@ import (
 type (
 	// The ViewModel type contains fields used to configure the dashboard view.
 	ViewModel struct {
-		component.ErrorBannerProps
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 	}
@@ -25,8 +26,8 @@ templ Dashboard(model ViewModel) {
 
 templ content(model ViewModel) {
 	<div class="p-8">
-		@component.ErrorBanner(model.ErrorBannerProps)
-		if model.Message == "" {
+		@component.ErrorBanner(model.Error)
+		if model.Error.Message == "" {
 			<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, { model.DisplayName }</h1>
 			<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Select a section from the sidebar to get started.</p>
 		}
