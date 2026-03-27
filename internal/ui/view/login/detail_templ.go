@@ -87,7 +87,7 @@ func detailContent(model DetailViewModel) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"p-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"p-4 sm:p-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -112,7 +112,7 @@ func detailContent(model DetailViewModel) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "Delete</button></div><div class=\"px-6 py-6 space-y-6\"><div><label class=\"block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5\">Username</label><p class=\"text-sm font-medium text-gray-900 dark:text-white\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<span class=\"hidden sm:inline\">Delete</span></button></div><div class=\"px-6 py-6 space-y-6\"><div><label class=\"block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5\">Username</label><p class=\"text-sm font-medium text-gray-900 dark:text-white\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

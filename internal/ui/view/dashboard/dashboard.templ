@@ -25,7 +25,7 @@ templ Dashboard(model ViewModel) {
 }
 
 templ content(model ViewModel) {
-	<div class="p-8">
+	<div class="p-4 sm:p-8">
 		@component.ErrorBanner(model.Error)
 		if model.Error.Message == "" {
 			<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, { model.DisplayName }</h1>

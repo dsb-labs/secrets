@@ -39,6 +39,18 @@ templ Scripts() {
 		function showConfirmDialog(id) {
 			document.getElementById(id).showModal();
 		}
+		function toggleMobileNav() {
+			var sidebar = document.getElementById('sidebar');
+			var backdrop = document.getElementById('sidebar-backdrop');
+			sidebar.classList.toggle('-translate-x-full');
+			backdrop.classList.toggle('hidden');
+		}
+		function closeMobileNav() {
+			var sidebar = document.getElementById('sidebar');
+			var backdrop = document.getElementById('sidebar-backdrop');
+			sidebar.classList.add('-translate-x-full');
+			backdrop.classList.add('hidden');
+		}
 		function copyToClipboard(fieldId, copyIconId, checkIconId) {
 			var value = document.getElementById(fieldId).value;
 			var copyIcon = document.getElementById(copyIconId);

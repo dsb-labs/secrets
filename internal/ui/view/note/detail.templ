@@ -33,7 +33,7 @@ templ Detail(model DetailViewModel) {
 }
 
 templ detailContent(model DetailViewModel) {
-	<div class="p-8">
+	<div class="p-4 sm:p-8">
 		@component.ErrorBanner(model.Error)
 		if model.Error.Message == "" {
 			<div class="mb-6 max-w-2xl">
@@ -55,7 +55,7 @@ templ detailContent(model DetailViewModel) {
 							class="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-800 bg-white dark:bg-gray-800 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
 						>
 							@component.IconTrash("w-4 h-4")
-							Delete
+							<span class="hidden sm:inline">Delete</span>
 						</button>
 						<button
 							type="button"

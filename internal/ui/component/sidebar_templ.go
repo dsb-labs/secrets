@@ -39,7 +39,7 @@ func Sidebar(props SidebarProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside class=\"w-64 shrink-0 flex flex-col bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700\"><div class=\"flex items-center gap-2.5 px-4 h-16 border-b border-gray-200 dark:border-gray-700 shrink-0\"><div class=\"flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600 shrink-0\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<aside id=\"sidebar\" class=\"fixed inset-y-0 left-0 z-40 flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 -translate-x-full transition-transform duration-200 ease-in-out md:static md:translate-x-0 md:shrink-0\"><div class=\"hidden md:flex items-center gap-2.5 px-4 h-16 border-b border-gray-200 dark:border-gray-700 shrink-0\"><div class=\"flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-600 shrink-0\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,7 +47,7 @@ func Sidebar(props SidebarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-sm font-semibold text-gray-900 dark:text-white\">Keeper</span></div><nav class=\"flex-1 px-3 py-4 space-y-0.5\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-sm font-semibold text-gray-900 dark:text-white\">Keeper</span></div><nav class=\"flex-1 px-3 pt-16 pb-4 md:py-4 space-y-0.5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

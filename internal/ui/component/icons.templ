@@ -108,6 +108,13 @@ templ IconEyeSlash(id, class string) {
 	</svg>
 }
 
+// IconMenu renders a hamburger menu SVG icon.
+templ IconMenu(class string) {
+	<svg class={ class } xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+		<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+	</svg>
+}
+
 // IconCopy renders a clipboard copy SVG icon with the given id. Used as the default state of copy-to-clipboard buttons.
 templ IconCopy(id, class string) {
 	<svg id={ id } class={ class } xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
