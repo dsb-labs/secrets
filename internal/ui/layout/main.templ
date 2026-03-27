@@ -4,12 +4,14 @@ import "github.com/davidsbond/keeper/internal/ui/component"
 
 // Main returns the main page layout.
 templ Main(title string, view templ.Component) {
+	<!DOCTYPE html>
 	<html lang="en" class="h-full">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title } - Keeper</title>
 			<link href="/asset/styles.css" rel="stylesheet"/>
+			<link href="/asset/favicon.svg" rel="icon" type="image/svg+xml"/>
 		</head>
 		<body class="h-full bg-gray-50 dark:bg-gray-900 antialiased">
 			<main class="h-full">
