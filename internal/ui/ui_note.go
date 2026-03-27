@@ -10,8 +10,8 @@ import (
 
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/component"
 	noteview "github.com/davidsbond/keeper/internal/ui/view/note"
+	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
 )
 
 type (
@@ -56,11 +56,8 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, noteview.List, noteview.ViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -71,12 +68,8 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		render(ctx, w, noteview.List, noteview.ViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load notes, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -89,7 +82,7 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	render(ctx, w, noteview.List, noteview.ViewModel{
+	render(ctx, w, http.StatusOK, noteview.List, noteview.ViewModel{
 		DisplayName: account.DisplayName,
 		Notes:       items,
 	})
@@ -102,22 +95,14 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 
 	noteID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Invalid note identifier.",
-				Detail:  err.Error(),
-			},
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	}
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -128,23 +113,16 @@ func (h *NoteHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case errors.Is(err, service.ErrNoteNotFound):
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{Message: "Note not found."},
-			DisplayName:      account.DisplayName,
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	case err != nil:
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load note, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
 
-	render(ctx, w, noteview.Detail, noteview.DetailViewModel{
+	render(ctx, w, http.StatusOK, noteview.Detail, noteview.DetailViewModel{
 		DisplayName: account.DisplayName,
 		ID:          note.ID.String(),
 		Name:        note.Name,
@@ -159,23 +137,7 @@ func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	noteID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Invalid note identifier.",
-				Detail:  err.Error(),
-			},
-		})
-		return
-	}
-
-	account, err := h.accounts.Get(tkn.ID())
-	if err != nil {
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	}
 
@@ -185,18 +147,11 @@ func (h *NoteHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case errors.Is(err, service.ErrNoteNotFound):
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{Message: "Note not found."},
-			DisplayName:      account.DisplayName,
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	case err != nil:
-		render(ctx, w, noteview.Detail, noteview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to delete note, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -211,16 +166,13 @@ func (h *NoteHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, noteview.Create, noteview.CreateViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
 
-	render(ctx, w, noteview.Create, noteview.CreateViewModel{
+	render(ctx, w, http.StatusOK, noteview.Create, noteview.CreateViewModel{
 		DisplayName: account.DisplayName,
 	})
 }
@@ -248,11 +200,8 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, noteview.Create, noteview.CreateViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -268,12 +217,12 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.As(err, &ve):
 		model.Validation.Errors = validationErrors(ve)
-		render(ctx, w, noteview.Create, model)
+		render(ctx, w, http.StatusUnprocessableEntity, noteview.Create, model)
 		return
 	case err != nil:
-		model.Error.Message = "An unexpected error occurred, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, noteview.Create, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 
@@ -288,9 +237,9 @@ func (h *NoteHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		model.Error.Message = "Failed to create note, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, noteview.Create, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 

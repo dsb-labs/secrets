@@ -1,0 +1,29 @@
+package status
+
+import "github.com/davidsbond/keeper/internal/ui/layout"
+
+type (
+	// NotFoundViewModel contains fields used to configure the 404 not found view.
+	NotFoundViewModel struct{}
+)
+
+// NotFound renders the 404 not found page.
+templ NotFound(model NotFoundViewModel) {
+	@layout.Main("Not Found", notFoundContent())
+}
+
+templ notFoundContent() {
+	<div class="min-h-full flex items-center justify-center px-4 py-12">
+		<div class="text-center">
+			<p class="text-6xl font-bold text-indigo-600 dark:text-indigo-400">404</p>
+			<h1 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Page not found</h1>
+			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">The page you&#39;re looking for doesn&#39;t exist.</p>
+			<a
+				href="/dashboard"
+				class="mt-6 inline-block rounded-lg bg-indigo-600 hover:bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
+			>
+				Go to dashboard
+			</a>
+		</div>
+	</div>
+}

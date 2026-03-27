@@ -10,8 +10,8 @@ import (
 
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/component"
 	cardview "github.com/davidsbond/keeper/internal/ui/view/card"
+	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
 )
 
 type (
@@ -52,11 +52,8 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, cardview.List, cardview.ViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -67,12 +64,8 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		render(ctx, w, cardview.List, cardview.ViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load cards, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -86,7 +79,7 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	render(ctx, w, cardview.List, cardview.ViewModel{
+	render(ctx, w, http.StatusOK, cardview.List, cardview.ViewModel{
 		DisplayName: account.DisplayName,
 		Cards:       items,
 	})

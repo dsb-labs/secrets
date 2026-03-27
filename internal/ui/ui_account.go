@@ -10,6 +10,7 @@ import (
 
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/ui/view/auth"
+	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
 )
 
 // The AccountHandler type is responsible for serving web interface pages regarding account management.
@@ -31,7 +32,7 @@ func (h *AccountHandler) Register(mux *http.ServeMux) {
 
 // CreateAccount renders the account creation view.
 func (h *AccountHandler) CreateAccount(w http.ResponseWriter, r *http.Request) {
-	render(r.Context(), w, auth.Register, auth.RegisterViewModel{})
+	render(r.Context(), w, http.StatusOK, auth.Register, auth.RegisterViewModel{})
 }
 
 // The CreateAccountForm type represents the form values submitted when calling AccountHandler.CreateAccountCallback.
@@ -71,18 +72,18 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 	switch {
 	case errors.As(err, &ve):
 		model.Validation.Errors = validationErrors(ve)
-		render(ctx, w, auth.Register, model)
+		render(ctx, w, http.StatusUnprocessableEntity, auth.Register, model)
 		return
 	case err != nil:
-		model.Error.Message = "An unexpected error occurred, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, auth.Register, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 
 	if form.Password != form.ConfirmPassword {
 		model.Error.Message = "Passwords do not match"
-		render(ctx, w, auth.Register, model)
+		render(ctx, w, http.StatusUnprocessableEntity, auth.Register, model)
 		return
 	}
 
@@ -94,16 +95,16 @@ func (h *AccountHandler) CreateAccountCallback(w http.ResponseWriter, r *http.Re
 	switch {
 	case errors.Is(err, service.ErrAccountExists):
 		model.Error.Message = "An account with that email address already exists"
-		render(ctx, w, auth.Register, model)
+		render(ctx, w, http.StatusConflict, auth.Register, model)
 		return
 	case err != nil:
-		model.Error.Message = "An unexpected error occurred, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, auth.Register, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 
-	render(ctx, w, auth.RegisterSuccess, auth.RegisterSuccessViewModel{
+	render(ctx, w, http.StatusOK, auth.RegisterSuccess, auth.RegisterSuccessViewModel{
 		DisplayName: form.DisplayName,
 		RestoreKey:  base64.StdEncoding.EncodeToString(restoreKey),
 	})

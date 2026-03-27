@@ -97,6 +97,7 @@ func Run(ctx context.Context, config Config) error {
 	ui.NewNoteHandler(accountSvc, noteSvc).Register(mux)
 	ui.NewCardHandler(accountSvc, cardSvc).Register(mux)
 	ui.NewAssetHandler().Register(mux)
+	ui.NewNotFoundHandler().Register(mux)
 
 	protection := csrf.New()
 

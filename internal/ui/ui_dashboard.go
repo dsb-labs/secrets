@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/view/dashboard"
+	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
 )
 
 // The DashboardHandler type is responsible for serving web interface pages regarding the user dashboard.
@@ -31,16 +31,13 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, dashboard.Dashboard, dashboard.ViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
 
-	render(ctx, w, dashboard.Dashboard, dashboard.ViewModel{
+	render(ctx, w, http.StatusOK, dashboard.Dashboard, dashboard.ViewModel{
 		DisplayName: account.DisplayName,
 	})
 }

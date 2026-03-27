@@ -11,8 +11,8 @@ import (
 
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/component"
 	loginview "github.com/davidsbond/keeper/internal/ui/view/login"
+	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
 )
 
 type (
@@ -57,11 +57,8 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, loginview.List, loginview.ViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -72,12 +69,8 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		render(ctx, w, loginview.List, loginview.ViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load logins, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -91,7 +84,7 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	render(ctx, w, loginview.List, loginview.ViewModel{
+	render(ctx, w, http.StatusOK, loginview.List, loginview.ViewModel{
 		DisplayName: account.DisplayName,
 		Logins:      items,
 	})
@@ -104,22 +97,14 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 
 	loginID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Invalid login identifier.",
-				Detail:  err.Error(),
-			},
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	}
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -130,23 +115,16 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case errors.Is(err, service.ErrLoginNotFound):
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{Message: "Login not found."},
-			DisplayName:      account.DisplayName,
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	case err != nil:
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load login, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
 
-	render(ctx, w, loginview.Detail, loginview.DetailViewModel{
+	render(ctx, w, http.StatusOK, loginview.Detail, loginview.DetailViewModel{
 		DisplayName: account.DisplayName,
 		ID:          login.ID.String(),
 		Username:    login.Username,
@@ -162,23 +140,7 @@ func (h *LoginHandler) Delete(w http.ResponseWriter, r *http.Request) {
 
 	loginID, err := uuid.Parse(r.PathValue("id"))
 	if err != nil {
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Invalid login identifier.",
-				Detail:  err.Error(),
-			},
-		})
-		return
-	}
-
-	account, err := h.accounts.Get(tkn.ID())
-	if err != nil {
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	}
 
@@ -188,18 +150,11 @@ func (h *LoginHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case errors.Is(err, service.ErrLoginNotFound):
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{Message: "Login not found."},
-			DisplayName:      account.DisplayName,
-		})
+		render(ctx, w, http.StatusNotFound, statusview.NotFound, statusview.NotFoundViewModel{})
 		return
 	case err != nil:
-		render(ctx, w, loginview.Detail, loginview.DetailViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to delete login, please try again.",
-				Detail:  err.Error(),
-			},
-			DisplayName: account.DisplayName,
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -214,16 +169,13 @@ func (h *LoginHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, loginview.Create, loginview.CreateViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
 
-	render(ctx, w, loginview.Create, loginview.CreateViewModel{
+	render(ctx, w, http.StatusOK, loginview.Create, loginview.CreateViewModel{
 		DisplayName: account.DisplayName,
 	})
 }
@@ -253,11 +205,8 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 
 	account, err := h.accounts.Get(tkn.ID())
 	if err != nil {
-		render(ctx, w, loginview.Create, loginview.CreateViewModel{
-			Error: component.ErrorBannerProps{
-				Message: "Failed to load account, please try again.",
-				Detail:  err.Error(),
-			},
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
 		})
 		return
 	}
@@ -274,12 +223,12 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.As(err, &ve):
 		model.Validation.Errors = validationErrors(ve)
-		render(ctx, w, loginview.Create, model)
+		render(ctx, w, http.StatusUnprocessableEntity, loginview.Create, model)
 		return
 	case err != nil:
-		model.Error.Message = "An unexpected error occurred, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, loginview.Create, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 
@@ -304,9 +253,9 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 		redirectToLogin(w, r)
 		return
 	case err != nil:
-		model.Error.Message = "Failed to create login, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, loginview.Create, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 

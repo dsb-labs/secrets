@@ -10,6 +10,7 @@ import (
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
 	"github.com/davidsbond/keeper/internal/ui/view/auth"
+	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
 )
 
 type (
@@ -40,7 +41,7 @@ func (h *AuthHandler) Register(mux *http.ServeMux) {
 
 // Login renders the login view.
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	render(r.Context(), w, auth.Login, auth.LoginViewModel{
+	render(r.Context(), w, http.StatusOK, auth.Login, auth.LoginViewModel{
 		Redirect: r.URL.Query().Get("redirect"),
 	})
 }
@@ -78,12 +79,12 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.As(err, &ve):
 		model.Validation.Errors = validationErrors(ve)
-		render(ctx, w, auth.Login, model)
+		render(ctx, w, http.StatusUnprocessableEntity, auth.Login, model)
 		return
 	case err != nil:
-		model.Error.Message = "An unexpected error occurred, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, auth.Login, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 
@@ -91,16 +92,16 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case errors.Is(err, service.ErrAccountNotFound):
 		model.Error.Message = "Account not found"
-		render(ctx, w, auth.Login, model)
+		render(ctx, w, http.StatusUnauthorized, auth.Login, model)
 		return
 	case errors.Is(err, service.ErrInvalidPassword):
 		model.Error.Message = "Invalid password"
-		render(ctx, w, auth.Login, model)
+		render(ctx, w, http.StatusUnauthorized, auth.Login, model)
 		return
 	case err != nil:
-		model.Error.Message = "An unexpected error occurred, please try again."
-		model.Error.Detail = err.Error()
-		render(ctx, w, auth.Login, model)
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
 		return
 	}
 

@@ -8,8 +8,6 @@ import (
 type (
 	// The ViewModel type contains fields used to configure the note list view.
 	ViewModel struct {
-		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
-		Error component.ErrorBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
 		// The list of notes stored for the authenticated user.
@@ -36,7 +34,6 @@ templ List(model ViewModel) {
 
 templ listContent(model ViewModel) {
 	<div class="p-4 sm:p-8">
-		@component.ErrorBanner(model.Error)
 		<div class="flex items-center justify-between mb-6">
 			<div>
 				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Notes</h1>
@@ -50,21 +47,19 @@ templ listContent(model ViewModel) {
 				<span class="hidden sm:inline">Add note</span>
 			</a>
 		</div>
-		if model.Error.Message == "" {
-			if len(model.Notes) == 0 {
-				@component.EmptyState(component.EmptyStateProps{
-					Title:       "No notes stored",
-					Description: "Use the button above to add your first note.",
-				}) {
-					@component.IconNote("w-6 h-6 text-gray-400 dark:text-gray-500")
-				}
-			} else {
-				<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
-					for _, item := range model.Notes {
-						@row(item)
-					}
-				</div>
+		if len(model.Notes) == 0 {
+			@component.EmptyState(component.EmptyStateProps{
+				Title:       "No notes stored",
+				Description: "Use the button above to add your first note.",
+			}) {
+				@component.IconNote("w-6 h-6 text-gray-400 dark:text-gray-500")
 			}
+		} else {
+			<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
+				for _, item := range model.Notes {
+					@row(item)
+				}
+			</div>
 		}
 	</div>
 }

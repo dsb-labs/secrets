@@ -15,9 +15,7 @@ import (
 type (
 	// The CreateViewModel type contains fields used to configure the login creation view.
 	CreateViewModel struct {
-		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
-		Error component.ErrorBannerProps
-		// Validation contains any validation errors to display above the form. Nothing is rendered when Errors is empty.
+		// Validation contains any validation errors to display above the form fields. Nothing is rendered when Errors is empty.
 		Validation component.ValidationBannerProps
 		// The display name of the authenticated user.
 		DisplayName string
@@ -85,15 +83,7 @@ func createContent(model CreateViewModel) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"p-4 sm:p-8\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = component.ErrorBanner(model.Error).Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"mb-6 max-w-2xl\"><a href=\"/logins\" class=\"inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"p-4 sm:p-8\"><div class=\"mb-6 max-w-2xl\"><a href=\"/logins\" class=\"inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -101,7 +91,7 @@ func createContent(model CreateViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "Back to logins</a></div><div class=\"max-w-2xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm\"><div class=\"px-6 py-5 border-b border-gray-200 dark:border-gray-700\"><h1 class=\"text-lg font-semibold text-gray-900 dark:text-white\">New login</h1></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "Back to logins</a></div><div class=\"max-w-2xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm\"><div class=\"px-6 py-5 border-b border-gray-200 dark:border-gray-700\"><h1 class=\"text-lg font-semibold text-gray-900 dark:text-white\">New login</h1></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -117,46 +107,46 @@ func createContent(model CreateViewModel) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"username\">Username</label> <input id=\"username\" type=\"text\" name=\"username\" placeholder=\"username@example.com\" required value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"username\">Username</label> <input id=\"username\" type=\"text\" name=\"username\" placeholder=\"username@example.com\" required value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(model.Username)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/create.templ`, Line: 66, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/create.templ`, Line: 63, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"password\">Password</label> <input id=\"password\" type=\"password\" name=\"password\" placeholder=\"••••••••\" required value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"password\">Password</label> <input id=\"password\" type=\"password\" name=\"password\" placeholder=\"••••••••\" required value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(model.Password)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/create.templ`, Line: 80, Col: 28}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/create.templ`, Line: 77, Col: 28}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"domains\">Domains <span class=\"font-normal text-gray-400 dark:text-gray-500\">(optional, comma-separated)</span></label> <input id=\"domains\" type=\"text\" name=\"domains\" placeholder=\"example.com, app.example.com\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono\"></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"domains\">Domains <span class=\"font-normal text-gray-400 dark:text-gray-500\">(optional, comma-separated)</span></label> <input id=\"domains\" type=\"text\" name=\"domains\" placeholder=\"example.com, app.example.com\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(model.Domains)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/create.templ`, Line: 94, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/create.templ`, Line: 91, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><button type=\"submit\" class=\"w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Create login</button>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\" class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"></div><button type=\"submit\" class=\"w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Create login</button>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -170,7 +160,7 @@ func createContent(model CreateViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

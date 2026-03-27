@@ -3,7 +3,6 @@ package ui
 
 import (
 	"context"
-	"io"
 	"net/http"
 	"net/url"
 
@@ -47,9 +46,9 @@ func redirectToLogin(w http.ResponseWriter, r *http.Request) {
 	redirect(w, r, "/login?redirect="+url.QueryEscape(target))
 }
 
-func render[T any](ctx context.Context, w io.Writer, view View[T], model T) {
-	err := view(model).Render(ctx, w)
-	if err != nil {
+func render[T any](ctx context.Context, w http.ResponseWriter, status int, view View[T], model T) {
+	w.WriteHeader(status)
+	if err := view(model).Render(ctx, w); err != nil {
 		panic(err)
 	}
 }

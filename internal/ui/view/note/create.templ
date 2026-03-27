@@ -8,8 +8,6 @@ import (
 type (
 	// The CreateViewModel type contains fields used to configure the note creation view.
 	CreateViewModel struct {
-		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
-		Error component.ErrorBannerProps
 		// Validation contains any validation errors to display above the form. Nothing is rendered when Errors is empty.
 		Validation component.ValidationBannerProps
 		// The display name of the authenticated user.
@@ -32,7 +30,6 @@ templ Create(model CreateViewModel) {
 
 templ createContent(model CreateViewModel) {
 	<div class="p-4 sm:p-8">
-		@component.ErrorBanner(model.Error)
 		<div class="mb-6 max-w-2xl">
 			<a
 				href="/notes"

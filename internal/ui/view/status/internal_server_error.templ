@@ -1,0 +1,38 @@
+package status
+
+import "github.com/davidsbond/keeper/internal/ui/layout"
+
+type (
+	// InternalServerErrorViewModel contains fields used to configure the 500 internal server error view.
+	InternalServerErrorViewModel struct {
+		// Detail is the optional technical error detail shown in a collapsible section.
+		Detail string
+	}
+)
+
+// InternalServerError renders the 500 internal server error page.
+templ InternalServerError(model InternalServerErrorViewModel) {
+	@layout.Main("Error", internalServerErrorContent(model))
+}
+
+templ internalServerErrorContent(model InternalServerErrorViewModel) {
+	<div class="min-h-full flex items-center justify-center px-4 py-12">
+		<div class="text-center">
+			<p class="text-6xl font-bold text-indigo-600 dark:text-indigo-400">500</p>
+			<h1 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white">Something went wrong</h1>
+			<p class="mt-2 text-sm text-gray-500 dark:text-gray-400">An unexpected error occurred. Please try again.</p>
+			if model.Detail != "" {
+				<details class="mt-4 text-left max-w-sm mx-auto">
+					<summary class="text-xs text-gray-400 dark:text-gray-500 cursor-pointer select-none">Show details</summary>
+					<pre class="mt-2 text-xs text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-lg px-3 py-2 whitespace-pre-wrap break-all">{ model.Detail }</pre>
+				</details>
+			}
+			<a
+				href="/dashboard"
+				class="mt-6 inline-block rounded-lg bg-indigo-600 hover:bg-indigo-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
+			>
+				Go to dashboard
+			</a>
+		</div>
+	</div>
+}
