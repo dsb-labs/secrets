@@ -62,7 +62,13 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := h.notes.List(tkn.ID())
+	query := r.URL.Query().Get("query")
+	filters := make([]filter.Filter[service.Note], 0)
+	if query != "" {
+		filters = append(filters, service.NotesByQuery(query))
+	}
+
+	results, err := h.notes.List(tkn.ID(), filters...)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		redirectToLogin(w, r)
@@ -85,6 +91,7 @@ func (h *NoteHandler) List(w http.ResponseWriter, r *http.Request) {
 	render(ctx, w, http.StatusOK, noteview.List, noteview.ViewModel{
 		DisplayName: account.DisplayName,
 		Notes:       items,
+		Query:       query,
 	})
 }
 

@@ -63,7 +63,13 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := h.logins.List(tkn.ID())
+	query := r.URL.Query().Get("query")
+	filters := make([]filter.Filter[service.Login], 0)
+	if query != "" {
+		filters = append(filters, service.LoginsByDomain(query))
+	}
+
+	results, err := h.logins.List(tkn.ID(), filters...)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		redirectToLogin(w, r)
@@ -87,6 +93,7 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 	render(ctx, w, http.StatusOK, loginview.List, loginview.ViewModel{
 		DisplayName: account.DisplayName,
 		Logins:      items,
+		Query:       query,
 	})
 }
 

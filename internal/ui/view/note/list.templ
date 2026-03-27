@@ -12,6 +12,8 @@ type (
 		DisplayName string
 		// The list of notes stored for the authenticated user.
 		Notes []Item
+		// The current search query, preserved in the search input between requests.
+		Query string
 	}
 
 	// The Item type represents a single note as displayed in the note list view.
@@ -47,12 +49,26 @@ templ listContent(model ViewModel) {
 				<span class="hidden sm:inline">Add note</span>
 			</a>
 		</div>
+		@component.SearchBar(component.SearchBarProps{
+			Action:      "/notes",
+			Query:       model.Query,
+			Placeholder: "Search by title or content...",
+		})
 		if len(model.Notes) == 0 {
-			@component.EmptyState(component.EmptyStateProps{
-				Title:       "No notes stored",
-				Description: "Use the button above to add your first note.",
-			}) {
-				@component.IconNote("w-6 h-6 text-gray-400 dark:text-gray-500")
+			if model.Query != "" {
+				@component.EmptyState(component.EmptyStateProps{
+					Title:       "No notes match your search",
+					Description: "Try a different search term.",
+				}) {
+					@component.IconNote("w-6 h-6 text-gray-400 dark:text-gray-500")
+				}
+			} else {
+				@component.EmptyState(component.EmptyStateProps{
+					Title:       "No notes stored",
+					Description: "Use the button above to add your first note.",
+				}) {
+					@component.IconNote("w-6 h-6 text-gray-400 dark:text-gray-500")
+				}
 			}
 		} else {
 			<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
