@@ -2,9 +2,11 @@ package database
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
@@ -68,6 +70,10 @@ func (r *NoteRepository) List() ([]Note, error) {
 	err := iterate(r.db, "note/", func(note Note) error {
 		notes = append(notes, note)
 		return nil
+	})
+
+	slices.SortFunc(notes, func(a, b Note) int {
+		return cmp.Compare(a.Name, b.Name)
 	})
 
 	return notes, err

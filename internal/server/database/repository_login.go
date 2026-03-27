@@ -2,9 +2,11 @@ package database
 
 import (
 	"bytes"
+	"cmp"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/dgraph-io/badger/v4"
@@ -70,6 +72,10 @@ func (r *LoginRepository) List() ([]Login, error) {
 	err := iterate(r.db, "login/", func(login Login) error {
 		logins = append(logins, login)
 		return nil
+	})
+
+	slices.SortFunc(logins, func(a, b Login) int {
+		return cmp.Compare(a.Username, b.Username)
 	})
 
 	return logins, err
