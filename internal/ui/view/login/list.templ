@@ -86,11 +86,23 @@ templ listContent(model ViewModel) {
 
 templ row(item Item) {
 	<div class="flex items-center justify-between px-4 py-3.5">
-		<div class="min-w-0">
-			<p class="text-sm font-medium text-gray-900 dark:text-white truncate">{ item.Username }</p>
+		<div class="flex items-center gap-3 min-w-0">
 			if len(item.Domains) > 0 {
-				<p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{ strings.Join(item.Domains, ", ") }</p>
+				<img
+					src={ "https://www.google.com/s2/favicons?domain=" + item.Domains[0] + "&sz=32" }
+					alt=""
+					class="w-5 h-5 rounded shrink-0"
+					onerror="this.style.display='none'"
+				/>
+			} else {
+				@component.IconKey("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
 			}
+			<div class="min-w-0">
+				<p class="text-sm font-medium text-gray-900 dark:text-white truncate">{ item.Username }</p>
+				if len(item.Domains) > 0 {
+					<p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{ strings.Join(item.Domains, ", ") }</p>
+				}
+			</div>
 		</div>
 		<a
 			href={ templ.SafeURL("/logins/" + item.ID) }
