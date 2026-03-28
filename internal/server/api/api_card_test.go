@@ -32,6 +32,7 @@ func TestCardAPI_Create(t *testing.T) {
 			Name:  "error if missing card number",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "",
 				ExpiryMonth: time.January,
@@ -45,6 +46,7 @@ func TestCardAPI_Create(t *testing.T) {
 			Name:  "error if card number is invalid",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "not-a-card-number",
 				ExpiryMonth: time.January,
@@ -58,6 +60,7 @@ func TestCardAPI_Create(t *testing.T) {
 			Name:  "error if month is out of range",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "4111 1111 1111 1111",
 				ExpiryMonth: time.Month(100),
@@ -71,6 +74,7 @@ func TestCardAPI_Create(t *testing.T) {
 			Name:  "error if cvv is invalid",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "4111 1111 1111 1111",
 				ExpiryMonth: time.January,
@@ -84,6 +88,7 @@ func TestCardAPI_Create(t *testing.T) {
 			Name:  "error if missing cvv",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "4111 1111 1111 1111",
 				ExpiryMonth: time.January,
@@ -94,9 +99,24 @@ func TestCardAPI_Create(t *testing.T) {
 			ExpectedCode: http.StatusBadRequest,
 		},
 		{
+			Name:  "error if missing name",
+			Token: token.TestToken(t, "test"),
+			Request: api.CreateCardRequest{
+				Name:        "",
+				HolderName:  "test",
+				Number:      "4111 1111 1111 1111",
+				ExpiryMonth: time.January,
+				ExpiryYear:  2025,
+				CVV:         "123",
+			},
+			ExpectsError: true,
+			ExpectedCode: http.StatusBadRequest,
+		},
+		{
 			Name:  "error if lifetime has expired",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "4111 1111 1111 1111",
 				ExpiryMonth: time.January,
@@ -113,6 +133,7 @@ func TestCardAPI_Create(t *testing.T) {
 			Name:  "error if creation fails",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "4111 1111 1111 1111",
 				ExpiryMonth: time.January,
@@ -129,6 +150,7 @@ func TestCardAPI_Create(t *testing.T) {
 			Name:  "success",
 			Token: token.TestToken(t, "test"),
 			Request: api.CreateCardRequest{
+				Name:        "test",
 				HolderName:  "test",
 				Number:      "4111 1111 1111 1111",
 				ExpiryMonth: time.January,

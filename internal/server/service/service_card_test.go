@@ -231,6 +231,37 @@ func TestCardService_List(t *testing.T) {
 				cards.EXPECT().List().Return(expected, nil).Once()
 			},
 		},
+		{
+			Name:   "uses filters",
+			UserID: uuid.NameSpaceDNS,
+			Expected: []service.Card{
+				{
+					ID:   uuid.NameSpaceDNS,
+					Name: "test",
+				},
+			},
+			Setup: func(cards *MockCardRepository, provider *MockRepositoryProvider[service.CardRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(cards, nil).Once()
+
+				expected := []database.Card{
+					{
+						ID:   uuid.NameSpaceURL,
+						Name: "abcde",
+					},
+					{
+						ID:   uuid.NameSpaceDNS,
+						Name: "test",
+					},
+				}
+
+				cards.EXPECT().List().Return(expected, nil).Once()
+			},
+			Filters: []filter.Filter[service.Card]{
+				service.CardsByName("test"),
+			},
+		},
 	}
 
 	for _, tc := range tt {

@@ -30,6 +30,7 @@ func TestClient_CreateCard(t *testing.T) {
 			ExpiryMonth: time.March,
 			ExpiryYear:  2027,
 			CVV:         "123",
+			Name:        "test",
 		}
 
 		id, err := client.CreateCard(ctx, card)
@@ -76,6 +77,7 @@ func TestClient_ListCards(t *testing.T) {
 		ExpiryMonth: time.March,
 		ExpiryYear:  2027,
 		CVV:         "123",
+		Name:        "test",
 	}
 
 	cardID, err := client.CreateCard(ctx, expected)
@@ -114,6 +116,7 @@ func TestClient_DeleteCard(t *testing.T) {
 		ExpiryMonth: time.March,
 		ExpiryYear:  2027,
 		CVV:         "123",
+		Name:        "test",
 	})
 	require.NoError(t, err)
 
@@ -153,6 +156,7 @@ func TestClient_GetCard(t *testing.T) {
 		ExpiryMonth: time.March,
 		ExpiryYear:  2027,
 		CVV:         "123",
+		Name:        "test",
 	}
 
 	id, err := client.CreateCard(ctx, expected)

@@ -36,6 +36,7 @@ func TestClient_Export(t *testing.T) {
 		ExpiryMonth: time.March,
 		ExpiryYear:  2027,
 		CVV:         "123",
+		Name:        "test",
 	}
 
 	expectedLogin := keeper.Login{

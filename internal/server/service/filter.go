@@ -40,3 +40,11 @@ func NotesByQuery(query string) filter.Filter[Note] {
 			strings.Contains(strings.ToLower(note.Content), strings.ToLower(query))
 	}
 }
+
+// CardsByName returns a filter.Filter implementation that filters cards based on a given name. The filter
+// returns true if the card name contains the provided string. This filter does not match on casing.
+func CardsByName(name string) filter.Filter[Card] {
+	return func(card Card) bool {
+		return strings.Contains(strings.ToLower(card.Name), strings.ToLower(name))
+	}
+}

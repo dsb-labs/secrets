@@ -47,6 +47,8 @@ type (
 		CVV string
 		// When the card was created.
 		CreatedAt time.Time
+		// A user-supplied name for the card
+		Name string
 	}
 )
 
@@ -83,6 +85,7 @@ func (svc *CardService) Create(userID uuid.UUID, card Card) error {
 		ExpiryYear:  card.ExpiryYear,
 		CVV:         card.CVV,
 		CreatedAt:   card.CreatedAt,
+		Name:        card.Name,
 	}
 
 	err = repo.Create(record)
@@ -124,6 +127,7 @@ func (svc *CardService) List(userID uuid.UUID, filters ...filter.Filter[Card]) (
 			ExpiryYear:  in.ExpiryYear,
 			CVV:         in.CVV,
 			CreatedAt:   in.CreatedAt,
+			Name:        in.Name,
 		}
 	})
 
@@ -188,6 +192,7 @@ func (svc *CardService) Get(userID uuid.UUID, cardID uuid.UUID) (Card, error) {
 		ExpiryMonth: result.ExpiryMonth,
 		ExpiryYear:  result.ExpiryYear,
 		CVV:         result.CVV,
-		CreatedAt:   result.CreatedAt, 
+		CreatedAt:   result.CreatedAt,
+		Name:        result.Name,
 	}, nil
 }

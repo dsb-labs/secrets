@@ -36,17 +36,19 @@ func (c *Client) Export(ctx context.Context) (Export, error) {
 	return Export{
 		Logins: convert.Slice(response.Logins, func(login api.Login) Login {
 			return Login{
-				ID:       login.ID,
-				Username: login.Username,
-				Password: login.Password,
-				Domains:  login.Domains,
+				ID:        login.ID,
+				Username:  login.Username,
+				Password:  login.Password,
+				Domains:   login.Domains,
+				CreatedAt: login.CreatedAt,
 			}
 		}),
 		Notes: convert.Slice(response.Notes, func(note api.Note) Note {
 			return Note{
-				ID:      note.ID,
-				Name:    note.Name,
-				Content: note.Content,
+				ID:        note.ID,
+				Name:      note.Name,
+				Content:   note.Content,
+				CreatedAt: note.CreatedAt,
 			}
 		}),
 		Cards: convert.Slice(response.Cards, func(card api.Card) Card {
@@ -57,6 +59,8 @@ func (c *Client) Export(ctx context.Context) (Export, error) {
 				ExpiryMonth: card.ExpiryMonth,
 				ExpiryYear:  card.ExpiryYear,
 				CVV:         card.CVV,
+				CreatedAt:   card.CreatedAt,
+				Name:        card.Name,
 			}
 		}),
 	}, nil

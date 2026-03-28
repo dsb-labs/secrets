@@ -36,6 +36,8 @@ type (
 		CVV string
 		// When the card was created.
 		CreatedAt time.Time
+		// A user-supplied name for the card
+		Name string
 	}
 )
 
@@ -79,7 +81,7 @@ func (r *CardRepository) List() ([]Card, error) {
 	})
 
 	slices.SortFunc(cards, func(a, b Card) int {
-		return cmp.Compare(a.CreatedAt.Unix(), b.CreatedAt.Unix())
+		return cmp.Compare(a.Name, b.Name)
 	})
 
 	return cards, err

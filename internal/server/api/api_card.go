@@ -51,6 +51,8 @@ type (
 		CVV string `json:"cvv"`
 		// When the card was created.
 		CreatedAt time.Time `json:"createdAt"`
+		// A user-supplied name for the card
+		Name string `json:"name"`
 	}
 )
 
@@ -81,6 +83,8 @@ type (
 		ExpiryYear int `json:"expiryYear"`
 		// The card's CVV.
 		CVV string `json:"cvv"`
+		// A user-supplied name for the card
+		Name string `json:"name"`
 	}
 
 	// The CreateCardResponse type represents the response body returned when calling CardAPI.Create
@@ -96,6 +100,7 @@ func (r CreateCardRequest) Validate() error {
 		validation.Field(&r.ExpiryMonth, validation.Required, validation.Min(time.January), validation.Max(time.December)),
 		validation.Field(&r.ExpiryYear, validation.Required),
 		validation.Field(&r.CVV, validation.Required, validation.Length(3, 4)),
+		validation.Field(&r.Name, validation.Required),
 	)
 }
 
@@ -117,6 +122,7 @@ func (api *CardAPI) Create(w http.ResponseWriter, r *http.Request) {
 		ExpiryYear:  request.ExpiryYear,
 		CVV:         request.CVV,
 		CreatedAt:   time.Now(),
+		Name:        request.Name,
 	}
 
 	err = api.cards.Create(tkn.ID(), card)
@@ -146,7 +152,12 @@ type (
 // an http.StatusOK code and a JSON-encoded ListCardsResponse.
 func (api *CardAPI) List(w http.ResponseWriter, r *http.Request) {
 	tkn := token.FromContext(r.Context())
-	results, err := api.cards.List(tkn.ID())
+	filters := make([]filter.Filter[service.Card], 0)
+	if name := r.URL.Query().Get("name"); name != "" {
+		filters = append(filters, service.CardsByName(name))
+	}
+
+	results, err := api.cards.List(tkn.ID(), filters...)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		writeError(w, http.StatusUnauthorized, http.StatusText(http.StatusUnauthorized))
@@ -166,6 +177,7 @@ func (api *CardAPI) List(w http.ResponseWriter, r *http.Request) {
 				ExpiryYear:  in.ExpiryYear,
 				CVV:         in.CVV,
 				CreatedAt:   in.CreatedAt,
+				Name:        in.Name,
 			}
 		}),
 	})
@@ -242,6 +254,7 @@ func (api *CardAPI) Get(w http.ResponseWriter, r *http.Request) {
 			ExpiryYear:  result.ExpiryYear,
 			CVV:         result.CVV,
 			CreatedAt:   result.CreatedAt,
+			Name:        result.Name,
 		},
 	})
 }
