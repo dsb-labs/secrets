@@ -13,16 +13,23 @@ type (
 )
 
 // Card renders a divided card with header, body, and footer sections separated by dividers.
+// Any nil slot is omitted entirely.
 templ Card(slots CardSlots) {
 	<div class="max-w-2xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm divide-y divide-gray-200 dark:divide-gray-700">
-		<div class="px-6 py-5 flex items-center justify-between">
-			@slots.Header
-		</div>
-		<div class="px-6 py-6 space-y-6">
-			@slots.Body
-		</div>
-		<div class="px-6 py-4">
-			@slots.Footer
-		</div>
+		if slots.Header != nil {
+			<div class="px-6 py-5 flex items-center justify-between">
+				@slots.Header
+			</div>
+		}
+		if slots.Body != nil {
+			<div class="px-6 py-6 space-y-6">
+				@slots.Body
+			</div>
+		}
+		if slots.Footer != nil {
+			<div class="px-6 py-4">
+				@slots.Footer
+			</div>
+		}
 	</div>
 }

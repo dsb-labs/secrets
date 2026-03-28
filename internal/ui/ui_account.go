@@ -31,6 +31,8 @@ func (h *AccountHandler) Register(mux *http.ServeMux) {
 	mux.HandleFunc("GET /register", h.CreateAccount)
 	mux.HandleFunc("POST /register", h.CreateAccountCallback)
 	mux.Handle("GET /account", requireToken(h.Detail))
+	mux.Handle("POST /account/password", requireToken(h.ChangePasswordCallback))
+	mux.Handle("POST /account/delete", requireToken(h.DeleteCallback))
 }
 
 // Detail renders the account detail view.
@@ -48,7 +50,111 @@ func (h *AccountHandler) Detail(w http.ResponseWriter, r *http.Request) {
 
 	render(ctx, w, http.StatusOK, accountview.Detail, accountview.ViewModel{
 		DisplayName: account.DisplayName,
+		Email:       account.Email,
 	})
+}
+
+// The ChangePasswordForm type represents the form values submitted when calling AccountHandler.ChangePasswordCallback.
+type ChangePasswordForm struct {
+	// The user's current password.
+	OldPassword string `form:"oldPassword"`
+	// The user's desired new password.
+	NewPassword string `form:"newPassword"`
+	// The user's desired new password, repeated for confirmation.
+	ConfirmPassword string `form:"confirmPassword"`
+}
+
+// Validate the form.
+func (f ChangePasswordForm) Validate() error {
+	return validation.ValidateStruct(&f,
+		validation.Field(&f.OldPassword, validation.Required),
+		validation.Field(&f.NewPassword, validation.Required),
+		validation.Field(&f.ConfirmPassword, validation.Required),
+	)
+}
+
+// ChangePasswordCallback handles the change password form submission. On success it renders the change password
+// success view, presenting the user with their new restore key.
+func (h *AccountHandler) ChangePasswordCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	form, err := decode[ChangePasswordForm](r)
+
+	model := accountview.ViewModel{
+		DisplayName: account.DisplayName,
+		Email:       account.Email,
+	}
+
+	var ve validation.Errors
+	switch {
+	case errors.As(err, &ve):
+		model.Validation.Errors = validationErrors(ve)
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.Detail, model)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	if form.NewPassword != form.ConfirmPassword {
+		model.Error.Message = "Passwords do not match"
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.Detail, model)
+		return
+	}
+
+	restoreKey, err := h.accounts.ChangePassword(tkn.ID(), form.OldPassword, form.NewPassword)
+	switch {
+	case errors.Is(err, service.ErrInvalidPassword):
+		model.Error.Message = "Current password is incorrect"
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.Detail, model)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, http.StatusOK, accountview.ChangePasswordSuccess, accountview.ChangePasswordSuccessViewModel{
+		DisplayName: account.DisplayName,
+		RestoreKey:  base64.StdEncoding.EncodeToString(restoreKey),
+	})
+}
+
+// DeleteCallback handles an account deletion request. On success, it clears the session cookie and redirects to the
+// login page.
+func (h *AccountHandler) DeleteCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	if err := h.accounts.Delete(tkn.ID()); err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "keeper",
+		Value:    "",
+		MaxAge:   -1,
+		Secure:   true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+	})
+
+	redirect(w, r, "/login")
 }
 
 // CreateAccount renders the account creation view.

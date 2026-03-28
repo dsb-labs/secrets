@@ -27,6 +27,11 @@ type (
 		// Create should create the given account, returning the restore key to be presented to the user. If an
 		// account with the given email already exists, service.ErrAccountExists should be returned.
 		Create(account service.Account) ([]byte, error)
+		// ChangePassword should update the account's password, returning the account's new restore key on success.
+		// Returns service.ErrInvalidPassword if oldPassword does not match the account's current password.
+		ChangePassword(id uuid.UUID, oldPassword, newPassword string) ([]byte, error)
+		// Delete should permanently remove the account associated with the given identifier.
+		Delete(id uuid.UUID) error
 	}
 
 	// The Validatable interface describes types that can validate their own fields, returning an error if any

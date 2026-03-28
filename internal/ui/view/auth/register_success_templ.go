@@ -102,20 +102,32 @@ func registerSuccess(model RegisterSuccessViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div><p class=\"text-sm font-semibold text-amber-800 dark:text-amber-300\">Save your restore key</p><p class=\"text-sm text-amber-700 dark:text-amber-400 mt-0.5\">This key is required to recover your data if you ever lose your password. It will not be shown again.</p></div></div></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\">Restore key</label><div class=\"font-mono text-xs break-all rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-3 py-2.5 text-gray-700 dark:text-gray-300 select-all\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div><p class=\"text-sm font-semibold text-amber-800 dark:text-amber-300\">Save your restore key</p><p class=\"text-sm text-amber-700 dark:text-amber-400 mt-0.5\">This key is required to recover your data if you ever lose your password. It will not be shown again.</p></div></div></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\">Restore key</label><div class=\"flex items-start gap-2\"><input id=\"restore-key\" type=\"text\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(model.RestoreKey)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register_success.templ`, Line: 50, Col: 24}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/auth/register_success.templ`, Line: 53, Col: 31}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><a href=\"/login\" class=\"block w-full text-center rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Continue to sign in</a></div></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" readonly class=\"flex-1 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-3 py-2.5 text-gray-700 dark:text-gray-300 focus:outline-none\"> <button type=\"button\" onclick=\"copyToClipboard('restore-key','restore-key-copy-icon','restore-key-check-icon')\" class=\"cursor-pointer shrink-0 flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors\" aria-label=\"Copy restore key to clipboard\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = component.IconCopy("restore-key-copy-icon", "w-4 h-4").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = component.IconCheckHidden("restore-key-check-icon", "w-4 h-4").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</button></div></div><a href=\"/login\" class=\"block w-full text-center rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Continue to sign in</a></div></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

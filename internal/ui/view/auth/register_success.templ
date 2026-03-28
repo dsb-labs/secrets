@@ -46,8 +46,23 @@ templ registerSuccess(model RegisterSuccessViewModel) {
 					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
 						Restore key
 					</label>
-					<div class="font-mono text-xs break-all rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-3 py-2.5 text-gray-700 dark:text-gray-300 select-all">
-						{ model.RestoreKey }
+					<div class="flex items-start gap-2">
+						<input
+							id="restore-key"
+							type="text"
+							value={ model.RestoreKey }
+							readonly
+							class="flex-1 font-mono text-xs rounded-lg bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 px-3 py-2.5 text-gray-700 dark:text-gray-300 focus:outline-none"
+						/>
+						<button
+							type="button"
+							onclick="copyToClipboard('restore-key','restore-key-copy-icon','restore-key-check-icon')"
+							class="cursor-pointer shrink-0 flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+							aria-label="Copy restore key to clipboard"
+						>
+							@component.IconCopy("restore-key-copy-icon", "w-4 h-4")
+							@component.IconCheckHidden("restore-key-check-icon", "w-4 h-4")
+						</button>
 					</div>
 				</div>
 				<a
