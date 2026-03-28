@@ -35,6 +35,8 @@ type (
 		Expiry string
 		// The card issuer short name, used to look up the issuer icon.
 		Issuer string
+		// Whether the card has expired.
+		Expired bool
 	}
 )
 
@@ -270,7 +272,7 @@ func row(item Item) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(url)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/card/list.templ`, Line: 100, Col: 17}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/card/list.templ`, Line: 102, Col: 17}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -283,7 +285,7 @@ func row(item Item) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(item.Issuer)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/card/list.templ`, Line: 100, Col: 37}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/card/list.templ`, Line: 102, Col: 37}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -304,7 +306,7 @@ func row(item Item) templ.Component {
 		templ_7745c5c3_Err = component.ListItem(component.ListItemProps{
 			Href:     "/cards/" + item.ID,
 			Title:    item.Name,
-			Subtitle: item.MaskedNumber + " · Expires " + item.Expiry,
+			Subtitle: item.MaskedNumber + " · " + cardExpiryLabel(item),
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

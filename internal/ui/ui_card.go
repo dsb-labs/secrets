@@ -79,6 +79,7 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	now := time.Now()
 	items := make([]cardview.Item, len(results))
 	for i, c := range results {
 		items[i] = cardview.Item{
@@ -87,6 +88,7 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 			MaskedNumber: maskCardNumber(c.Number),
 			Expiry:       fmt.Sprintf("%02d/%02d", int(c.ExpiryMonth), c.ExpiryYear%100),
 			Issuer:       c.Issuer,
+			Expired:      c.ExpiryYear < now.Year() || (c.ExpiryYear == now.Year() && c.ExpiryMonth < now.Month()),
 		}
 	}
 
@@ -248,6 +250,7 @@ func (h *CardHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	now := time.Now()
 	render(ctx, w, http.StatusOK, cardview.Detail, cardview.DetailViewModel{
 		DisplayName: account.DisplayName,
 		ID:          card.ID.String(),
@@ -258,6 +261,7 @@ func (h *CardHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		CVV:         card.CVV,
 		CreatedAt:   card.CreatedAt.Format("2 January 2006 at 15:04"),
 		Issuer:      card.Issuer,
+		Expired:     card.ExpiryYear < now.Year() || (card.ExpiryYear == now.Year() && card.ExpiryMonth < now.Month()),
 	})
 }
 

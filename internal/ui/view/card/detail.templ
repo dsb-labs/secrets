@@ -28,6 +28,8 @@ type (
 		CreatedAt string
 		// The card issuer short name, used to look up the issuer icon.
 		Issuer string
+		// Whether the card has expired.
+		Expired bool
 	}
 )
 
@@ -118,7 +120,12 @@ templ cardBody(model DetailViewModel) {
 	</div>
 	<div>
 		<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Expiry</label>
-		<p class="text-sm font-medium text-gray-900 dark:text-white font-mono">{ model.Expiry }</p>
+		<div class="flex items-center gap-2">
+			<p class="text-sm font-medium text-gray-900 dark:text-white font-mono">{ model.Expiry }</p>
+			if model.Expired {
+				<span class="text-xs font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded px-1.5 py-0.5">Expired</span>
+			}
+		</div>
 	</div>
 	<div>
 		<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">CVV</label>
