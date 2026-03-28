@@ -37,21 +37,19 @@ templ Sidebar(props SidebarProps) {
 			}
 		</nav>
 		<div class="px-3 py-3 border-t border-gray-200 dark:border-gray-700 shrink-0">
-			if props.CurrentPage == "account" {
-				<a href="/account" class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30">
-					<div class="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 shrink-0">
-						@IconUser("w-4 h-4 text-indigo-600 dark:text-indigo-400")
-					</div>
-					<span class="text-sm font-medium truncate">{ props.DisplayName }</span>
-				</a>
-			} else {
-				<a href="/account" class="flex items-center gap-2.5 rounded-lg px-2 py-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white transition-colors">
-					<div class="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 shrink-0">
-						@IconUser("w-4 h-4 text-indigo-600 dark:text-indigo-400")
-					</div>
-					<span class="text-sm font-medium truncate">{ props.DisplayName }</span>
-				</a>
-			}
+			<a
+				href="/account"
+				class={
+					"flex items-center gap-2.5 rounded-lg px-2 py-1.5",
+					templ.KV("text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30", props.CurrentPage == "account"),
+					templ.KV("text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white transition-colors", props.CurrentPage != "account"),
+				}
+			>
+				<div class="flex items-center justify-center w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/50 shrink-0">
+					@IconUser("w-4 h-4 text-indigo-600 dark:text-indigo-400")
+				</div>
+				<span class="text-sm font-medium truncate">{ props.DisplayName }</span>
+			</a>
 		</div>
 	</aside>
 }

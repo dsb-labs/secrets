@@ -54,7 +54,7 @@ func SearchBar(props SearchBarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"mb-4 flex gap-2\"><div class=\"relative flex-1\"><div class=\"pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"flex gap-2\"><div class=\"relative flex-1\"><div class=\"pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

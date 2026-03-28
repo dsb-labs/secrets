@@ -2,21 +2,15 @@ package component
 
 // SidebarItem renders a single navigation link within the sidebar, highlighted when active.
 templ SidebarItem(href string, label string, active bool) {
-	if active {
-		<a
-			href={ templ.SafeURL(href) }
-			class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30"
-		>
-			{ children... }
-			{ label }
-		</a>
-	} else {
-		<a
-			href={ templ.SafeURL(href) }
-			class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white transition-colors"
-		>
-			{ children... }
-			{ label }
-		</a>
-	}
+	<a
+		href={ templ.SafeURL(href) }
+		class={
+			"flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium",
+			templ.KV("text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30", active),
+			templ.KV("text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white transition-colors", !active),
+		}
+	>
+		{ children... }
+		{ label }
+	</a>
 }
