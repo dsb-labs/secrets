@@ -1,0 +1,33 @@
+package component
+
+type (
+	// The PageHeaderProps type contains fields used to configure the PageHeader component.
+	PageHeaderProps struct {
+		// Title is the primary heading text.
+		Title string
+		// Subtitle is the supporting description shown below the title.
+		Subtitle string
+		// Action is an optional element rendered on the right side of the header row, e.g. an "Add" button.
+		Action templ.Component
+		// Search is an optional element rendered below the title row, e.g. a SearchBar.
+		Search templ.Component
+	}
+)
+
+// PageHeader renders a sticky page header with a title, subtitle, and optional action and search slots.
+templ PageHeader(props PageHeaderProps) {
+	<div class="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-8 pt-4 sm:pt-8 pb-4">
+		<div class={ "flex items-center justify-between", templ.KV("mb-4", props.Search != nil) }>
+			<div>
+				<h1 class="text-2xl font-bold text-gray-900 dark:text-white">{ props.Title }</h1>
+				<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{ props.Subtitle }</p>
+			</div>
+			if props.Action != nil {
+				@props.Action
+			}
+		</div>
+		if props.Search != nil {
+			@props.Search
+		}
+	</div>
+}

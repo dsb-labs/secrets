@@ -1,6 +1,9 @@
 package dashboard
 
-import "github.com/davidsbond/keeper/internal/ui/layout"
+import (
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/layout"
+)
 
 type (
 	// The ViewModel type contains fields used to configure the dashboard view.
@@ -20,8 +23,8 @@ templ Dashboard(model ViewModel) {
 }
 
 templ content(model ViewModel) {
-	<div class="p-4 sm:p-8">
-		<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Welcome back, { model.DisplayName }</h1>
-		<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Select a section from the sidebar to get started.</p>
-	</div>
+	@component.PageHeader(component.PageHeaderProps{
+		Title:    "Welcome back, " + model.DisplayName,
+		Subtitle: "Select a section from the sidebar to get started.",
+	})
 }
