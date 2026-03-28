@@ -30,6 +30,8 @@ type (
 		CreatedAt time.Time
 		// A user-supplied name for the card.
 		Name string
+		// The card issuer.
+		Issuer string
 	}
 )
 
@@ -77,6 +79,7 @@ func (c *Client) ListCards(ctx context.Context) ([]Card, error) {
 			CVV:         in.CVV,
 			CreatedAt:   in.CreatedAt,
 			Name:        in.Name,
+			Issuer:      in.Issuer,
 		}
 	}), nil
 }
@@ -116,5 +119,6 @@ func (c *Client) GetCard(ctx context.Context, id string) (Card, error) {
 		CVV:         response.Card.CVV,
 		CreatedAt:   response.Card.CreatedAt,
 		Name:        response.Card.Name,
+		Issuer:      response.Card.Issuer,
 	}, nil
 }

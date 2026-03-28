@@ -7,6 +7,7 @@ import (
 
 	"github.com/davidsbond/x/convert"
 	"github.com/davidsbond/x/filter"
+	creditcard "github.com/durango/go-credit-card"
 	"github.com/google/uuid"
 
 	"github.com/davidsbond/keeper/internal/server/database"
@@ -47,8 +48,10 @@ type (
 		CVV string
 		// When the card was created.
 		CreatedAt time.Time
-		// A user-supplied name for the card
+		// A user-supplied name for the card.
 		Name string
+		// The card issuer.
+		Issuer string
 	}
 )
 
@@ -86,6 +89,11 @@ func (svc *CardService) Create(userID uuid.UUID, card Card) error {
 		CVV:         card.CVV,
 		CreatedAt:   card.CreatedAt,
 		Name:        card.Name,
+	}
+
+	cc := creditcard.Card{Number: card.Number}
+	if err = cc.Method(); err == nil {
+		record.Issuer = cc.Company.Short
 	}
 
 	err = repo.Create(record)
@@ -128,6 +136,7 @@ func (svc *CardService) List(userID uuid.UUID, filters ...filter.Filter[Card]) (
 			CVV:         in.CVV,
 			CreatedAt:   in.CreatedAt,
 			Name:        in.Name,
+			Issuer:      in.Issuer,
 		}
 	})
 
@@ -194,5 +203,6 @@ func (svc *CardService) Get(userID uuid.UUID, cardID uuid.UUID) (Card, error) {
 		CVV:         result.CVV,
 		CreatedAt:   result.CreatedAt,
 		Name:        result.Name,
+		Issuer:      result.Issuer,
 	}, nil
 }

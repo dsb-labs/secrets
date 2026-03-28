@@ -36,8 +36,10 @@ type (
 		CVV string
 		// When the card was created.
 		CreatedAt time.Time
-		// A user-supplied name for the card
+		// A user-supplied name for the card.
 		Name string
+		// The card issuer.
+		Issuer string
 	}
 )
 

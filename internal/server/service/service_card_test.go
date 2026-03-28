@@ -32,7 +32,7 @@ func TestCardService_Create(t *testing.T) {
 			Card: service.Card{
 				ID:          uuid.NameSpaceDNS,
 				HolderName:  "Test McTest",
-				Number:      "000000000000",
+				Number:      "5425233430109903",
 				ExpiryMonth: time.January,
 				ExpiryYear:  2025,
 				CVV:         "123",
@@ -50,7 +50,7 @@ func TestCardService_Create(t *testing.T) {
 			Card: service.Card{
 				ID:          uuid.NameSpaceDNS,
 				HolderName:  "Test McTest",
-				Number:      "000000000000",
+				Number:      "5425233430109903",
 				ExpiryMonth: time.January,
 				ExpiryYear:  2025,
 				CVV:         "123",
@@ -68,7 +68,7 @@ func TestCardService_Create(t *testing.T) {
 			Card: service.Card{
 				ID:          uuid.NameSpaceDNS,
 				HolderName:  "Test McTest",
-				Number:      "000000000000",
+				Number:      "5425233430109903",
 				ExpiryMonth: time.January,
 				ExpiryYear:  2025,
 				CVV:         "123",
@@ -88,7 +88,7 @@ func TestCardService_Create(t *testing.T) {
 			Card: service.Card{
 				ID:          uuid.NameSpaceDNS,
 				HolderName:  "Test McTest",
-				Number:      "000000000000",
+				Number:      "5425233430109903",
 				ExpiryMonth: time.January,
 				ExpiryYear:  2025,
 				CVV:         "123",
@@ -107,7 +107,7 @@ func TestCardService_Create(t *testing.T) {
 			Card: service.Card{
 				ID:          uuid.NameSpaceDNS,
 				HolderName:  "Test McTest",
-				Number:      "000000000000",
+				Number:      "5425233430109903",
 				ExpiryMonth: time.January,
 				ExpiryYear:  2025,
 				CVV:         "123",
@@ -206,7 +206,7 @@ func TestCardService_List(t *testing.T) {
 				{
 					ID:          uuid.NameSpaceDNS,
 					HolderName:  "Test McTest",
-					Number:      "000000000000",
+					Number:      "5425233430109903",
 					ExpiryMonth: time.January,
 					ExpiryYear:  2025,
 					CVV:         "123",
@@ -221,7 +221,7 @@ func TestCardService_List(t *testing.T) {
 					{
 						ID:          uuid.NameSpaceDNS,
 						HolderName:  "Test McTest",
-						Number:      "000000000000",
+						Number:      "5425233430109903",
 						ExpiryMonth: time.January,
 						ExpiryYear:  2025,
 						CVV:         "123",
@@ -471,7 +471,7 @@ func TestCardService_Get(t *testing.T) {
 			Expected: service.Card{
 				ID:          uuid.NameSpaceDNS,
 				HolderName:  "Test McTest",
-				Number:      "000000000000",
+				Number:      "5425233430109903",
 				ExpiryMonth: time.January,
 				ExpiryYear:  2025,
 				CVV:         "123",
@@ -484,7 +484,7 @@ func TestCardService_Get(t *testing.T) {
 				expected := database.Card{
 					ID:          uuid.NameSpaceDNS,
 					HolderName:  "Test McTest",
-					Number:      "000000000000",
+					Number:      "5425233430109903",
 					ExpiryMonth: time.January,
 					ExpiryYear:  2025,
 					CVV:         "123",

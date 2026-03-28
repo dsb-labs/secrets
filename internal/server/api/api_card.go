@@ -53,6 +53,8 @@ type (
 		CreatedAt time.Time `json:"createdAt"`
 		// A user-supplied name for the card
 		Name string `json:"name"`
+		// The card issuer
+		Issuer string `json:"issuer"`
 	}
 )
 
@@ -178,6 +180,7 @@ func (api *CardAPI) List(w http.ResponseWriter, r *http.Request) {
 				CVV:         in.CVV,
 				CreatedAt:   in.CreatedAt,
 				Name:        in.Name,
+				Issuer:      in.Issuer,
 			}
 		}),
 	})
@@ -255,6 +258,7 @@ func (api *CardAPI) Get(w http.ResponseWriter, r *http.Request) {
 			CVV:         result.CVV,
 			CreatedAt:   result.CreatedAt,
 			Name:        result.Name,
+			Issuer:      result.Issuer,
 		},
 	})
 }
