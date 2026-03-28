@@ -86,6 +86,7 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 			Name:         c.Name,
 			MaskedNumber: maskCardNumber(c.Number),
 			Expiry:       fmt.Sprintf("%02d/%02d", int(c.ExpiryMonth), c.ExpiryYear%100),
+			Issuer:       c.Issuer,
 		}
 	}
 
@@ -256,6 +257,7 @@ func (h *CardHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		Expiry:      fmt.Sprintf("%02d/%d", int(card.ExpiryMonth), card.ExpiryYear),
 		CVV:         card.CVV,
 		CreatedAt:   card.CreatedAt.Format("2 January 2006 at 15:04"),
+		Issuer:      card.Issuer,
 	})
 }
 

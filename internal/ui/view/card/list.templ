@@ -26,6 +26,8 @@ type (
 		MaskedNumber string
 		// The formatted expiry date, e.g. "03/26".
 		Expiry string
+		// The card issuer short name, used to look up the issuer icon.
+		Issuer string
 	}
 )
 
@@ -93,5 +95,11 @@ templ row(item Item) {
 		Href:     "/cards/" + item.ID,
 		Title:    item.Name,
 		Subtitle: item.MaskedNumber + " · Expires " + item.Expiry,
-	})
+	}) {
+		if url := issuerIconURL(item.Issuer); url != "" {
+			<img src={ url } alt={ item.Issuer } class="h-5 w-auto object-contain shrink-0" onerror="this.style.display='none'"/>
+		} else {
+			@component.IconCard("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
+		}
+	}
 }

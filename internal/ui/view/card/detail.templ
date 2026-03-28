@@ -26,6 +26,8 @@ type (
 		CVV string
 		// The formatted creation timestamp.
 		CreatedAt string
+		// The card issuer short name, used to look up the issuer icon.
+		Issuer string
 	}
 )
 
@@ -61,7 +63,12 @@ templ detailContent(model DetailViewModel) {
 }
 
 templ cardHeader(model DetailViewModel) {
-	<h1 class="text-lg font-semibold text-gray-900 dark:text-white">{ model.Name }</h1>
+	<div class="flex items-center gap-3">
+		if url := issuerIconURL(model.Issuer); url != "" {
+			<img src={ url } alt={ model.Issuer } class="h-7 w-auto object-contain shrink-0" onerror="this.style.display='none'"/>
+		}
+		<h1 class="text-lg font-semibold text-gray-900 dark:text-white">{ model.Name }</h1>
+	</div>
 	<button
 		type="button"
 		onclick="showConfirmDialog('delete-dialog')"
