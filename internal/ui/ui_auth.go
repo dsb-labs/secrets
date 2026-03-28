@@ -110,6 +110,7 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 		Value:    tkn.String(),
 		Expires:  tkn.ExpiresAt(),
 		Secure:   true,
+		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
 	})

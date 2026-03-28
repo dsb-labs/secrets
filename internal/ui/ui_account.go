@@ -126,6 +126,16 @@ func (h *AccountHandler) ChangePasswordCallback(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "keeper",
+		Value:    "",
+		MaxAge:   -1,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+	})
+
 	render(ctx, w, http.StatusOK, accountview.ChangePasswordSuccess, accountview.ChangePasswordSuccessViewModel{
 		DisplayName: account.DisplayName,
 		RestoreKey:  base64.StdEncoding.EncodeToString(restoreKey),
@@ -150,6 +160,7 @@ func (h *AccountHandler) DeleteCallback(w http.ResponseWriter, r *http.Request) 
 		Value:    "",
 		MaxAge:   -1,
 		Secure:   true,
+		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Path:     "/",
 	})
