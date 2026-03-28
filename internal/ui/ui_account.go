@@ -9,6 +9,8 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 
 	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/davidsbond/keeper/internal/server/token"
+	accountview "github.com/davidsbond/keeper/internal/ui/view/account"
 	"github.com/davidsbond/keeper/internal/ui/view/auth"
 	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
 )
@@ -28,6 +30,25 @@ func NewAccountHandler(accounts AccountService) *AccountHandler {
 func (h *AccountHandler) Register(mux *http.ServeMux) {
 	mux.HandleFunc("GET /register", h.CreateAccount)
 	mux.HandleFunc("POST /register", h.CreateAccountCallback)
+	mux.Handle("GET /account", requireToken(h.Detail))
+}
+
+// Detail renders the account detail view.
+func (h *AccountHandler) Detail(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, http.StatusOK, accountview.Detail, accountview.ViewModel{
+		DisplayName: account.DisplayName,
+	})
 }
 
 // CreateAccount renders the account creation view.

@@ -1,0 +1,24 @@
+package account
+
+import "github.com/davidsbond/keeper/internal/ui/layout"
+
+type (
+	// The ViewModel type contains fields used to configure the account detail view.
+	ViewModel struct {
+		// The display name of the authenticated user.
+		DisplayName string
+	}
+)
+
+// Detail returns the account detail view using the provided view model values.
+templ Detail(model ViewModel) {
+	@layout.Authenticated(layout.AuthenticatedViewModel{
+		Title:       "Account",
+		CurrentPage: "account",
+		DisplayName: model.DisplayName,
+	}, detailContent(model))
+}
+
+templ detailContent(model ViewModel) {
+	<div class="p-4 sm:p-8"></div>
+}
