@@ -66,7 +66,8 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := h.cards.List(tkn.ID())
+	query := r.URL.Query().Get("query")
+	results, err := h.cards.List(tkn.ID(), service.CardsByName(query))
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		redirectToLogin(w, r)
@@ -82,6 +83,7 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 	for i, c := range results {
 		items[i] = cardview.Item{
 			ID:           c.ID.String(),
+			Name:         c.Name,
 			MaskedNumber: maskCardNumber(c.Number),
 			Expiry:       fmt.Sprintf("%02d/%02d", int(c.ExpiryMonth), c.ExpiryYear%100),
 		}
@@ -90,6 +92,7 @@ func (h *CardHandler) List(w http.ResponseWriter, r *http.Request) {
 	render(ctx, w, http.StatusOK, cardview.List, cardview.ViewModel{
 		DisplayName: account.DisplayName,
 		Cards:       items,
+		Query:       query,
 	})
 }
 
@@ -113,6 +116,8 @@ func (h *CardHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 // The CreateCardForm type represents the form values submitted when calling CardHandler.CreateCallback.
 type CreateCardForm struct {
+	// The user-supplied name for the card.
+	Name string `form:"name"`
 	// The cardholder's name.
 	HolderName string `form:"holderName"`
 	// The card number.
@@ -128,6 +133,7 @@ type CreateCardForm struct {
 // Validate the form.
 func (f CreateCardForm) Validate() error {
 	return validation.ValidateStruct(&f,
+		validation.Field(&f.Name, validation.Required),
 		validation.Field(&f.Number, validation.Required, is.CreditCard),
 		validation.Field(&f.ExpiryMonth, validation.Required, validation.Min(time.January), validation.Max(time.December)),
 		validation.Field(&f.ExpiryYear, validation.Required),
@@ -161,6 +167,7 @@ func (h *CardHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 
 	model := cardview.CreateViewModel{
 		DisplayName: account.DisplayName,
+		Name:        form.Name,
 		HolderName:  form.HolderName,
 		Number:      form.Number,
 		ExpiryMonth: expiryMonth,
@@ -184,6 +191,7 @@ func (h *CardHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	cardID := uuid.New()
 	err = h.cards.Create(tkn.ID(), service.Card{
 		ID:          cardID,
+		Name:        form.Name,
 		HolderName:  form.HolderName,
 		Number:      form.Number,
 		ExpiryMonth: form.ExpiryMonth,
@@ -242,6 +250,7 @@ func (h *CardHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	render(ctx, w, http.StatusOK, cardview.Detail, cardview.DetailViewModel{
 		DisplayName: account.DisplayName,
 		ID:          card.ID.String(),
+		Name:        card.Name,
 		HolderName:  card.HolderName,
 		Number:      card.Number,
 		Expiry:      fmt.Sprintf("%02d/%d", int(card.ExpiryMonth), card.ExpiryYear),

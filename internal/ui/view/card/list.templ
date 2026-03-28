@@ -12,12 +12,16 @@ type (
 		DisplayName string
 		// The list of cards stored for the authenticated user.
 		Cards []Item
+		// The current search query, preserved in the search input between requests.
+		Query string
 	}
 
 	// The Item type represents a single card as displayed in the card list view.
 	Item struct {
 		// The unique identifier of the card, used to link to the detail view.
 		ID string
+		// The user-supplied name of the card.
+		Name string
 		// The masked card number, e.g. "•••• •••• •••• 4242".
 		MaskedNumber string
 		// The formatted expiry date, e.g. "03/26".
@@ -37,7 +41,7 @@ templ List(model ViewModel) {
 templ listContent(model ViewModel) {
 	<div>
 		<div class="sticky top-0 z-10 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-8 pt-4 sm:pt-8 pb-4">
-			<div class="flex items-center justify-between">
+			<div class="flex items-center justify-between mb-4">
 				<div>
 					<h1 class="text-2xl font-bold text-gray-900 dark:text-white">Cards</h1>
 					<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Stored payment cards.</p>
@@ -50,14 +54,28 @@ templ listContent(model ViewModel) {
 					<span class="hidden sm:inline">Add card</span>
 				</a>
 			</div>
+			@component.SearchBar(component.SearchBarProps{
+				Action:      "/cards",
+				Query:       model.Query,
+				Placeholder: "Search by name...",
+			})
 		</div>
 		<div class="px-4 sm:px-8 py-6">
 			if len(model.Cards) == 0 {
-				@component.EmptyState(component.EmptyStateProps{
-					Title:       "No cards stored",
-					Description: "Use the button above to add your first card.",
-				}) {
-					@component.IconCard("w-6 h-6 text-gray-400 dark:text-gray-500")
+				if model.Query != "" {
+					@component.EmptyState(component.EmptyStateProps{
+						Title:       "No cards match your search",
+						Description: "Try a different name.",
+					}) {
+						@component.IconCard("w-6 h-6 text-gray-400 dark:text-gray-500")
+					}
+				} else {
+					@component.EmptyState(component.EmptyStateProps{
+						Title:       "No cards stored",
+						Description: "Use the button above to add your first card.",
+					}) {
+						@component.IconCard("w-6 h-6 text-gray-400 dark:text-gray-500")
+					}
 				}
 			} else {
 				<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
@@ -72,9 +90,8 @@ templ listContent(model ViewModel) {
 
 templ row(item Item) {
 	@component.ListItem(component.ListItemProps{
-		Href:       "/cards/" + item.ID,
-		Title:      item.MaskedNumber,
-		Subtitle:   "Expires " + item.Expiry,
-		TitleClass: "font-mono",
+		Href:     "/cards/" + item.ID,
+		Title:    item.Name,
+		Subtitle: item.MaskedNumber + " · Expires " + item.Expiry,
 	})
 }

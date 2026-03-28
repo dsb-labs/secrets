@@ -14,6 +14,8 @@ type (
 		DisplayName string
 		// The unique identifier of the card.
 		ID string
+		// The user-supplied name of the card.
+		Name string
 		// The cardholder's name.
 		HolderName string
 		// The full card number, displayed in a hidden field.
@@ -59,7 +61,7 @@ templ detailContent(model DetailViewModel) {
 }
 
 templ cardHeader(model DetailViewModel) {
-	<h1 class="text-lg font-semibold text-gray-900 dark:text-white font-mono">Card details</h1>
+	<h1 class="text-lg font-semibold text-gray-900 dark:text-white">{ model.Name }</h1>
 	<button
 		type="button"
 		onclick="showConfirmDialog('delete-dialog')"
