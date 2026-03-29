@@ -31,7 +31,9 @@ func (h *AccountHandler) Register(mux *http.ServeMux) {
 	mux.HandleFunc("GET /register", h.CreateAccount)
 	mux.HandleFunc("POST /register", h.CreateAccountCallback)
 	mux.Handle("GET /account", requireToken(h.Detail))
+	mux.Handle("GET /account/password", requireToken(h.ChangePassword))
 	mux.Handle("POST /account/password", requireToken(h.ChangePasswordCallback))
+	mux.Handle("GET /account/delete", requireToken(h.Delete))
 	mux.Handle("POST /account/delete", requireToken(h.DeleteCallback))
 }
 
@@ -51,6 +53,24 @@ func (h *AccountHandler) Detail(w http.ResponseWriter, r *http.Request) {
 	render(ctx, w, http.StatusOK, accountview.Detail, accountview.ViewModel{
 		DisplayName: account.DisplayName,
 		Email:       account.Email,
+	})
+}
+
+// ChangePassword renders the change password form.
+func (h *AccountHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, http.StatusOK, accountview.ChangePassword, accountview.ChangePasswordViewModel{
+		DisplayName: account.DisplayName,
 	})
 }
 
@@ -89,16 +109,15 @@ func (h *AccountHandler) ChangePasswordCallback(w http.ResponseWriter, r *http.R
 
 	form, err := decode[ChangePasswordForm](r)
 
-	model := accountview.ViewModel{
+	model := accountview.ChangePasswordViewModel{
 		DisplayName: account.DisplayName,
-		Email:       account.Email,
 	}
 
 	var ve validation.Errors
 	switch {
 	case errors.As(err, &ve):
 		model.Validation.Errors = validationErrors(ve)
-		render(ctx, w, http.StatusUnprocessableEntity, accountview.Detail, model)
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.ChangePassword, model)
 		return
 	case err != nil:
 		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
@@ -109,7 +128,7 @@ func (h *AccountHandler) ChangePasswordCallback(w http.ResponseWriter, r *http.R
 
 	if form.NewPassword != form.ConfirmPassword {
 		model.Error.Message = "Passwords do not match"
-		render(ctx, w, http.StatusUnprocessableEntity, accountview.Detail, model)
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.ChangePassword, model)
 		return
 	}
 
@@ -117,7 +136,7 @@ func (h *AccountHandler) ChangePasswordCallback(w http.ResponseWriter, r *http.R
 	switch {
 	case errors.Is(err, service.ErrInvalidPassword):
 		model.Error.Message = "Current password is incorrect"
-		render(ctx, w, http.StatusUnprocessableEntity, accountview.Detail, model)
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.ChangePassword, model)
 		return
 	case err != nil:
 		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
@@ -142,13 +161,84 @@ func (h *AccountHandler) ChangePasswordCallback(w http.ResponseWriter, r *http.R
 	})
 }
 
+// Delete renders the delete account confirmation form.
+func (h *AccountHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, http.StatusOK, accountview.Delete, accountview.DeleteViewModel{
+		DisplayName: account.DisplayName,
+	})
+}
+
+// The DeleteAccountForm type represents the form values submitted when calling AccountHandler.DeleteCallback.
+type DeleteAccountForm struct {
+	// The user's current password, required to confirm account deletion.
+	Password string `form:"password"`
+}
+
+// Validate the form.
+func (f DeleteAccountForm) Validate() error {
+	return validation.ValidateStruct(&f,
+		validation.Field(&f.Password, validation.Required),
+	)
+}
+
 // DeleteCallback handles an account deletion request. On success, it clears the session cookie and redirects to the
 // login page.
 func (h *AccountHandler) DeleteCallback(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	tkn := token.FromContext(ctx)
 
-	if err := h.accounts.Delete(tkn.ID()); err != nil {
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	form, err := decode[DeleteAccountForm](r)
+
+	model := accountview.DeleteViewModel{
+		DisplayName: account.DisplayName,
+	}
+
+	var ve validation.Errors
+	switch {
+	case errors.As(err, &ve):
+		model.Validation.Errors = validationErrors(ve)
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.Delete, model)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	err = h.accounts.VerifyPassword(tkn.ID(), form.Password)
+	switch {
+	case errors.Is(err, service.ErrInvalidPassword):
+		model.Error.Message = "Password is incorrect"
+		render(ctx, w, http.StatusUnprocessableEntity, accountview.Delete, model)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	if err = h.accounts.Delete(tkn.ID()); err != nil {
 		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
 			Detail: err.Error(),
 		})

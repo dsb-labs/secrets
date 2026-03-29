@@ -32,6 +32,9 @@ type (
 		ChangePassword(id uuid.UUID, oldPassword, newPassword string) ([]byte, error)
 		// Delete should permanently remove the account associated with the given identifier.
 		Delete(id uuid.UUID) error
+		// VerifyPassword should return ErrInvalidPassword if the given password does not match the account's stored
+		// password, or ErrAccountNotFound if the account does not exist.
+		VerifyPassword(id uuid.UUID, password string) error
 	}
 
 	// The Validatable interface describes types that can validate their own fields, returning an error if any

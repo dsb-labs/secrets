@@ -1,0 +1,86 @@
+package account
+
+import (
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/layout"
+)
+
+type (
+	// The DeleteViewModel type contains fields used to configure the delete account view.
+	DeleteViewModel struct {
+		// The display name of the authenticated user.
+		DisplayName string
+		// Error contains any error to display above the form. Nothing is rendered when Message is empty.
+		Error component.ErrorBannerProps
+		// Validation contains any validation errors to display above the form. Nothing is rendered when Errors is empty.
+		Validation component.ValidationBannerProps
+	}
+)
+
+// Delete returns the delete account view using the provided view model values.
+templ Delete(model DeleteViewModel) {
+	@layout.Authenticated(layout.AuthenticatedViewModel{
+		Title:       "Delete Account",
+		CurrentPage: "account",
+		DisplayName: model.DisplayName,
+	}, deleteContent(model))
+}
+
+templ deleteContent(model DeleteViewModel) {
+	<div class="p-4 sm:p-8">
+		<div class="mb-6">
+			<a
+				href="/account"
+				class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+			>
+				@component.IconArrowLeft("w-4 h-4")
+				Back to account
+			</a>
+		</div>
+		@component.Card(component.CardSlots{Header: deleteHeader(), Body: deleteBody(model)})
+	</div>
+}
+
+templ deleteHeader() {
+	<div class="flex items-center gap-2">
+		@component.IconTrash("w-4 h-4 text-gray-500 dark:text-gray-400")
+		<h2 class="text-base font-semibold text-gray-900 dark:text-white">Delete account</h2>
+	</div>
+}
+
+templ deleteBody(model DeleteViewModel) {
+	@component.ErrorBanner(model.Error)
+	<div class="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3">
+		<div class="flex gap-3">
+			@component.IconWarning("w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5")
+			<p class="text-sm text-red-700 dark:text-red-400">
+				This will permanently delete your account and all stored data. This action cannot be undone.
+			</p>
+		</div>
+	</div>
+	@component.Form(component.FormProps{
+		Action:     "/account/delete",
+		Class:      "space-y-4",
+		Validation: model.Validation,
+	}) {
+		<div>
+			<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="password">
+				Confirm your password
+			</label>
+			<input
+				id="password"
+				type="password"
+				name="password"
+				placeholder="••••••••"
+				required
+				class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+			/>
+		</div>
+		<button
+			type="submit"
+			class="cursor-pointer w-full rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 text-sm transition-colors"
+		>
+			Delete account
+		</button>
+	}
+}

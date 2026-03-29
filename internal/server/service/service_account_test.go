@@ -260,6 +260,95 @@ func TestAccountService_Delete(t *testing.T) {
 	}
 }
 
+func TestAccountService_VerifyPassword(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		ID           uuid.UUID
+		Password     string
+		ExpectsError bool
+		Setup        func(accounts *MockAccountRepository)
+	}{
+		{
+			Name:         "error if account does not exist",
+			ID:           uuid.NameSpaceDNS,
+			Password:     "test",
+			ExpectsError: true,
+			Setup: func(accounts *MockAccountRepository) {
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(database.Account{}, database.ErrAccountNotFound).
+					Once()
+			},
+		},
+		{
+			Name:         "error querying account",
+			ID:           uuid.NameSpaceDNS,
+			Password:     "test",
+			ExpectsError: true,
+			Setup: func(accounts *MockAccountRepository) {
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(database.Account{}, io.EOF).
+					Once()
+			},
+		},
+		{
+			Name:         "password does not match",
+			ID:           uuid.NameSpaceDNS,
+			Password:     "wrong",
+			ExpectsError: true,
+			Setup: func(accounts *MockAccountRepository) {
+				account := database.Account{
+					ID:           uuid.NameSpaceDNS,
+					PasswordHash: mustBcrypt(t, "test"),
+				}
+
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(account, nil).
+					Once()
+			},
+		},
+		{
+			Name:     "success",
+			ID:       uuid.NameSpaceDNS,
+			Password: "test",
+			Setup: func(accounts *MockAccountRepository) {
+				account := database.Account{
+					ID:           uuid.NameSpaceDNS,
+					PasswordHash: mustBcrypt(t, "test"),
+				}
+
+				accounts.EXPECT().
+					FindByID(uuid.NameSpaceDNS).
+					Return(account, nil).
+					Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			accounts := NewMockAccountRepository(t)
+
+			if tc.Setup != nil {
+				tc.Setup(accounts)
+			}
+
+			svc := service.NewAccountService(accounts, nil)
+			err := svc.VerifyPassword(tc.ID, tc.Password)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+		})
+	}
+}
+
 func TestAccountService_ChangePassword(t *testing.T) {
 	t.Parallel()
 

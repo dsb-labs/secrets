@@ -137,6 +137,28 @@ func (svc *AccountService) Delete(id uuid.UUID) error {
 	return nil
 }
 
+// VerifyPassword checks that the provided password matches the account's stored hash. Returns ErrAccountNotFound if
+// the account does not exist, or ErrInvalidPassword if the password does not match.
+func (svc *AccountService) VerifyPassword(userID uuid.UUID, password string) error {
+	account, err := svc.accounts.FindByID(userID)
+	switch {
+	case errors.Is(err, database.ErrAccountNotFound):
+		return ErrAccountNotFound
+	case err != nil:
+		return fmt.Errorf("failed to query account: %w", err)
+	}
+
+	err = bcrypt.CompareHashAndPassword(account.PasswordHash, []byte(password))
+	switch {
+	case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
+		return ErrInvalidPassword
+	case err != nil:
+		return fmt.Errorf("failed to compare password: %w", err)
+	}
+
+	return nil
+}
+
 // ChangePassword attempts to replace the user's current password with the new one. This causes the derived key that
 // encrypts the user's personal database to change, effectively logging them out on all platforms in which they
 // are authenticated. Returns ErrAccountNotFound if the specified user does not exist or ErrInvalidPassword if the

@@ -15,7 +15,8 @@ type ConfirmDialogProps struct {
 }
 
 // ConfirmDialog renders a styled modal confirmation dialog. Open it by calling showConfirmDialog('<id>') from an
-// onclick handler.
+// onclick handler. Optional children are rendered inside the form between the message and the action buttons,
+// allowing extra fields (e.g. a password confirmation input) to be included in the submission.
 templ ConfirmDialog(props ConfirmDialogProps) {
 	{{
 		confirmText := props.ConfirmText
@@ -27,26 +28,27 @@ templ ConfirmDialog(props ConfirmDialogProps) {
 		id={ props.ID }
 		class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-xl p-0 w-full max-w-sm backdrop:bg-black/50 backdrop:backdrop-blur-sm"
 	>
-		<div class="px-6 pt-6 pb-2">
+		<div class="px-6 pt-6 pb-4">
 			<h2 class="text-base font-semibold text-gray-900 dark:text-white">{ props.Title }</h2>
 			<p class="mt-1.5 text-sm text-gray-500 dark:text-gray-400">{ props.Message }</p>
 		</div>
-		<div class="flex justify-end gap-2 px-6 py-4">
-			<button
-				type="button"
-				onclick={ templ.ComponentScript{Call: "document.getElementById('" + props.ID + "').close()"} }
-				class="cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-			>
-				Cancel
-			</button>
-			@Form(FormProps{Action: props.Action}) {
+		@Form(FormProps{Action: props.Action}) {
+			{ children... }
+			<div class="flex justify-end gap-2 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+				<button
+					type="button"
+					onclick={ templ.ComponentScript{Call: "document.getElementById('" + props.ID + "').close()"} }
+					class="cursor-pointer rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+				>
+					Cancel
+				</button>
 				<button
 					type="submit"
 					class="cursor-pointer rounded-lg bg-red-600 hover:bg-red-700 px-4 py-2 text-sm font-semibold text-white transition-colors"
 				>
 					{ confirmText }
 				</button>
-			}
-		</div>
+			</div>
+		}
 	</dialog>
 }
