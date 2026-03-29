@@ -1,12 +1,15 @@
 package service_test
 
 import (
+	_ "embed"
 	"io"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
 	"github.com/davidsbond/keeper/internal/server/database"
@@ -14,6 +17,15 @@ import (
 )
 
 type (
+	ImportMocks struct {
+		logins        *MockLoginRepository
+		loginProvider *MockRepositoryProvider[service.LoginRepository]
+		notes         *MockNoteRepository
+		noteProvider  *MockRepositoryProvider[service.NoteRepository]
+		cards         *MockCardRepository
+		cardProvider  *MockRepositoryProvider[service.CardRepository]
+	}
+
 	ExportMocks struct {
 		logins        *MockLoginRepository
 		loginProvider *MockRepositoryProvider[service.LoginRepository]
@@ -356,6 +368,363 @@ func TestToolService_Export(t *testing.T) {
 			}
 
 			actual, err := service.NewToolService(mocks.loginProvider, mocks.noteProvider, mocks.cardProvider).Export(tc.UserID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.EqualValues(t, tc.Expected, actual)
+		})
+	}
+}
+
+var (
+	//go:embed testdata/keeper.json
+	keeperJSON string
+	//go:embed testdata/bitwarden.json
+	bitwardenJSON string
+	//go:embed testdata/bitwarden_invalid_card.json
+	bitwardenInvalidCardJSON string
+)
+
+func TestToolService_Import(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		UserID       uuid.UUID
+		Source       service.ImportSource
+		Data         string
+		Expected     service.ImportResult
+		ExpectsError bool
+		Setup        func(mocks *ImportMocks)
+	}{
+		{
+			Name:         "invalid import source",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSource(99),
+			Data:         `{}`,
+		},
+		{
+			Name:         "keeper: invalid JSON",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         `not json`,
+		},
+		{
+			Name:         "keeper: error if login database lifetime has expired",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "keeper: error getting login database",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "keeper: error if note database lifetime has expired",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "keeper: error getting note database",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "keeper: error if card database lifetime has expired",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "keeper: error getting card database",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "keeper: error creating login",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.cards, nil).Once()
+
+				mocks.logins.EXPECT().
+					Create(mock.Anything).
+					Return(io.EOF).Once()
+			},
+		},
+		{
+			Name:         "keeper: error creating note",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.cards, nil).Once()
+
+				mocks.logins.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.notes.EXPECT().
+					Create(mock.Anything).
+					Return(io.EOF).Once()
+			},
+		},
+		{
+			Name:         "keeper: card database lifetime expired on create",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.cards, nil).Once()
+
+				mocks.logins.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.notes.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.cards.EXPECT().
+					Create(mock.Anything).
+					Return(database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "keeper: error creating card",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceKeeper,
+			Data:         keeperJSON,
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.cards, nil).Once()
+
+				mocks.logins.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.notes.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.cards.EXPECT().
+					Create(mock.Anything).
+					Return(io.EOF).Once()
+			},
+		},
+		{
+			Name:   "keeper: success",
+			UserID: uuid.NameSpaceDNS,
+			Source: service.ImportSourceKeeper,
+			Data:   keeperJSON,
+			Expected: service.ImportResult{
+				Logins: 1,
+				Notes:  1,
+				Cards:  1,
+			},
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.cards, nil).Once()
+
+				mocks.logins.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.notes.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.cards.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+			},
+		},
+		{
+			Name:         "bitwarden: invalid JSON",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Source:       service.ImportSourceBitwarden,
+			Data:         `not json`,
+		},
+		{
+			Name:   "bitwarden: card with invalid expiry month",
+			UserID: uuid.NameSpaceDNS,
+			Source: service.ImportSourceBitwarden,
+			Data:   bitwardenInvalidCardJSON,
+			Expected: service.ImportResult{
+				Errors: []string{`failed to import card "bad card", expiry month is invalid: strconv.Atoi: parsing "not-a-number": invalid syntax`},
+			},
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.cards, nil).Once()
+			},
+		},
+		{
+			Name:   "bitwarden: success",
+			UserID: uuid.NameSpaceDNS,
+			Source: service.ImportSourceBitwarden,
+			Data:   bitwardenJSON,
+			Expected: service.ImportResult{
+				Logins: 1,
+				Notes:  1,
+				Cards:  1,
+			},
+			Setup: func(mocks *ImportMocks) {
+				mocks.loginProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.logins, nil).Once()
+				mocks.noteProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.notes, nil).Once()
+				mocks.cardProvider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(mocks.cards, nil).Once()
+
+				mocks.logins.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.notes.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+
+				mocks.cards.EXPECT().
+					Create(mock.Anything).
+					Return(nil).Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			mocks := &ImportMocks{
+				logins:        NewMockLoginRepository(t),
+				loginProvider: NewMockRepositoryProvider[service.LoginRepository](t),
+				notes:         NewMockNoteRepository(t),
+				noteProvider:  NewMockRepositoryProvider[service.NoteRepository](t),
+				cards:         NewMockCardRepository(t),
+				cardProvider:  NewMockRepositoryProvider[service.CardRepository](t),
+			}
+
+			if tc.Setup != nil {
+				tc.Setup(mocks)
+			}
+
+			actual, err := service.NewToolService(mocks.loginProvider, mocks.noteProvider, mocks.cardProvider).Import(tc.UserID, tc.Source, strings.NewReader(tc.Data))
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return

@@ -89,11 +89,7 @@ func (svc *CardService) Create(userID uuid.UUID, card Card) error {
 		CVV:         card.CVV,
 		CreatedAt:   card.CreatedAt,
 		Name:        card.Name,
-	}
-
-	cc := creditcard.Card{Number: card.Number}
-	if err = cc.Method(); err == nil {
-		record.Issuer = cc.Company.Short
+		Issuer:      cardIssuer(card.Number),
 	}
 
 	err = repo.Create(record)
@@ -205,4 +201,13 @@ func (svc *CardService) Get(userID uuid.UUID, cardID uuid.UUID) (Card, error) {
 		Name:        result.Name,
 		Issuer:      result.Issuer,
 	}, nil
+}
+
+func cardIssuer(number string) string {
+	cc := creditcard.Card{Number: number}
+	if err := cc.Method(); err == nil {
+		return cc.Company.Short
+	}
+
+	return ""
 }

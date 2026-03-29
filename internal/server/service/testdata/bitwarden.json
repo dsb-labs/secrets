@@ -1,0 +1,33 @@
+{
+  "items": [
+    {
+      "type": 1,
+      "name": "test login",
+      "creationDate": "2024-01-01T00:00:00Z",
+      "login": {
+        "username": "test",
+        "password": "secret",
+        "uris": [{"uri": "https://example.com"}]
+      }
+    },
+    {
+      "type": 2,
+      "name": "test note",
+      "creationDate": "2024-01-01T00:00:00Z",
+      "notes": "note content",
+      "fields": []
+    },
+    {
+      "type": 3,
+      "name": "test card",
+      "creationDate": "2024-01-01T00:00:00Z",
+      "card": {
+        "cardholderName": "test",
+        "number": "4111111111111111",
+        "expMonth": "1",
+        "expYear": "2025",
+        "code": "123"
+      }
+    }
+  ]
+}

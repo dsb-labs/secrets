@@ -1,0 +1,27 @@
+{
+  "Logins": [
+    {
+      "ID": "6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+      "Username": "test",
+      "Password": "test",
+      "Domains": ["test.com"]
+    }
+  ],
+  "Notes": [
+    {
+      "ID": "6ba7b811-9dad-11d1-80b4-00c04fd430c8",
+      "Name": "test",
+      "Content": "test content"
+    }
+  ],
+  "Cards": [
+    {
+      "ID": "6ba7b812-9dad-11d1-80b4-00c04fd430c8",
+      "HolderName": "test",
+      "Number": "4111111111111111",
+      "ExpiryMonth": 1,
+      "ExpiryYear": 2025,
+      "CVV": "123"
+    }
+  ]
+}

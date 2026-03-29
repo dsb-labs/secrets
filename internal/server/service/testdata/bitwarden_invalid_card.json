@@ -1,0 +1,16 @@
+{
+  "items": [
+    {
+      "type": 3,
+      "name": "bad card",
+      "creationDate": "2024-01-01T00:00:00Z",
+      "card": {
+        "cardholderName": "test",
+        "number": "4111111111111111",
+        "expMonth": "not-a-number",
+        "expYear": "2025",
+        "code": "123"
+      }
+    }
+  ]
+}
