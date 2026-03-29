@@ -35,6 +35,7 @@ func (h *AccountHandler) Register(mux *http.ServeMux) {
 	mux.Handle("POST /account/password", requireToken(h.ChangePasswordCallback))
 	mux.Handle("GET /account/delete", requireToken(h.Delete))
 	mux.Handle("POST /account/delete", requireToken(h.DeleteCallback))
+	mux.HandleFunc("GET /logout", h.Logout)
 }
 
 // Detail renders the account detail view.
@@ -245,6 +246,21 @@ func (h *AccountHandler) DeleteCallback(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "keeper",
+		Value:    "",
+		MaxAge:   -1,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+		Path:     "/",
+	})
+
+	redirect(w, r, "/login")
+}
+
+// Logout clears the session cookie and redirects to the login page.
+func (h *AccountHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "keeper",
 		Value:    "",

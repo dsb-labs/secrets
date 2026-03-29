@@ -45,6 +45,13 @@ templ detailContent(model ViewModel) {
 			}) {
 				@component.IconTrash("w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400")
 			}
+			@component.ListItem(component.ListItemProps{
+				Href:     "/logout",
+				Title:    "Sign out",
+				Subtitle: "End your current session",
+			}) {
+				@component.IconLogout("w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400")
+			}
 		</div>
 	</div>
 }
