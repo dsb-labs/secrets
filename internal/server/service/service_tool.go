@@ -61,6 +61,19 @@ var (
 	ErrInvalidImportSource = errors.New("invalid import source")
 )
 
+// ParseImportSource converts a string identifier to its corresponding ImportSource constant. Recognized values
+// are "keeper" and "bitwarden". Returns ErrInvalidImportSource for any other value.
+func ParseImportSource(s string) (ImportSource, error) {
+	switch s {
+	case "keeper":
+		return ImportSourceKeeper, nil
+	case "bitwarden":
+		return ImportSourceBitwarden, nil
+	default:
+		return 0, ErrInvalidImportSource
+	}
+}
+
 // NewToolService returns a new instance of the ToolService type that will query logins, cards and notes from the given
 // repository provider implementations.
 func NewToolService(logins RepositoryProvider[LoginRepository], notes RepositoryProvider[NoteRepository], cards RepositoryProvider[CardRepository]) *ToolService {

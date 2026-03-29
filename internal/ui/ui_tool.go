@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -27,6 +28,9 @@ type (
 	ToolService interface {
 		// Export should return all the specified user's data.
 		Export(accountID uuid.UUID) (service.Export, error)
+		// Import should import vault data for the specified user from the given reader, interpreting
+		// it according to the provided ImportSource.
+		Import(accountID uuid.UUID, source service.ImportSource, data io.Reader) (service.ImportResult, error)
 	}
 
 )
@@ -42,6 +46,8 @@ func (h *ToolHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /tools", requireToken(h.Index))
 	mux.Handle("GET /tools/export", requireToken(h.Export))
 	mux.Handle("POST /tools/export", requireToken(h.ExportCallback))
+	mux.Handle("GET /tools/import", requireToken(h.Import))
+	mux.Handle("POST /tools/import", requireToken(h.ImportCallback))
 }
 
 // Index renders the tools index view.
@@ -164,3 +170,87 @@ func (h *ToolHandler) ExportCallback(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(data)
 }
+
+// Import renders the import form view.
+func (h *ToolHandler) Import(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, http.StatusOK, toolview.Import, toolview.ImportViewModel{
+		DisplayName: account.DisplayName,
+	})
+}
+
+// ImportCallback handles a multipart form submission to import vault data. On success it renders the import
+// result view showing counts of imported records and any per-item errors.
+func (h *ToolHandler) ImportCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	model := toolview.ImportViewModel{
+		DisplayName: account.DisplayName,
+	}
+
+	if err = r.ParseMultipartForm(10 << 20); err != nil {
+		model.Error.Message = "Failed to read the uploaded file"
+		render(ctx, w, http.StatusUnprocessableEntity, toolview.Import, model)
+		return
+	}
+
+	source, err := service.ParseImportSource(r.FormValue("source"))
+	if err != nil {
+		model.Validation.Errors = map[string]string{"source": "Invalid import source selected"}
+		render(ctx, w, http.StatusUnprocessableEntity, toolview.Import, model)
+		return
+	}
+
+	file, _, err := r.FormFile("file")
+	switch {
+	case errors.Is(err, http.ErrMissingFile):
+		model.Validation.Errors = map[string]string{"file": "A file is required"}
+		render(ctx, w, http.StatusUnprocessableEntity, toolview.Import, model)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+	defer file.Close()
+
+	result, err := h.tools.Import(tkn.ID(), source, file)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		model.Error.Message = err.Error()
+		render(ctx, w, http.StatusUnprocessableEntity, toolview.Import, model)
+		return
+	}
+
+	render(ctx, w, http.StatusOK, toolview.ImportResult, toolview.ImportResultViewModel{
+		DisplayName: account.DisplayName,
+		Logins:      result.Logins,
+		Notes:       result.Notes,
+		Cards:       result.Cards,
+		Errors:      result.Errors,
+	})
+}
+

@@ -28,13 +28,20 @@ templ indexContent(model ViewModel) {
 		Subtitle: "Utilities for managing your data.",
 	})
 	<div class="p-4 sm:p-8">
-		<div class="max-w-2xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+		<div class="max-w-2xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden divide-y divide-gray-200 dark:divide-gray-700">
 			@component.ListItem(component.ListItemProps{
 				Href:     "/tools/export",
 				Title:    "Export data",
 				Subtitle: "Download all your stored data as JSON",
 			}) {
 				@component.IconDownload("w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400")
+			}
+			@component.ListItem(component.ListItemProps{
+				Href:     "/tools/import",
+				Title:    "Import data",
+				Subtitle: "Upload vault data from another source",
+			}) {
+				@component.IconUpload("w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400")
 			}
 		</div>
 	</div>

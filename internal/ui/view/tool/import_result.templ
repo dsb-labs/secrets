@@ -1,0 +1,95 @@
+package tool
+
+import (
+	"fmt"
+
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/layout"
+)
+
+type (
+	// The ImportResultViewModel type contains fields used to configure the import result view.
+	ImportResultViewModel struct {
+		// The display name of the authenticated user.
+		DisplayName string
+		// Logins is the number of login records successfully imported.
+		Logins int
+		// Notes is the number of note records successfully imported.
+		Notes int
+		// Cards is the number of payment card records successfully imported.
+		Cards int
+		// Errors contains any per-item errors encountered during import.
+		Errors []string
+	}
+)
+
+// ImportResult returns the import result view using the provided view model values.
+templ ImportResult(model ImportResultViewModel) {
+	@layout.Authenticated(layout.AuthenticatedViewModel{
+		Title:       "Import Data",
+		CurrentPage: "tools",
+		DisplayName: model.DisplayName,
+	}, importResultContent(model))
+}
+
+templ importResultContent(model ImportResultViewModel) {
+	<div class="p-4 sm:p-8">
+		<div class="mb-6">
+			<a
+				href="/tools"
+				class="inline-flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+			>
+				@component.IconArrowLeft("w-4 h-4")
+				Back to tools
+			</a>
+		</div>
+		@component.Card(component.CardSlots{Header: importResultHeader(), Body: importResultBody(model)})
+	</div>
+}
+
+templ importResultHeader() {
+	<div class="flex items-center gap-2">
+		@component.IconUpload("w-4 h-4 text-gray-500 dark:text-gray-400")
+		<h2 class="text-base font-semibold text-gray-900 dark:text-white">Import complete</h2>
+	</div>
+}
+
+templ importResultBody(model ImportResultViewModel) {
+	<div class="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 px-4 py-3">
+		<div class="flex gap-3">
+			@component.IconCheck("w-5 h-5 text-green-600 dark:text-green-400 shrink-0 mt-0.5")
+			<p class="text-sm text-green-700 dark:text-green-400">
+				Import finished successfully.
+			</p>
+		</div>
+	</div>
+	<dl class="divide-y divide-gray-200 dark:divide-gray-700 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+		<div class="flex items-center justify-between px-4 py-3">
+			<dt class="text-sm text-gray-500 dark:text-gray-400">Logins</dt>
+			<dd class="text-sm font-semibold text-gray-900 dark:text-white">{ fmt.Sprintf("%d", model.Logins) }</dd>
+		</div>
+		<div class="flex items-center justify-between px-4 py-3">
+			<dt class="text-sm text-gray-500 dark:text-gray-400">Notes</dt>
+			<dd class="text-sm font-semibold text-gray-900 dark:text-white">{ fmt.Sprintf("%d", model.Notes) }</dd>
+		</div>
+		<div class="flex items-center justify-between px-4 py-3">
+			<dt class="text-sm text-gray-500 dark:text-gray-400">Cards</dt>
+			<dd class="text-sm font-semibold text-gray-900 dark:text-white">{ fmt.Sprintf("%d", model.Cards) }</dd>
+		</div>
+	</dl>
+	if len(model.Errors) > 0 {
+		<div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-4 py-3">
+			<div class="flex gap-3">
+				@component.IconWarning("w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5")
+				<div class="space-y-1">
+					<p class="text-sm font-medium text-amber-700 dark:text-amber-400">Some items could not be imported:</p>
+					<ul class="list-disc list-inside space-y-0.5">
+						for _, e := range model.Errors {
+							<li class="text-sm text-amber-700 dark:text-amber-400">{ e }</li>
+						}
+					</ul>
+				</div>
+			</div>
+		</div>
+	}
+}
