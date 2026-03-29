@@ -82,21 +82,24 @@ func Run(ctx context.Context, config Config) error {
 	loginSvc := service.NewLoginService(loginRepo)
 	noteSvc := service.NewNoteService(noteRepo)
 	cardSvc := service.NewCardService(cardRepo)
+	toolSvc := service.NewToolService(loginRepo, noteRepo, cardRepo)
 
+	// API handlers.
 	api.NewAuthAPI(authSvc).Register(mux)
 	api.NewAccountAPI(accountSvc).Register(mux)
 	api.NewLoginAPI(loginSvc).Register(mux)
 	api.NewNoteAPI(noteSvc).Register(mux)
-	api.NewToolAPI(service.NewToolService(loginRepo, noteRepo, cardRepo)).Register(mux)
+	api.NewToolAPI(toolSvc).Register(mux)
 	api.NewCardAPI(cardSvc).Register(mux)
 
+	// UI handlers.
 	ui.NewAuthHandler(authSvc).Register(mux)
 	ui.NewDashboardHandler(accountSvc).Register(mux)
 	ui.NewAccountHandler(accountSvc).Register(mux)
 	ui.NewLoginHandler(accountSvc, loginSvc).Register(mux)
 	ui.NewNoteHandler(accountSvc, noteSvc).Register(mux)
 	ui.NewCardHandler(accountSvc, cardSvc).Register(mux)
-	ui.NewToolHandler(accountSvc).Register(mux)
+	ui.NewToolHandler(accountSvc, toolSvc).Register(mux)
 	ui.NewAssetHandler().Register(mux)
 	ui.NewNotFoundHandler().Register(mux)
 
