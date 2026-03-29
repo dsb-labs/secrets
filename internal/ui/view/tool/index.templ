@@ -1,0 +1,41 @@
+package tool
+
+import (
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/layout"
+)
+
+type (
+	// The ViewModel type contains fields used to configure the tools index view.
+	ViewModel struct {
+		// The display name of the authenticated user.
+		DisplayName string
+	}
+)
+
+// Index returns the tools index view using the provided view model values.
+templ Index(model ViewModel) {
+	@layout.Authenticated(layout.AuthenticatedViewModel{
+		Title:       "Tools",
+		CurrentPage: "tools",
+		DisplayName: model.DisplayName,
+	}, indexContent(model))
+}
+
+templ indexContent(model ViewModel) {
+	@component.PageHeader(component.PageHeaderProps{
+		Title:    "Tools",
+		Subtitle: "Utilities for managing your data.",
+	})
+	<div class="p-4 sm:p-8">
+		<div class="max-w-2xl bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm overflow-hidden">
+			@component.ListItem(component.ListItemProps{
+				Href:     "/tools/export",
+				Title:    "Export data",
+				Subtitle: "Download all your stored data as JSON",
+			}) {
+				@component.IconDownload("w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400")
+			}
+		</div>
+	</div>
+}
