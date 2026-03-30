@@ -1,8 +1,10 @@
 package ui
 
 import (
+	"errors"
 	"net/http"
 
+	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
 	"github.com/davidsbond/keeper/internal/ui/view/dashboard"
 	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
@@ -11,12 +13,13 @@ import (
 // The DashboardHandler type is responsible for serving web interface pages regarding the user dashboard.
 type DashboardHandler struct {
 	accounts AccountService
+	logins   LoginService
 }
 
 // NewDashboardHandler returns a new instance of the DashboardHandler type that will serve dashboard UIs using
-// the provided AccountService implementation.
-func NewDashboardHandler(accounts AccountService) *DashboardHandler {
-	return &DashboardHandler{accounts: accounts}
+// the provided AccountService and LoginService implementations.
+func NewDashboardHandler(accounts AccountService, logins LoginService) *DashboardHandler {
+	return &DashboardHandler{accounts: accounts, logins: logins}
 }
 
 // Register HTTP endpoints onto the provided http.ServeMux.
@@ -37,7 +40,20 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	duplicates, err := h.logins.ListReusedPasswords(tkn.ID())
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
 	render(ctx, w, http.StatusOK, dashboard.Dashboard, dashboard.ViewModel{
-		DisplayName: account.DisplayName,
+		DisplayName:            account.DisplayName,
+		DuplicatePasswordCount: len(duplicates),
 	})
 }

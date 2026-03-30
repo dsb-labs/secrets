@@ -182,9 +182,9 @@ func (svc *LoginService) Get(userID uuid.UUID, loginID uuid.UUID) (Login, error)
 	}, nil
 }
 
-// DuplicatePasswords returns all login records that reuse a password. Returns ErrReauthenticate if the underlying
+// ListReusedPasswords returns all login records that reuse a password. Returns ErrReauthenticate if the underlying
 // individual user database's lifetime has expired and the caller must reauthenticate.
-func (svc *LoginService) DuplicatePasswords(userID uuid.UUID) ([]Login, error) {
+func (svc *LoginService) ListReusedPasswords(userID uuid.UUID) ([]Login, error) {
 	repo, err := svc.logins.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):

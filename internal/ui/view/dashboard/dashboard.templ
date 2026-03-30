@@ -1,6 +1,8 @@
 package dashboard
 
 import (
+	"strconv"
+
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
 )
@@ -10,6 +12,8 @@ type (
 	ViewModel struct {
 		// The display name of the authenticated user.
 		DisplayName string
+		// The number of logins that share a password with at least one other login.
+		DuplicatePasswordCount int
 	}
 )
 
@@ -25,6 +29,30 @@ templ Dashboard(model ViewModel) {
 templ content(model ViewModel) {
 	@component.PageHeader(component.PageHeaderProps{
 		Title:    "Welcome back, " + model.DisplayName,
-		Subtitle: "Select a section from the sidebar to get started.",
+		Subtitle: "Here's an overview of your vault.",
 	})
+	<div class="p-4 sm:p-8">
+		<dl class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+			@reusedPasswordsStat(model.DuplicatePasswordCount)
+		</dl>
+	</div>
+}
+
+templ reusedPasswordsStat(count int) {
+	<a
+		href="/logins/reused"
+		class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800/75 dark:ring-1 dark:ring-inset dark:ring-white/10 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+	>
+		<div>
+			<dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Reused passwords</dt>
+			<dd
+				class={
+					"mt-1 text-3xl font-semibold tracking-tight",
+					templ.KV("text-amber-500", count > 0),
+					templ.KV("text-gray-900 dark:text-white", count == 0),
+				}
+			>{ strconv.Itoa(count) }</dd>
+		</div>
+		@component.IconChevronRight("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
+	</a>
 }

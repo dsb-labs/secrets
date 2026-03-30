@@ -33,6 +33,8 @@ type (
 		Get(accountID uuid.UUID, loginID uuid.UUID) (service.Login, error)
 		// Delete should remove the login record associated with the given user and login identifiers.
 		Delete(accountID uuid.UUID, loginID uuid.UUID) error
+		// ListReusedPasswords should return all logins that share a password with at least one other login.
+		ListReusedPasswords(accountID uuid.UUID) ([]service.Login, error)
 	}
 )
 

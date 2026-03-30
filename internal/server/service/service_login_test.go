@@ -369,7 +369,7 @@ func TestLoginService_Delete(t *testing.T) {
 	}
 }
 
-func TestLoginService_DuplicatePasswords(t *testing.T) {
+func TestLoginService_ListReusedPasswords(t *testing.T) {
 	t.Parallel()
 
 	tt := []struct {
@@ -472,7 +472,7 @@ func TestLoginService_DuplicatePasswords(t *testing.T) {
 				tc.Setup(logins, provider)
 			}
 
-			actual, err := service.NewLoginService(provider).DuplicatePasswords(tc.UserID)
+			actual, err := service.NewLoginService(provider).ListReusedPasswords(tc.UserID)
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return

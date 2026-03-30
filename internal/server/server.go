@@ -94,7 +94,7 @@ func Run(ctx context.Context, config Config) error {
 
 	// UI handlers.
 	ui.NewAuthHandler(authSvc).Register(mux)
-	ui.NewDashboardHandler(accountSvc).Register(mux)
+	ui.NewDashboardHandler(accountSvc, loginSvc).Register(mux)
 	ui.NewAccountHandler(accountSvc).Register(mux)
 	ui.NewLoginHandler(accountSvc, loginSvc).Register(mux)
 	ui.NewNoteHandler(accountSvc, noteSvc).Register(mux)
