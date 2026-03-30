@@ -2,6 +2,7 @@ package login
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
@@ -22,6 +23,8 @@ type (
 		Domains []string
 		// The formatted creation timestamp.
 		CreatedAt string
+		// The number of other logins that share the same password as this one.
+		SharedPasswordCount int
 	}
 )
 
@@ -45,7 +48,14 @@ templ detailContent(model DetailViewModel) {
 				Back to logins
 			</a>
 		</div>
-		@component.Card(component.CardSlots{Header: loginHeader(model), Body: loginBody(model), Footer: loginFooter(model)})
+		<div class="flex flex-col lg:flex-row lg:items-start gap-6">
+			<div class="w-full lg:max-w-2xl min-w-0">
+				@component.Card(component.CardSlots{Header: loginHeader(model), Body: loginBody(model), Footer: loginFooter(model)})
+			</div>
+			<dl class="w-full lg:w-64 shrink-0">
+				@sharedPasswordStat(model.SharedPasswordCount)
+			</dl>
+		</div>
 		@component.ConfirmDialog(component.ConfirmDialogProps{
 			ID:          "delete-dialog",
 			Title:       "Delete login",
@@ -54,6 +64,25 @@ templ detailContent(model DetailViewModel) {
 			Action:      fmt.Sprintf("/logins/%s/delete", model.ID),
 		})
 	</div>
+}
+
+templ sharedPasswordStat(count int) {
+	<a
+		href="/logins/reused"
+		class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800/75 dark:ring-1 dark:ring-inset dark:ring-white/10 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+	>
+		<div>
+			<dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Logins using this password</dt>
+			<dd
+				class={
+					"mt-1 text-3xl font-semibold tracking-tight",
+					templ.KV("text-amber-500", count > 0),
+					templ.KV("text-gray-900 dark:text-white", count == 0),
+				}
+			>{ strconv.Itoa(count) }</dd>
+		</div>
+		@component.IconChevronRight("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
+	</a>
 }
 
 templ loginHeader(model DetailViewModel) {
@@ -115,7 +144,12 @@ templ loginBody(model DetailViewModel) {
 							class="w-5 h-5 rounded shrink-0"
 							onerror="this.style.display='none'"
 						/>
-						<span class="text-sm text-gray-900 dark:text-white">{ domain }</span>
+						<a
+							href={ templ.SafeURL(domain) }
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+						>{ domain }</a>
 					</li>
 				}
 			</ul>

@@ -35,6 +35,8 @@ type (
 		Delete(accountID uuid.UUID, loginID uuid.UUID) error
 		// ListReusedPasswords should return all logins that share a password with at least one other login.
 		ListReusedPasswords(accountID uuid.UUID) ([]service.Login, error)
+		// ListSamePassword should return all logins that share the same password as the given login.
+		ListSamePassword(accountID uuid.UUID, loginID uuid.UUID) ([]service.Login, error)
 	}
 )
 
@@ -134,13 +136,26 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	shared, err := h.logins.ListSamePassword(tkn.ID(), loginID)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
 	render(ctx, w, http.StatusOK, loginview.Detail, loginview.DetailViewModel{
-		DisplayName: account.DisplayName,
-		ID:          login.ID.String(),
-		Username:    login.Username,
-		Password:    login.Password,
-		Domains:     login.Domains,
-		CreatedAt:   login.CreatedAt.Format("2 January 2006 at 15:04"),
+		DisplayName:         account.DisplayName,
+		ID:                  login.ID.String(),
+		Username:            login.Username,
+		Password:            login.Password,
+		Domains:             login.Domains,
+		CreatedAt:           login.CreatedAt.Format("2 January 2006 at 15:04"),
+		SharedPasswordCount: len(shared),
 	})
 }
 
