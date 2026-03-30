@@ -221,3 +221,53 @@ func (svc *LoginService) ListReusedPasswords(userID uuid.UUID) ([]Login, error) 
 
 	return out, nil
 }
+
+// ListSamePassword returns all login records that share the same password with the specified login. Returns 
+// ErrReauthenticate if the underlying individual user database's lifetime has expired and the caller must reauthenticate 
+// or ErrLoginNotFound if the specified login record does not exist.
+func (svc *LoginService) ListSamePassword(userID, loginID uuid.UUID) ([]Login, error) {
+	repo, err := svc.logins.For(userID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return nil, ErrReauthenticate
+	case err != nil:
+		return nil, fmt.Errorf("failed to get database for user: %w", err)
+	}
+
+	login, err := repo.Get(loginID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return nil, ErrReauthenticate
+	case errors.Is(err, database.ErrLoginNotFound):
+		return nil, ErrLoginNotFound
+	case err != nil:
+		return nil, fmt.Errorf("failed to get login record: %w", err)
+	}
+
+	results, err := repo.List()
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return nil, ErrReauthenticate
+	case err != nil:
+		return nil, fmt.Errorf("failed to list login records: %w", err)
+	}
+
+	out := make([]Login, 0)
+	for _, result := range results {
+		if result.ID == login.ID {
+			continue
+		}
+
+		if result.Password == login.Password {
+			out = append(out, Login{
+				ID:        result.ID,
+				Username:  result.Username,
+				Password:  result.Password,
+				Domains:   result.Domains,
+				CreatedAt: result.CreatedAt,
+			})
+		}
+	}
+
+	return out, nil
+}

@@ -484,6 +484,186 @@ func TestLoginService_ListReusedPasswords(t *testing.T) {
 	}
 }
 
+func TestLoginService_ListSamePassword(t *testing.T) {
+	t.Parallel()
+
+	tt := []struct {
+		Name         string
+		UserID       uuid.UUID
+		LoginID      uuid.UUID
+		Expected     []service.Login
+		ExpectsError bool
+		Setup        func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository])
+	}{
+		{
+			Name:         "error if database lifetime has expired",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "error when getting user database fails",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(nil, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "error if database lifetime has expired on get",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Login{}, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "error if login does not exist",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Login{}, database.ErrLoginNotFound).Once()
+			},
+		},
+		{
+			Name:         "error when getting login",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Login{}, io.EOF).Once()
+			},
+		},
+		{
+			Name:         "error if database lifetime has expired on list",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Login{ID: uuid.NameSpaceDNS, Password: "shared"}, nil).Once()
+
+				logins.EXPECT().List().Return(nil, database.ErrClosed).Once()
+			},
+		},
+		{
+			Name:         "error when listing logins",
+			ExpectsError: true,
+			UserID:       uuid.NameSpaceDNS,
+			LoginID:      uuid.NameSpaceDNS,
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Login{ID: uuid.NameSpaceDNS, Password: "shared"}, nil).Once()
+
+				logins.EXPECT().List().Return(nil, io.EOF).Once()
+			},
+		},
+		{
+			Name:     "returns empty when no other logins share the same password",
+			UserID:   uuid.NameSpaceDNS,
+			LoginID:  uuid.NameSpaceDNS,
+			Expected: []service.Login{},
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Login{ID: uuid.NameSpaceDNS, Username: "alice", Password: "unique", Domains: []string{"example.com"}}, nil).Once()
+
+				expected := []database.Login{
+					{ID: uuid.NameSpaceDNS, Username: "alice", Password: "unique", Domains: []string{"example.com"}},
+					{ID: uuid.NameSpaceURL, Username: "bob", Password: "different", Domains: []string{"example.org"}},
+				}
+
+				logins.EXPECT().List().Return(expected, nil).Once()
+			},
+		},
+		{
+			Name:    "returns other logins that share the same password",
+			UserID:  uuid.NameSpaceDNS,
+			LoginID: uuid.NameSpaceDNS,
+			Expected: []service.Login{
+				{ID: uuid.NameSpaceURL, Username: "bob", Password: "shared", Domains: []string{"example.org"}},
+			},
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				logins.EXPECT().
+					Get(uuid.NameSpaceDNS).
+					Return(database.Login{ID: uuid.NameSpaceDNS, Username: "alice", Password: "shared", Domains: []string{"example.com"}}, nil).Once()
+
+				expected := []database.Login{
+					{ID: uuid.NameSpaceDNS, Username: "alice", Password: "shared", Domains: []string{"example.com"}},
+					{ID: uuid.NameSpaceURL, Username: "bob", Password: "shared", Domains: []string{"example.org"}},
+					{ID: uuid.NameSpaceOID, Username: "carol", Password: "unique", Domains: []string{"example.net"}},
+				}
+
+				logins.EXPECT().List().Return(expected, nil).Once()
+			},
+		},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.Name, func(t *testing.T) {
+			logins := NewMockLoginRepository(t)
+			provider := NewMockRepositoryProvider[service.LoginRepository](t)
+
+			if tc.Setup != nil {
+				tc.Setup(logins, provider)
+			}
+
+			actual, err := service.NewLoginService(provider).ListSamePassword(tc.UserID, tc.LoginID)
+			if tc.ExpectsError {
+				require.Error(t, err)
+				return
+			}
+
+			require.NoError(t, err)
+			assert.ElementsMatch(t, tc.Expected, actual)
+		})
+	}
+}
+
 func TestLoginService_Get(t *testing.T) {
 	t.Parallel()
 
