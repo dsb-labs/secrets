@@ -1,0 +1,72 @@
+package login
+
+import (
+	"strconv"
+	"strings"
+
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/layout"
+)
+
+type (
+	// The ReusedViewModel type contains fields used to configure the reused passwords view.
+	ReusedViewModel struct {
+		// The display name of the authenticated user.
+		DisplayName string
+		// The list of logins that share a password with at least one other login.
+		Logins []Item
+	}
+)
+
+// Reused returns the reused passwords view using the provided view model values.
+templ Reused(model ReusedViewModel) {
+	@layout.Authenticated(layout.AuthenticatedViewModel{
+		Title:       "Reused Passwords",
+		CurrentPage: "login",
+		DisplayName: model.DisplayName,
+	}, reusedContent(model))
+}
+
+templ reusedContent(model ReusedViewModel) {
+	<div>
+		@component.PageHeader(component.PageHeaderProps{
+			Title:    strconv.Itoa(len(model.Logins)) + " reused passwords",
+			Subtitle: "Logins sharing a password with at least one other.",
+		})
+		<div class="px-4 sm:px-8 py-6">
+			if len(model.Logins) == 0 {
+				@component.EmptyState(component.EmptyStateProps{
+					Title:       "No reused passwords",
+					Description: "None of your logins share a password with another.",
+				}) {
+					@component.IconKey("w-6 h-6 text-gray-400 dark:text-gray-500")
+				}
+			} else {
+				<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
+					for _, item := range model.Logins {
+						@reusedRow(item)
+					}
+				</div>
+			}
+		</div>
+	</div>
+}
+
+templ reusedRow(item Item) {
+	@component.ListItem(component.ListItemProps{
+		Href:     "/logins/" + item.ID,
+		Title:    item.Username,
+		Subtitle: strings.Join(item.Domains, ", "),
+	}) {
+		if len(item.Domains) > 0 {
+			<img
+				src={ "https://www.google.com/s2/favicons?domain=" + item.Domains[0] + "&sz=32" }
+				alt=""
+				class="w-5 h-5 rounded shrink-0"
+				onerror="this.style.display='none'"
+			/>
+		} else {
+			@component.IconKey("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
+		}
+	}
+}

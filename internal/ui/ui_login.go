@@ -51,6 +51,7 @@ func NewLoginHandler(accounts AccountService, logins LoginService) *LoginHandler
 func (h *LoginHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /logins", requireToken(h.List))
 	mux.Handle("GET /logins/new", requireToken(h.Create))
+	mux.Handle("GET /logins/reused", requireToken(h.Reused))
 	mux.Handle("POST /logins", requireToken(h.CreateCallback))
 	mux.Handle("GET /logins/{id}", requireToken(h.Detail))
 	mux.Handle("POST /logins/{id}/delete", requireToken(h.Delete))
@@ -100,6 +101,46 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 		DisplayName: account.DisplayName,
 		Logins:      items,
 		Query:       query,
+	})
+}
+
+// Reused renders the reused passwords view, listing all logins that share a password with at least one other.
+func (h *LoginHandler) Reused(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	results, err := h.logins.ListReusedPasswords(tkn.ID())
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	items := make([]loginview.Item, len(results))
+	for i, l := range results {
+		items[i] = loginview.Item{
+			ID:       l.ID.String(),
+			Username: l.Username,
+			Domains:  l.Domains,
+		}
+	}
+
+	render(ctx, w, http.StatusOK, loginview.Reused, loginview.ReusedViewModel{
+		DisplayName: account.DisplayName,
+		Logins:      items,
 	})
 }
 
