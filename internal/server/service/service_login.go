@@ -181,3 +181,43 @@ func (svc *LoginService) Get(userID uuid.UUID, loginID uuid.UUID) (Login, error)
 		CreatedAt: result.CreatedAt,
 	}, nil
 }
+
+// DuplicatePasswords returns all login records that reuse a password. Returns ErrReauthenticate if the underlying
+// individual user database's lifetime has expired and the caller must reauthenticate.
+func (svc *LoginService) DuplicatePasswords(userID uuid.UUID) ([]Login, error) {
+	repo, err := svc.logins.For(userID)
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return nil, ErrReauthenticate
+	case err != nil:
+		return nil, fmt.Errorf("failed to get database for user: %w", err)
+	}
+
+	results, err := repo.List()
+	switch {
+	case errors.Is(err, database.ErrClosed):
+		return nil, ErrReauthenticate
+	case err != nil:
+		return nil, fmt.Errorf("failed to list login records: %w", err)
+	}
+
+	logins := make(map[string][]Login, len(results))
+	for _, login := range results {
+		logins[login.Password] = append(logins[login.Password], Login{
+			ID:        login.ID,
+			Username:  login.Username,
+			Password:  login.Password,
+			Domains:   login.Domains,
+			CreatedAt: login.CreatedAt,
+		})
+	}
+
+	out := make([]Login, 0)
+	for _, group := range logins {
+		if len(group) > 1 {
+			out = append(out, group...)
+		}
+	}
+
+	return out, nil
+}
