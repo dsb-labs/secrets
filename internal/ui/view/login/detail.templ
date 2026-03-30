@@ -163,7 +163,7 @@ templ loginBody(model DetailViewModel) {
 			<label class="block text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Domains</label>
 			<ul class="space-y-2">
 				for _, domain := range model.Domains {
-					<li class="flex items-center gap-2.5">
+					<li class="flex items-center gap-2.5 min-w-0">
 						<img
 							src={ "https://www.google.com/s2/favicons?domain=" + domain + "&sz=32" }
 							alt=""
@@ -174,7 +174,7 @@ templ loginBody(model DetailViewModel) {
 							href={ templ.SafeURL(domain) }
 							target="_blank"
 							rel="noopener noreferrer"
-							class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+							class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline truncate min-w-0"
 						>{ domain }</a>
 					</li>
 				}
