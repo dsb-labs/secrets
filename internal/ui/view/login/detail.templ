@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/davidsbond/keeper/internal/server/password"
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
 	"github.com/davidsbond/keeper/internal/ui/script"
@@ -26,6 +27,8 @@ type (
 		CreatedAt string
 		// The number of other logins that share the same password as this one.
 		SharedPasswordCount int
+		// The strength rating of the login's password.
+		PasswordRating password.Rating
 	}
 )
 
@@ -58,8 +61,9 @@ templ detailContent(model DetailViewModel) {
 			<div class="w-full lg:max-w-2xl min-w-0">
 				@component.Card(component.CardSlots{Header: loginHeader(model), Body: loginBody(model), Footer: loginFooter(model)})
 			</div>
-			<dl class="w-full lg:w-64 shrink-0">
+			<dl class="w-full lg:w-64 shrink-0 space-y-4">
 				@sharedPasswordStat(model.SharedPasswordCount)
+				@passwordRatingStat(model.PasswordRating)
 			</dl>
 		</div>
 		@component.ConfirmDialog(component.ConfirmDialogProps{
@@ -89,6 +93,22 @@ templ sharedPasswordStat(count int) {
 		</div>
 		@component.IconChevronRight("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
 	</a>
+}
+
+templ passwordRatingStat(rating password.Rating) {
+	<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800/75 dark:ring-1 dark:ring-inset dark:ring-white/10">
+		<dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Password strength</dt>
+		<dd
+			class={
+				"mt-1 text-2xl font-semibold tracking-tight",
+				templ.KV("text-red-500", rating == password.RatingVeryWeak),
+				templ.KV("text-amber-500", rating == password.RatingWeak),
+				templ.KV("text-yellow-500", rating == password.RatingGood),
+				templ.KV("text-green-500", rating == password.RatingStrong),
+				templ.KV("text-emerald-600 dark:text-emerald-400", rating == password.RatingVeryStrong),
+			}
+		>{ rating.String() }</dd>
+	</div>
 }
 
 templ loginHeader(model DetailViewModel) {

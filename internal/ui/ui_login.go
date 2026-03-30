@@ -10,6 +10,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
+	"github.com/davidsbond/keeper/internal/server/password"
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
 	loginview "github.com/davidsbond/keeper/internal/ui/view/login"
@@ -156,6 +157,7 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		Domains:             login.Domains,
 		CreatedAt:           login.CreatedAt.Format("2 January 2006 at 15:04"),
 		SharedPasswordCount: len(shared),
+		PasswordRating:      password.Rate(login.Password),
 	})
 }
 
