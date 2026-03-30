@@ -5,6 +5,7 @@ import (
 
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
+	"github.com/davidsbond/keeper/internal/ui/script"
 )
 
 type (
@@ -39,6 +40,11 @@ templ Detail(model DetailViewModel) {
 		Title:       "Card",
 		CurrentPage: "cards",
 		DisplayName: model.DisplayName,
+		Scripts: []templ.Component{
+			script.TogglePassword(),
+			script.ShowConfirmDialog(),
+			script.CopyToClipboard(),
+		},
 	}, detailContent(model))
 }
 

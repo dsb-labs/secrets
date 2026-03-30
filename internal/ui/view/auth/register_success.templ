@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
+	"github.com/davidsbond/keeper/internal/ui/script"
 )
 
 type (
@@ -17,7 +18,7 @@ type (
 
 // RegisterSuccess returns the account creation success view using the provided view model values.
 templ RegisterSuccess(model RegisterSuccessViewModel) {
-	@layout.Main("Account Created", registerSuccess(model))
+	@layout.Main("Account Created", registerSuccess(model), script.CopyToClipboard())
 }
 
 templ registerSuccess(model RegisterSuccessViewModel) {

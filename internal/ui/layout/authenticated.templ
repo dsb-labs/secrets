@@ -1,6 +1,9 @@
 package layout
 
-import "github.com/davidsbond/keeper/internal/ui/component"
+import (
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/script"
+)
 
 type (
 	// The AuthenticatedViewModel type contains fields used to configure the authenticated page layout.
@@ -11,12 +14,14 @@ type (
 		CurrentPage string
 		// The display name of the authenticated user, shown at the bottom of the sidebar.
 		DisplayName string
+		// Scripts contains any page-specific JavaScript components to render before </body>.
+		Scripts []templ.Component
 	}
 )
 
 // Authenticated returns a page layout for authenticated users, wrapping the provided view in a shell with a sidebar.
 templ Authenticated(model AuthenticatedViewModel, view templ.Component) {
-	@Main(model.Title, authenticatedShell(model, view))
+	@Main(model.Title, authenticatedShell(model, view), authenticatedScripts(model.Scripts))
 }
 
 templ authenticatedShell(model AuthenticatedViewModel, view templ.Component) {
@@ -46,4 +51,11 @@ templ authenticatedShell(model AuthenticatedViewModel, view templ.Component) {
 			@view
 		</div>
 	</div>
+}
+
+templ authenticatedScripts(viewScripts []templ.Component) {
+	@script.ToggleMobileNav()
+	for _, s := range viewScripts {
+		@s
+	}
 }

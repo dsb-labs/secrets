@@ -5,6 +5,7 @@ import (
 
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
+	"github.com/davidsbond/keeper/internal/ui/script"
 )
 
 type (
@@ -29,6 +30,11 @@ templ Detail(model DetailViewModel) {
 		Title:       "Note",
 		CurrentPage: "notes",
 		DisplayName: model.DisplayName,
+		Scripts: []templ.Component{
+			script.ToggleSecretField(),
+			script.ShowConfirmDialog(),
+			script.CopyToClipboard(),
+		},
 	}, detailContent(model))
 }
 

@@ -1,9 +1,7 @@
 package layout
 
-import "github.com/davidsbond/keeper/internal/ui/component"
-
 // Main returns the main page layout.
-templ Main(title string, view templ.Component) {
+templ Main(title string, view templ.Component, scripts ...templ.Component) {
 	<!DOCTYPE html>
 	<html lang="en" class="h-full">
 		<head>
@@ -17,7 +15,9 @@ templ Main(title string, view templ.Component) {
 			<main class="h-full">
 				@view
 			</main>
-			@component.Scripts()
+			for _, s := range scripts {
+				@s
+			}
 		</body>
 	</html>
 }
