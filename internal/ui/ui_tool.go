@@ -11,6 +11,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
+	"github.com/davidsbond/keeper/internal/server/password"
 	"github.com/davidsbond/keeper/internal/server/service"
 	"github.com/davidsbond/keeper/internal/server/token"
 	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
@@ -32,7 +33,6 @@ type (
 		// it according to the provided ImportSource.
 		Import(accountID uuid.UUID, source service.ImportSource, data io.Reader) (service.ImportResult, error)
 	}
-
 )
 
 // NewToolHandler returns a new instance of the ToolHandler type that will serve tool UIs using the provided
@@ -48,6 +48,8 @@ func (h *ToolHandler) Register(mux *http.ServeMux) {
 	mux.Handle("POST /tools/export", requireToken(h.ExportCallback))
 	mux.Handle("GET /tools/import", requireToken(h.Import))
 	mux.Handle("POST /tools/import", requireToken(h.ImportCallback))
+	mux.Handle("GET /tools/password-generator", requireToken(h.PasswordGenerator))
+	mux.Handle("POST /tools/password-generator", requireToken(h.PasswordGeneratorCallback))
 }
 
 // Index renders the tools index view.
@@ -254,3 +256,98 @@ func (h *ToolHandler) ImportCallback(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// PasswordGenerator renders the password generator view with default options.
+func (h *ToolHandler) PasswordGenerator(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	render(ctx, w, http.StatusOK, toolview.PasswordGenerator, toolview.PasswordGeneratorViewModel{
+		DisplayName: account.DisplayName,
+		Length:      16,
+		Uppercase:   true,
+		Lowercase:   true,
+		Numbers:     true,
+		Symbols:     true,
+	})
+}
+
+// The PasswordGeneratorForm type represents the form values submitted when calling ToolHandler.PasswordGeneratorCallback.
+type PasswordGeneratorForm struct {
+	// The desired password length.
+	Length int `form:"length"`
+	// Whether to include uppercase letters.
+	Uppercase bool `form:"uppercase"`
+	// Whether to include lowercase letters.
+	Lowercase bool `form:"lowercase"`
+	// Whether to include numeric digits.
+	Numbers bool `form:"numbers"`
+	// Whether to include symbols.
+	Symbols bool `form:"symbols"`
+}
+
+// Validate the form.
+func (f PasswordGeneratorForm) Validate() error {
+	return validation.ValidateStruct(&f,
+		validation.Field(&f.Length, validation.Required, validation.Min(1), validation.Max(128)),
+	)
+}
+
+// PasswordGeneratorCallback handles a password generation request. On success, it renders the generator view
+// with the generated password and its strength rating.
+func (h *ToolHandler) PasswordGeneratorCallback(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	form, err := decode[PasswordGeneratorForm](r)
+	model := toolview.PasswordGeneratorViewModel{
+		DisplayName: account.DisplayName,
+		Length:      form.Length,
+		Uppercase:   form.Uppercase,
+		Lowercase:   form.Lowercase,
+		Numbers:     form.Numbers,
+		Symbols:     form.Symbols,
+	}
+
+	if model.Length == 0 {
+		model.Length = 16
+	}
+
+	if _, ok := errors.AsType[validation.Errors](err); ok {
+		model.Error.Message = "Please enter a valid length between 1 and 128."
+		render(ctx, w, http.StatusUnprocessableEntity, toolview.PasswordGenerator, model)
+		return
+	}
+
+	generated, err := password.Generate(password.GenerateOptions{
+		Length:    form.Length,
+		Uppercase: form.Uppercase,
+		Lowercase: form.Lowercase,
+		Numbers:   form.Numbers,
+		Symbols:   form.Symbols,
+	})
+	if err != nil {
+		model.Error.Message = err.Error()
+		render(ctx, w, http.StatusUnprocessableEntity, toolview.PasswordGenerator, model)
+		return
+	}
+
+	model.Password = generated
+	model.Rating = password.Rate(generated)
+	render(ctx, w, http.StatusOK, toolview.PasswordGenerator, model)
+}

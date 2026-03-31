@@ -43,6 +43,13 @@ templ indexContent(model ViewModel) {
 			}) {
 				@component.IconUpload("w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400")
 			}
+			@component.ListItem(component.ListItemProps{
+				Href:     "/tools/password-generator",
+				Title:    "Password generator",
+				Subtitle: "Generate a secure password to your specification",
+			}) {
+				@component.IconKey("w-4 h-4 shrink-0 text-gray-500 dark:text-gray-400")
+			}
 		</div>
 	</div>
 }

@@ -2,8 +2,73 @@
 package password
 
 import (
+	"crypto/rand"
+	"errors"
+	"math/big"
+
 	"github.com/nbutton23/zxcvbn-go"
 )
+
+type (
+	// The GenerateOptions type contains fields used to configure password generation.
+	GenerateOptions struct {
+		// The desired length of the generated password.
+		Length int
+		// Whether to include uppercase letters.
+		Uppercase bool
+		// Whether to include lowercase letters.
+		Lowercase bool
+		// Whether to include numeric digits.
+		Numbers bool
+		// Whether to include symbols.
+		Symbols bool
+	}
+)
+
+const (
+	charsetUpper   = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	charsetLower   = "abcdefghijklmnopqrstuvwxyz"
+	charsetNumbers = "0123456789"
+	charsetSymbols = "!@#$%^&*()-_=+[]{}|;:,.<>?"
+)
+
+// Generate creates a cryptographically random password matching the given options. Returns an error if no
+// character sets are selected or the requested length is less than one.
+func Generate(opts GenerateOptions) (string, error) {
+	if opts.Length < 1 {
+		return "", errors.New("length must be at least 1")
+	}
+
+	charset := ""
+	if opts.Uppercase {
+		charset += charsetUpper
+	}
+	if opts.Lowercase {
+		charset += charsetLower
+	}
+	if opts.Numbers {
+		charset += charsetNumbers
+	}
+	if opts.Symbols {
+		charset += charsetSymbols
+	}
+
+	if charset == "" {
+		return "", errors.New("at least one character set must be selected")
+	}
+
+	result := make([]byte, opts.Length)
+	size := big.NewInt(int64(len(charset)))
+	for i := range result {
+		n, err := rand.Int(rand.Reader, size)
+		if err != nil {
+			return "", err
+		}
+		result[i] = charset[n.Int64()]
+	}
+
+	return string(result), nil
+}
 
 // Rating represents the strength of a password.
 type (
