@@ -96,19 +96,25 @@ templ sharedPasswordStat(count int) {
 }
 
 templ passwordRatingStat(rating password.Rating) {
-	<div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800/75 dark:ring-1 dark:ring-inset dark:ring-white/10">
-		<dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Password strength</dt>
-		<dd
-			class={
-				"mt-1 text-2xl font-semibold tracking-tight",
-				templ.KV("text-red-500", rating == password.RatingVeryWeak),
-				templ.KV("text-amber-500", rating == password.RatingWeak),
-				templ.KV("text-yellow-500", rating == password.RatingGood),
-				templ.KV("text-green-500", rating == password.RatingStrong),
-				templ.KV("text-emerald-600 dark:text-emerald-400", rating == password.RatingVeryStrong),
-			}
-		>{ rating.String() }</dd>
-	</div>
+	<a
+		href="/logins/weak"
+		class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6 dark:bg-gray-800/75 dark:ring-1 dark:ring-inset dark:ring-white/10 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+	>
+		<div>
+			<dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-400">Password strength</dt>
+			<dd
+				class={
+					"mt-1 text-2xl font-semibold tracking-tight",
+					templ.KV("text-red-500", rating == password.RatingVeryWeak),
+					templ.KV("text-amber-500", rating == password.RatingWeak),
+					templ.KV("text-yellow-500", rating == password.RatingGood),
+					templ.KV("text-green-500", rating == password.RatingStrong),
+					templ.KV("text-emerald-600 dark:text-emerald-400", rating == password.RatingVeryStrong),
+				}
+			>{ rating.String() }</dd>
+		</div>
+		@component.IconChevronRight("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
+	</a>
 }
 
 templ loginHeader(model DetailViewModel) {

@@ -38,6 +38,8 @@ type (
 		ListReusedPasswords(accountID uuid.UUID) ([]service.Login, error)
 		// ListSamePassword should return all logins that share the same password as the given login.
 		ListSamePassword(accountID uuid.UUID, loginID uuid.UUID) ([]service.Login, error)
+		// ListWeakPasswords should return all logins whose password is rated below Good.
+		ListWeakPasswords(accountID uuid.UUID) ([]service.Login, error)
 	}
 )
 

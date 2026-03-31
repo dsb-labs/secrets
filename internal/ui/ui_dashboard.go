@@ -52,8 +52,21 @@ func (h *DashboardHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	weak, err := h.logins.ListWeakPasswords(tkn.ID())
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
 	render(ctx, w, http.StatusOK, dashboard.Dashboard, dashboard.ViewModel{
 		DisplayName:            account.DisplayName,
 		DuplicatePasswordCount: len(duplicates),
+		WeakPasswordCount:      len(weak),
 	})
 }
