@@ -35,11 +35,11 @@ type (
 		// Delete should remove the login record associated with the given user and login identifiers.
 		Delete(accountID uuid.UUID, loginID uuid.UUID) error
 		// ListReusedPasswords should return all logins that share a password with at least one other login.
-		ListReusedPasswords(accountID uuid.UUID) ([]service.Login, error)
+		ListReusedPasswords(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)
 		// ListSamePassword should return all logins that share the same password as the given login.
 		ListSamePassword(accountID uuid.UUID, loginID uuid.UUID) ([]service.Login, error)
 		// ListWeakPasswords should return all logins whose password is rated below Good.
-		ListWeakPasswords(accountID uuid.UUID) ([]service.Login, error)
+		ListWeakPasswords(accountID uuid.UUID, filters ...filter.Filter[service.Login]) ([]service.Login, error)
 	}
 )
 

@@ -377,6 +377,7 @@ func TestLoginService_ListReusedPasswords(t *testing.T) {
 		UserID       uuid.UUID
 		Expected     []service.Login
 		ExpectsError bool
+		Filters      []filter.Filter[service.Login]
 		Setup        func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository])
 	}{
 		{
@@ -461,6 +462,29 @@ func TestLoginService_ListReusedPasswords(t *testing.T) {
 				logins.EXPECT().List().Return(expected, nil).Once()
 			},
 		},
+		{
+			Name:   "uses filters",
+			UserID: uuid.NameSpaceDNS,
+			Expected: []service.Login{
+				{ID: uuid.NameSpaceDNS, Username: "alice", Password: "shared", Domains: []string{"https://account.google.com"}},
+			},
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				expected := []database.Login{
+					{ID: uuid.NameSpaceDNS, Username: "alice", Password: "shared", Domains: []string{"https://account.google.com"}},
+					{ID: uuid.NameSpaceURL, Username: "bob", Password: "shared", Domains: []string{"https://example.org"}},
+					{ID: uuid.NameSpaceOID, Username: "carol", Password: "unique", Domains: []string{"https://example.net"}},
+				}
+
+				logins.EXPECT().List().Return(expected, nil).Once()
+			},
+			Filters: []filter.Filter[service.Login]{
+				service.LoginsByDomain("google.com"),
+			},
+		},
 	}
 
 	for _, tc := range tt {
@@ -472,7 +496,7 @@ func TestLoginService_ListReusedPasswords(t *testing.T) {
 				tc.Setup(logins, provider)
 			}
 
-			actual, err := service.NewLoginService(provider).ListReusedPasswords(tc.UserID)
+			actual, err := service.NewLoginService(provider).ListReusedPasswords(tc.UserID, tc.Filters...)
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return
@@ -798,6 +822,7 @@ func TestLoginService_ListWeakPasswords(t *testing.T) {
 		UserID       uuid.UUID
 		Expected     []service.Login
 		ExpectsError bool
+		Filters      []filter.Filter[service.Login]
 		Setup        func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository])
 	}{
 		{
@@ -882,6 +907,29 @@ func TestLoginService_ListWeakPasswords(t *testing.T) {
 				logins.EXPECT().List().Return(expected, nil).Once()
 			},
 		},
+		{
+			Name:   "uses filters",
+			UserID: uuid.NameSpaceDNS,
+			Expected: []service.Login{
+				{ID: uuid.NameSpaceDNS, Username: "alice", Password: "password", Domains: []string{"https://account.google.com"}},
+			},
+			Setup: func(logins *MockLoginRepository, provider *MockRepositoryProvider[service.LoginRepository]) {
+				provider.EXPECT().
+					For(uuid.NameSpaceDNS).
+					Return(logins, nil).Once()
+
+				expected := []database.Login{
+					{ID: uuid.NameSpaceDNS, Username: "alice", Password: "password", Domains: []string{"https://account.google.com"}},
+					{ID: uuid.NameSpaceURL, Username: "bob", Password: "Monday99", Domains: []string{"https://example.org"}},
+					{ID: uuid.NameSpaceOID, Username: "carol", Password: "Tr0ub4dor", Domains: []string{"https://example.net"}},
+				}
+
+				logins.EXPECT().List().Return(expected, nil).Once()
+			},
+			Filters: []filter.Filter[service.Login]{
+				service.LoginsByDomain("google.com"),
+			},
+		},
 	}
 
 	for _, tc := range tt {
@@ -893,7 +941,7 @@ func TestLoginService_ListWeakPasswords(t *testing.T) {
 				tc.Setup(logins, provider)
 			}
 
-			actual, err := service.NewLoginService(provider).ListWeakPasswords(tc.UserID)
+			actual, err := service.NewLoginService(provider).ListWeakPasswords(tc.UserID, tc.Filters...)
 			if tc.ExpectsError {
 				require.Error(t, err)
 				return

@@ -184,8 +184,9 @@ func (svc *LoginService) Get(userID uuid.UUID, loginID uuid.UUID) (Login, error)
 }
 
 // ListReusedPasswords returns all login records that reuse a password. Returns ErrReauthenticate if the underlying
-// individual user database's lifetime has expired and the caller must reauthenticate.
-func (svc *LoginService) ListReusedPasswords(userID uuid.UUID) ([]Login, error) {
+// individual user database's lifetime has expired and the caller must reauthenticate. The resulting list can be
+// filtered by passing one or more filter.Filter implementations.
+func (svc *LoginService) ListReusedPasswords(userID uuid.UUID, filters ...filter.Filter[Login]) ([]Login, error) {
 	repo, err := svc.logins.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
@@ -220,7 +221,11 @@ func (svc *LoginService) ListReusedPasswords(userID uuid.UUID) ([]Login, error) 
 		}
 	}
 
-	return out, nil
+	if len(filters) == 0 {
+		return out, nil
+	}
+
+	return filter.All(out, filters...), nil
 }
 
 // ListSamePassword returns all login records that share the same password with the specified login. Returns
@@ -274,8 +279,9 @@ func (svc *LoginService) ListSamePassword(userID, loginID uuid.UUID) ([]Login, e
 }
 
 // ListWeakPasswords returns all login records whose password is rated below Good. Returns ErrReauthenticate if the
-// underlying individual user database's lifetime has expired and the caller must reauthenticate.
-func (svc *LoginService) ListWeakPasswords(userID uuid.UUID) ([]Login, error) {
+// underlying individual user database's lifetime has expired and the caller must reauthenticate. The resulting list can
+// be filtered by passing one or more filter.Filter implementations.
+func (svc *LoginService) ListWeakPasswords(userID uuid.UUID, filters ...filter.Filter[Login]) ([]Login, error) {
 	repo, err := svc.logins.For(userID)
 	switch {
 	case errors.Is(err, database.ErrClosed):
@@ -307,5 +313,9 @@ func (svc *LoginService) ListWeakPasswords(userID uuid.UUID) ([]Login, error) {
 		})
 	}
 
-	return out, nil
+	if len(filters) == 0 {
+		return out, nil
+	}
+
+	return filter.All(out, filters...), nil
 }
