@@ -75,7 +75,10 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("query")
 	filters := make([]filter.Filter[service.Login], 0)
 	if query != "" {
-		filters = append(filters, service.LoginsByDomain(query))
+		filters = append(filters,
+			service.LoginsByDomain(query),
+			service.LoginsByName(query),
+		)
 	}
 
 	results, err := h.logins.List(tkn.ID(), filters...)
@@ -123,7 +126,10 @@ func (h *LoginHandler) Reused(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("query")
 	filters := make([]filter.Filter[service.Login], 0)
 	if query != "" {
-		filters = append(filters, service.LoginsByDomain(query))
+		filters = append(filters,
+			service.LoginsByDomain(query),
+			service.LoginsByName(query),
+		)
 	}
 
 	results, err := h.logins.ListReusedPasswords(tkn.ID(), filters...)
@@ -263,6 +269,8 @@ func (h *LoginHandler) Create(w http.ResponseWriter, r *http.Request) {
 
 // The CreateLoginForm type represents the form values submitted when calling LoginHandler.CreateCallback.
 type CreateLoginForm struct {
+	// The optional name for the login.
+	Name string `form:"name"`
 	// The username.
 	Username string `form:"username"`
 	// The password.
@@ -295,6 +303,7 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	form, err := decode[CreateLoginForm](r)
 	model := loginview.CreateViewModel{
 		DisplayName: account.DisplayName,
+		Name:        form.Name,
 		Username:    form.Username,
 		Password:    form.Password,
 		Domains:     form.Domains,
@@ -325,6 +334,7 @@ func (h *LoginHandler) CreateCallback(w http.ResponseWriter, r *http.Request) {
 	loginID := uuid.New()
 	err = h.logins.Create(tkn.ID(), service.Login{
 		ID:        loginID,
+		Name:      form.Name,
 		Username:  form.Username,
 		Password:  form.Password,
 		Domains:   domains,

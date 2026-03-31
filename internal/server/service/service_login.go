@@ -128,7 +128,7 @@ func (svc *LoginService) List(userID uuid.UUID, filters ...filter.Filter[Login])
 		return logins, nil
 	}
 
-	return filter.All(logins, filters...), nil
+	return filter.Any(logins, filters...), nil
 }
 
 // Delete a login record for the given user. Returns ErrReauthenticate if the underlying individual user database's
@@ -231,7 +231,7 @@ func (svc *LoginService) ListReusedPasswords(userID uuid.UUID, filters ...filter
 		return out, nil
 	}
 
-	return filter.All(out, filters...), nil
+	return filter.Any(out, filters...), nil
 }
 
 // ListSamePassword returns all login records that share the same password with the specified login. Returns
@@ -325,5 +325,5 @@ func (svc *LoginService) ListWeakPasswords(userID uuid.UUID, filters ...filter.F
 		return out, nil
 	}
 
-	return filter.All(out, filters...), nil
+	return filter.Any(out, filters...), nil
 }

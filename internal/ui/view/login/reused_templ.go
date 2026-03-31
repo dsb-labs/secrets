@@ -91,7 +91,7 @@ func reusedContent(model ReusedViewModel) templ.Component {
 			Search: component.SearchBar(component.SearchBarProps{
 				Action:      "/logins/reused",
 				Query:       model.Query,
-				Placeholder: "Search by domain...",
+				Placeholder: "Search by name or domain...",
 			}),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

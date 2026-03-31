@@ -102,7 +102,7 @@ func listContent(model ViewModel) templ.Component {
 			Search: component.SearchBar(component.SearchBarProps{
 				Action:      "/logins",
 				Query:       model.Query,
-				Placeholder: "Search by domain...",
+				Placeholder: "Search by name or domain...",
 			}),
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {

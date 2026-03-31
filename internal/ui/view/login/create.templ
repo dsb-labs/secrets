@@ -18,6 +18,8 @@ type (
 		Password string
 		// The domains for the login as a comma-separated string, preserved on validation error.
 		Domains string
+		// The optional name for the login, preserved on validation error.
+		Name string
 	}
 )
 
@@ -50,6 +52,20 @@ templ createContent(model CreateViewModel) {
 				Class:      "px-6 py-6 space-y-5",
 				Validation: model.Validation,
 			}) {
+				<div>
+					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="name">
+						Name
+						<span class="font-normal text-gray-400 dark:text-gray-500">(optional)</span>
+					</label>
+					<input
+						id="name"
+						type="text"
+						name="name"
+						placeholder="My login"
+						value={ model.Name }
+						class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+					/>
+				</div>
 				<div>
 					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5" for="username">
 						Username
