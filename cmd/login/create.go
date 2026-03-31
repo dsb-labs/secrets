@@ -12,6 +12,7 @@ import (
 func create() *cobra.Command {
 	var (
 		domains []string
+		name    string
 	)
 
 	cmd := &cobra.Command{
@@ -31,6 +32,7 @@ func create() *cobra.Command {
 				Username: args[0],
 				Password: password,
 				Domains:  domains,
+				Name:     name,
 			}
 
 			id, err := client.CreateLogin(ctx, login)
@@ -45,6 +47,7 @@ func create() *cobra.Command {
 
 	flags := cmd.Flags()
 	flags.StringSliceVarP(&domains, "domains", "d", nil, "domains where this login can be used")
+	flags.StringVarP(&name, "name", "n", "", "login name")
 
 	return cmd
 }

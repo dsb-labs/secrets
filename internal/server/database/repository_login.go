@@ -32,6 +32,8 @@ type (
 		Domains []string
 		// When the login was created.
 		CreatedAt time.Time
+		// A user-supplied name for the login.
+		Name string
 	}
 )
 

@@ -24,6 +24,7 @@ func TestLoginRepository_Create(t *testing.T) {
 			Name: "creates login",
 			Login: database.Login{
 				ID:       uuid.New(),
+				Name:     "Test Login",
 				Username: "test@test.com",
 				Password: "password",
 				Domains:  []string{"test.com"},
@@ -158,6 +159,7 @@ func TestLoginRepository_Get(t *testing.T) {
 			ID:   uuid.NameSpaceDNS,
 			Expected: database.Login{
 				ID:       uuid.NameSpaceDNS,
+				Name:     "Test Login",
 				Username: "test@test.com",
 				Password: "password",
 				Domains:  []string{"test.com"},

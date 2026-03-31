@@ -44,6 +44,8 @@ type (
 		Domains []string
 		// When the login was created.
 		CreatedAt time.Time
+		// A user-supplied name for the login.
+		Name string
 	}
 )
 
@@ -78,6 +80,7 @@ func (svc *LoginService) Create(userID uuid.UUID, login Login) error {
 		Password:  login.Password,
 		Domains:   login.Domains,
 		CreatedAt: login.CreatedAt,
+		Name:      login.Name,
 	}
 
 	err = repo.Create(record)
@@ -117,6 +120,7 @@ func (svc *LoginService) List(userID uuid.UUID, filters ...filter.Filter[Login])
 			Password:  in.Password,
 			Domains:   in.Domains,
 			CreatedAt: in.CreatedAt,
+			Name:      in.Name,
 		}
 	})
 
@@ -180,6 +184,7 @@ func (svc *LoginService) Get(userID uuid.UUID, loginID uuid.UUID) (Login, error)
 		Password:  result.Password,
 		Domains:   result.Domains,
 		CreatedAt: result.CreatedAt,
+		Name:      result.Name,
 	}, nil
 }
 
@@ -211,6 +216,7 @@ func (svc *LoginService) ListReusedPasswords(userID uuid.UUID, filters ...filter
 			Password:  login.Password,
 			Domains:   login.Domains,
 			CreatedAt: login.CreatedAt,
+			Name:      login.Name,
 		})
 	}
 
@@ -271,6 +277,7 @@ func (svc *LoginService) ListSamePassword(userID, loginID uuid.UUID) ([]Login, e
 				Password:  result.Password,
 				Domains:   result.Domains,
 				CreatedAt: result.CreatedAt,
+				Name:      result.Name,
 			})
 		}
 	}
@@ -310,6 +317,7 @@ func (svc *LoginService) ListWeakPasswords(userID uuid.UUID, filters ...filter.F
 			Password:  result.Password,
 			Domains:   result.Domains,
 			CreatedAt: result.CreatedAt,
+			Name:      result.Name,
 		})
 	}
 

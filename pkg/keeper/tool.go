@@ -41,6 +41,7 @@ func (c *Client) Export(ctx context.Context) (Export, error) {
 				Password:  login.Password,
 				Domains:   login.Domains,
 				CreatedAt: login.CreatedAt,
+				Name:      login.Name,
 			}
 		}),
 		Notes: convert.Slice(response.Notes, func(note api.Note) Note {

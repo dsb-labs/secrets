@@ -24,6 +24,8 @@ type (
 		Domains []string
 		// When the login was created.
 		CreatedAt time.Time
+		// A user supplied name for the login.
+		Name string
 	}
 )
 
@@ -33,6 +35,7 @@ func (c *Client) CreateLogin(ctx context.Context, login Login) (string, error) {
 		Username: login.Username,
 		Password: login.Password,
 		Domains:  login.Domains,
+		Name:     login.Name,
 	})
 	if err != nil {
 		return "", err
@@ -71,6 +74,7 @@ func (c *Client) ListLogins(ctx context.Context, domain string) ([]Login, error)
 			Password:  in.Password,
 			Domains:   in.Domains,
 			CreatedAt: in.CreatedAt,
+			Name:      in.Name,
 		}
 	}), nil
 }
@@ -107,5 +111,6 @@ func (c *Client) GetLogin(ctx context.Context, id string) (Login, error) {
 		Password:  response.Login.Password,
 		Domains:   response.Login.Domains,
 		CreatedAt: response.Login.CreatedAt,
+		Name:      response.Login.Name,
 	}, nil
 }

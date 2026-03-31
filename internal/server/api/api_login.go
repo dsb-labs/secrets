@@ -46,6 +46,8 @@ type (
 		Domains []string `json:"domains"`
 		// When the login was created.
 		CreatedAt time.Time `json:"createdAt"`
+		// A user-supplied name for the login.
+		Name string `json:"name"`
 	}
 )
 
@@ -72,6 +74,8 @@ type (
 		Password string `json:"password"`
 		// The domains where this username/password combination can be used.
 		Domains []string `json:"domains"`
+		// A user-supplied name for the login.
+		Name string `json:"name"`
 	}
 
 	// The CreateLoginResponse type represents the response body returned when calling LoginAPI.Create
@@ -103,6 +107,7 @@ func (api *LoginAPI) Create(w http.ResponseWriter, r *http.Request) {
 		Username:  request.Username,
 		Password:  request.Password,
 		Domains:   request.Domains,
+		Name:      request.Name,
 		CreatedAt: time.Now(),
 	}
 
@@ -156,6 +161,7 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 				Password:  in.Password,
 				Domains:   in.Domains,
 				CreatedAt: in.CreatedAt,
+				Name:      in.Name,
 			}
 		}),
 	})
@@ -230,6 +236,7 @@ func (api *LoginAPI) Get(w http.ResponseWriter, r *http.Request) {
 			Password:  result.Password,
 			Domains:   result.Domains,
 			CreatedAt: result.CreatedAt,
+			Name:      result.Name,
 		},
 	})
 }

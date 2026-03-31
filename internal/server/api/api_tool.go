@@ -70,6 +70,7 @@ func (api *ToolAPI) Export(w http.ResponseWriter, r *http.Request) {
 				Username: in.Username,
 				Password: in.Password,
 				Domains:  in.Domains,
+				Name:     in.Name,
 			}
 		}),
 		Notes: convert.Slice(export.Notes, func(in service.Note) Note {
