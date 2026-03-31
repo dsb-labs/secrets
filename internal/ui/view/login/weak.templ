@@ -1,0 +1,87 @@
+package login
+
+import (
+	"strconv"
+
+	"github.com/davidsbond/keeper/internal/ui/component"
+	"github.com/davidsbond/keeper/internal/ui/layout"
+)
+
+type (
+	// The WeakViewModel type contains fields used to configure the weak passwords view.
+	WeakViewModel struct {
+		// The display name of the authenticated user.
+		DisplayName string
+		// The list of logins whose password is rated below Good.
+		Logins []Item
+		// The current search query, preserved in the search input between requests.
+		Query string
+	}
+)
+
+// Weak returns the weak passwords view using the provided view model values.
+templ Weak(model WeakViewModel) {
+	@layout.Authenticated(layout.AuthenticatedViewModel{
+		Title:       "Weak Passwords",
+		CurrentPage: "login",
+		DisplayName: model.DisplayName,
+	}, weakContent(model))
+}
+
+templ weakContent(model WeakViewModel) {
+	<div>
+		@component.PageHeader(component.PageHeaderProps{
+			Title:    strconv.Itoa(len(model.Logins)) + " weak passwords",
+			Subtitle: "Logins with a password rated below Good.",
+			Search: component.SearchBar(component.SearchBarProps{
+				Action:      "/logins/weak",
+				Query:       model.Query,
+				Placeholder: "Search by name or domain...",
+			}),
+		})
+		<div class="px-4 sm:px-8 py-6">
+			if len(model.Logins) == 0 {
+				if model.Query != "" {
+					@component.EmptyState(component.EmptyStateProps{
+						Title:       "No logins match your search",
+						Description: "Try a different name or domain.",
+					}) {
+						@component.IconKey("w-6 h-6 text-gray-400 dark:text-gray-500")
+					}
+				} else {
+					@component.EmptyState(component.EmptyStateProps{
+						Title:       "No weak passwords",
+						Description: "All of your logins have a password rated Good or above.",
+					}) {
+						@component.IconKey("w-6 h-6 text-gray-400 dark:text-gray-500")
+					}
+				}
+			} else {
+				<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
+					for _, item := range model.Logins {
+						@weakRow(item)
+					}
+				</div>
+			}
+		</div>
+	</div>
+}
+
+templ weakRow(item Item) {
+	@component.ListItem(component.ListItemProps{
+		Href:     "/logins/" + item.ID,
+		Title:    itemTitle(item),
+		Subtitle: item.Username,
+	}) {
+		if len(item.Domains) > 0 {
+			<img
+				src={ "https://www.google.com/s2/favicons?domain=" + item.Domains[0] + "&sz=32" }
+				alt=""
+				class="w-5 h-5 rounded shrink-0"
+				onerror="this.style.display='none'"
+			/>
+		} else {
+			@component.IconKey("w-5 h-5 shrink-0 text-gray-400 dark:text-gray-500")
+		}
+	}
+}

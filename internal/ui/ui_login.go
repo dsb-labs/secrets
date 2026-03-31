@@ -54,6 +54,7 @@ func (h *LoginHandler) Register(mux *http.ServeMux) {
 	mux.Handle("GET /logins", requireToken(h.List))
 	mux.Handle("GET /logins/new", requireToken(h.Create))
 	mux.Handle("GET /logins/reused", requireToken(h.Reused))
+	mux.Handle("GET /logins/weak", requireToken(h.Weak))
 	mux.Handle("POST /logins", requireToken(h.CreateCallback))
 	mux.Handle("GET /logins/{id}", requireToken(h.Detail))
 	mux.Handle("POST /logins/{id}/delete", requireToken(h.Delete))
@@ -155,6 +156,57 @@ func (h *LoginHandler) Reused(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render(ctx, w, http.StatusOK, loginview.Reused, loginview.ReusedViewModel{
+		DisplayName: account.DisplayName,
+		Logins:      items,
+		Query:       query,
+	})
+}
+
+// Weak renders the weak passwords view, listing all logins whose password is rated below Good.
+func (h *LoginHandler) Weak(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	tkn := token.FromContext(ctx)
+
+	account, err := h.accounts.Get(tkn.ID())
+	if err != nil {
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	query := r.URL.Query().Get("query")
+	filters := make([]filter.Filter[service.Login], 0)
+	if query != "" {
+		filters = append(filters,
+			service.LoginsByDomain(query),
+			service.LoginsByName(query),
+		)
+	}
+
+	results, err := h.logins.ListWeakPasswords(tkn.ID(), filters...)
+	switch {
+	case errors.Is(err, service.ErrReauthenticate):
+		redirectToLogin(w, r)
+		return
+	case err != nil:
+		render(ctx, w, http.StatusInternalServerError, statusview.InternalServerError, statusview.InternalServerErrorViewModel{
+			Detail: err.Error(),
+		})
+		return
+	}
+
+	items := make([]loginview.Item, len(results))
+	for i, l := range results {
+		items[i] = loginview.Item{
+			ID:       l.ID.String(),
+			Username: l.Username,
+			Domains:  l.Domains,
+			Name:     l.Name,
+		}
+	}
+
+	render(ctx, w, http.StatusOK, loginview.Weak, loginview.WeakViewModel{
 		DisplayName: account.DisplayName,
 		Logins:      items,
 		Query:       query,
