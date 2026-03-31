@@ -1,0 +1,45 @@
+name: node
+
+concurrency:
+  group: ${{ github.workflow }}/${{ github.ref_name }}
+
+on:
+  push:
+    paths:
+      - '**.js'
+      - '**yarn.lock'
+      - '**package.json'
+      - '.github/workflows/node.yml'
+    branches:
+      - main
+  pull_request:
+    paths:
+      - '**.js'
+      - '**yarn.lock'
+      - '**package.json'
+      - '.github/workflows/node.yml'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Install node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'yarn'
+          cache-dependency-path: internal/ui/yarn.lock
+          
+      - name: Install dependencies
+        working-directory: internal/ui
+        run: yarn install
+
+      - name: Run generators
+        working-directory: internal/ui
+        run: |
+          yarn generate          
+          git add .
+          git diff --staged --exit-code
