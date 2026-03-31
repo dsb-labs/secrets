@@ -1,8 +1,6 @@
 package login
 
 import (
-	"strings"
-
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
 )
@@ -26,6 +24,8 @@ type (
 		Username string
 		// The domains this login can be used on.
 		Domains []string
+		// A user-supplied name for the login.
+		Name string
 	}
 )
 
@@ -88,11 +88,21 @@ templ loginAddButton() {
 	</a>
 }
 
+func itemTitle(item Item) string {
+	if item.Name != "" {
+		return item.Name
+	}
+	if len(item.Domains) > 0 {
+		return item.Domains[0]
+	}
+	return item.Username
+}
+
 templ row(item Item) {
 	@component.ListItem(component.ListItemProps{
 		Href:     "/logins/" + item.ID,
-		Title:    item.Username,
-		Subtitle: strings.Join(item.Domains, ", "),
+		Title:    itemTitle(item),
+		Subtitle: item.Username,
 	}) {
 		if len(item.Domains) > 0 {
 			<img

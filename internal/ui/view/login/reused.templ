@@ -2,7 +2,6 @@ package login
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
@@ -71,8 +70,8 @@ templ reusedContent(model ReusedViewModel) {
 templ reusedRow(item Item) {
 	@component.ListItem(component.ListItemProps{
 		Href:     "/logins/" + item.ID,
-		Title:    item.Username,
-		Subtitle: strings.Join(item.Domains, ", "),
+		Title:    itemTitle(item),
+		Subtitle: item.Username,
 	}) {
 		if len(item.Domains) > 0 {
 			<img

@@ -214,6 +214,7 @@ func (svc *ToolService) importBitwarden(userID uuid.UUID, data io.Reader) (Impor
 				Domains: convert.Slice(item.Login.Uris, func(have bitwarden.URI) string {
 					return have.URI
 				}),
+				Name: item.Name,
 			})
 
 			result.Logins++
@@ -292,6 +293,7 @@ func (svc *ToolService) performImport(userID uuid.UUID, export Export) error {
 			Password:  login.Password,
 			Domains:   login.Domains,
 			CreatedAt: login.CreatedAt,
+			Name:      login.Name,
 		})
 		switch {
 		case errors.Is(err, database.ErrClosed):

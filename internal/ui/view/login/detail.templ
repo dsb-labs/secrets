@@ -29,6 +29,8 @@ type (
 		SharedPasswordCount int
 		// The strength rating of the login's password.
 		PasswordRating password.Rating
+		// A user-supplied name for the login.
+		Name string
 	}
 )
 
@@ -117,8 +119,15 @@ templ passwordRatingStat(rating password.Rating) {
 	</a>
 }
 
+func cardTitle(model DetailViewModel) string {
+	if model.Name != "" {
+		return model.Name
+	}
+	return "Login details"
+}
+
 templ loginHeader(model DetailViewModel) {
-	<h1 class="text-lg font-semibold text-gray-900 dark:text-white">Login details</h1>
+	<h1 class="text-lg font-semibold text-gray-900 dark:text-white">{ cardTitle(model) }</h1>
 	<button
 		type="button"
 		onclick="showConfirmDialog('delete-dialog')"

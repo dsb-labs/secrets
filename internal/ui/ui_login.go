@@ -96,6 +96,7 @@ func (h *LoginHandler) List(w http.ResponseWriter, r *http.Request) {
 			ID:       l.ID.String(),
 			Username: l.Username,
 			Domains:  l.Domains,
+			Name:     l.Name,
 		}
 	}
 
@@ -143,6 +144,7 @@ func (h *LoginHandler) Reused(w http.ResponseWriter, r *http.Request) {
 			ID:       l.ID.String(),
 			Username: l.Username,
 			Domains:  l.Domains,
+			Name:     l.Name,
 		}
 	}
 
@@ -208,6 +210,7 @@ func (h *LoginHandler) Detail(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:           login.CreatedAt.Format("2 January 2006 at 15:04"),
 		SharedPasswordCount: len(shared),
 		PasswordRating:      password.Rate(login.Password),
+		Name:                login.Name,
 	})
 }
 

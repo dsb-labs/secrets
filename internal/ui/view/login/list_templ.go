@@ -8,8 +8,6 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"strings"
-
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
 )
@@ -33,6 +31,8 @@ type (
 		Username string
 		// The domains this login can be used on.
 		Domains []string
+		// A user-supplied name for the login.
+		Name string
 	}
 )
 
@@ -227,6 +227,16 @@ func loginAddButton() templ.Component {
 	})
 }
 
+func itemTitle(item Item) string {
+	if item.Name != "" {
+		return item.Name
+	}
+	if len(item.Domains) > 0 {
+		return item.Domains[0]
+	}
+	return item.Username
+}
+
 func row(item Item) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -268,7 +278,7 @@ func row(item Item) templ.Component {
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs("https://www.google.com/s2/favicons?domain=" + item.Domains[0] + "&sz=32")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 99, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/list.templ`, Line: 109, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
@@ -288,8 +298,8 @@ func row(item Item) templ.Component {
 		})
 		templ_7745c5c3_Err = component.ListItem(component.ListItemProps{
 			Href:     "/logins/" + item.ID,
-			Title:    item.Username,
-			Subtitle: strings.Join(item.Domains, ", "),
+			Title:    itemTitle(item),
+			Subtitle: item.Username,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var7), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

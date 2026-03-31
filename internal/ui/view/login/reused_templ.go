@@ -9,7 +9,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"strconv"
-	"strings"
 
 	"github.com/davidsbond/keeper/internal/ui/component"
 	"github.com/davidsbond/keeper/internal/ui/layout"
@@ -221,7 +220,7 @@ func reusedRow(item Item) templ.Component {
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs("https://www.google.com/s2/favicons?domain=" + item.Domains[0] + "&sz=32")
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/reused.templ`, Line: 79, Col: 83}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/ui/view/login/reused.templ`, Line: 78, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
@@ -241,8 +240,8 @@ func reusedRow(item Item) templ.Component {
 		})
 		templ_7745c5c3_Err = component.ListItem(component.ListItemProps{
 			Href:     "/logins/" + item.ID,
-			Title:    item.Username,
-			Subtitle: strings.Join(item.Domains, ", "),
+			Title:    itemTitle(item),
+			Subtitle: item.Username,
 		}).Render(templ.WithChildren(ctx, templ_7745c5c3_Var6), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
