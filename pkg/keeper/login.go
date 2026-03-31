@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"path"
 	"time"
 
@@ -49,12 +50,31 @@ func (c *Client) CreateLogin(ctx context.Context, login Login) (string, error) {
 	return response.ID, nil
 }
 
-// ListLogins attempts to return all login records stored for the authenticated user. If the "domain" parameter is set,
-// the server will filter the results to credentials that may be usable on the domain.
-func (c *Client) ListLogins(ctx context.Context, domain string) ([]Login, error) {
+type (
+	// The LoginListOptions type contains fields used to filter the results of listing login records.
+	LoginListOptions struct {
+		// The domain to match logins to.
+		Domain string
+		// The name to match logins to.
+		Name string
+	}
+)
+
+// ListLogins attempts to return all login records stored for the authenticated user. The LoginListOptions struct
+// can be used to filter by name or domain.
+func (c *Client) ListLogins(ctx context.Context, options LoginListOptions) ([]Login, error) {
+	values := url.Values{}
+	if options.Domain != "" {
+		values.Add("domain", options.Domain)
+	}
+	if options.Name != "" {
+		values.Add("name", options.Name)
+	}
+
 	p := "/api/v1/login"
-	if domain != "" {
-		p += "?domain=" + domain
+	v := values.Encode()
+	if v != "" {
+		p += "?" + v
 	}
 
 	request, err := c.buildRequest(ctx, http.MethodGet, p, nil)

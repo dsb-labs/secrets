@@ -143,6 +143,10 @@ func (api *LoginAPI) List(w http.ResponseWriter, r *http.Request) {
 		filters = append(filters, service.LoginsByDomain(domain))
 	}
 
+	if name := r.URL.Query().Get("name"); name != "" {
+		filters = append(filters, service.LoginsByName(name))
+	}
+
 	results, err := api.logins.List(tkn.ID(), filters...)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):

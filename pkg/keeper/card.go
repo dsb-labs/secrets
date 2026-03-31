@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"net/http"
+	"net/url"
 	"path"
 	"time"
 
@@ -57,9 +58,28 @@ func (c *Client) CreateCard(ctx context.Context, card Card) (string, error) {
 	return response.ID, nil
 }
 
-// ListCards attempts to return all card records stored for the authenticated user.
-func (c *Client) ListCards(ctx context.Context) ([]Card, error) {
-	request, err := c.buildRequest(ctx, http.MethodGet, "/api/v1/card", nil)
+type (
+	// The CardListOptions type contains fields used to filter the results of listing card records.
+	CardListOptions struct {
+		// The name to match cards to.
+		Name string
+	}
+)
+
+// ListCards attempts to return all card records stored for the authenticated user. The CardListOptions struct
+// can be used to filter by name.
+func (c *Client) ListCards(ctx context.Context, options CardListOptions) ([]Card, error) {
+	values := url.Values{}
+	if options.Name != "" {
+		values.Add("name", options.Name)
+	}
+
+	p := "/api/v1/card"
+	if v := values.Encode(); v != "" {
+		p += "?" + v
+	}
+
+	request, err := c.buildRequest(ctx, http.MethodGet, p, nil)
 	if err != nil {
 		return nil, err
 	}

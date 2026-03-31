@@ -58,7 +58,7 @@ func TestClient_ListCards(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.ListCards(ctx)
+		_, err := client.ListCards(ctx, keeper.CardListOptions{})
 		require.Error(t, err)
 		assert.True(t, keeper.IsUnauthorized(err))
 	})
@@ -66,7 +66,7 @@ func TestClient_ListCards(t *testing.T) {
 	setupAccount(t, client)
 
 	t.Run("lists no cards", func(t *testing.T) {
-		cards, err := client.ListCards(ctx)
+		cards, err := client.ListCards(ctx, keeper.CardListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, cards, 0)
 	})
@@ -84,7 +84,7 @@ func TestClient_ListCards(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("lists cards", func(t *testing.T) {
-		cards, err := client.ListCards(ctx)
+		cards, err := client.ListCards(ctx, keeper.CardListOptions{})
 		require.NoError(t, err)
 		if assert.Len(t, cards, 1) {
 			actual := cards[0]

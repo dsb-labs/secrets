@@ -43,12 +43,20 @@ func (c *Client) CreateNote(ctx context.Context, note Note) (string, error) {
 	return response.ID, nil
 }
 
-// ListNotes attempts to return all note records stored for the authenticated user. If the "query" parameter is set,
-// the server will filter the results to notes that contain the query string in their name or content.
-func (c *Client) ListNotes(ctx context.Context, query string) ([]Note, error) {
+type (
+	// The NoteListOptions type contains fields used to filter the results of listing note records.
+	NoteListOptions struct {
+		// The query to match notes to, checked against name and content.
+		Query string
+	}
+)
+
+// ListNotes attempts to return all note records stored for the authenticated user. The NoteListOptions struct
+// can be used to filter by name or content.
+func (c *Client) ListNotes(ctx context.Context, options NoteListOptions) ([]Note, error) {
 	p := "/api/v1/note"
-	if query != "" {
-		p += "?query=" + query
+	if options.Query != "" {
+		p += "?query=" + options.Query
 	}
 
 	request, err := c.buildRequest(ctx, http.MethodGet, p, nil)
@@ -63,9 +71,9 @@ func (c *Client) ListNotes(ctx context.Context, query string) ([]Note, error) {
 
 	return convert.Slice(response.Notes, func(in api.Note) Note {
 		return Note{
-			ID:      in.ID,
-			Name:    in.Name,
-			Content: in.Content,
+			ID:        in.ID,
+			Name:      in.Name,
+			Content:   in.Content,
 			CreatedAt: in.CreatedAt,
 		}
 	}), nil
@@ -98,9 +106,9 @@ func (c *Client) GetNote(ctx context.Context, id string) (Note, error) {
 	}
 
 	return Note{
-		ID:      response.Note.ID,
-		Name:    response.Note.Name,
-		Content: response.Note.Content,
+		ID:        response.Note.ID,
+		Name:      response.Note.Name,
+		Content:   response.Note.Content,
 		CreatedAt: response.Note.CreatedAt,
 	}, nil
 }

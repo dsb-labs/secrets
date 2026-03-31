@@ -170,6 +170,7 @@ func TestLoginRepository_Get(t *testing.T) {
 					Username: "test@test.com",
 					Password: "password",
 					Domains:  []string{"test.com"},
+					Name:     "Test Login",
 				}
 
 				require.NoError(t, logins.Create(expected))

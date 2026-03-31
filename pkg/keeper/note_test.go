@@ -46,7 +46,7 @@ func TestClient_ListNotes(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.ListNotes(ctx, "")
+		_, err := client.ListNotes(ctx, keeper.NoteListOptions{})
 		require.Error(t, err)
 		assert.True(t, keeper.IsUnauthorized(err))
 	})
@@ -54,7 +54,7 @@ func TestClient_ListNotes(t *testing.T) {
 	setupAccount(t, client)
 
 	t.Run("lists no notes", func(t *testing.T) {
-		notes, err := client.ListNotes(ctx, "")
+		notes, err := client.ListNotes(ctx, keeper.NoteListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, notes, 0)
 	})
@@ -68,7 +68,7 @@ func TestClient_ListNotes(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("lists notes", func(t *testing.T) {
-		notes, err := client.ListNotes(ctx, "")
+		notes, err := client.ListNotes(ctx, keeper.NoteListOptions{})
 		require.NoError(t, err)
 		if assert.Len(t, notes, 1) {
 			actual := notes[0]
@@ -79,7 +79,7 @@ func TestClient_ListNotes(t *testing.T) {
 	})
 
 	t.Run("lists notes by query", func(t *testing.T) {
-		notes, err := client.ListNotes(ctx, "test")
+		notes, err := client.ListNotes(ctx, keeper.NoteListOptions{Query: "test"})
 		require.NoError(t, err)
 		if assert.Len(t, notes, 1) {
 			actual := notes[0]

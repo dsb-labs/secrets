@@ -31,6 +31,14 @@ func LoginsByDomain(domain string) filter.Filter[Login] {
 	}
 }
 
+// LoginsByName returns a filter.Filter implementation that filters logins based on a given name. The filter
+// returns true if the login name contains the provided string. This filter does not match on casing.
+func LoginsByName(name string) filter.Filter[Login] {
+	return func(login Login) bool {
+		return strings.Contains(strings.ToLower(login.Name), strings.ToLower(name))
+	}
+}
+
 // NotesByQuery returns a filter.Filter implementation that filters notes based on a given query value. The filter
 // returns true if either the name or content of the note contains the query text. This filter does not match on
 // casing.

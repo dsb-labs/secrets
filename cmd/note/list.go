@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/davidsbond/keeper/internal/cli"
+	"github.com/davidsbond/keeper/pkg/keeper"
 )
 
 func list() *cobra.Command {
@@ -23,7 +24,7 @@ func list() *cobra.Command {
 			ctx := cmd.Context()
 			client := cli.ClientFromContext(ctx)
 
-			notes, err := client.ListNotes(ctx, query)
+			notes, err := client.ListNotes(ctx, keeper.NoteListOptions{Query: query})
 			if err != nil {
 				return fmt.Errorf("failed to list notes: %w", err)
 			}

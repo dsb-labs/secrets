@@ -76,7 +76,7 @@ func TestClient_ChangePassword(t *testing.T) {
 	})
 
 	t.Run("is now unauthenticated", func(t *testing.T) {
-		_, err := client.ListLogins(ctx, "")
+		_, err := client.ListLogins(ctx, keeper.LoginListOptions{})
 		require.Error(t, err)
 		assert.True(t, keeper.IsUnauthorized(err))
 	})

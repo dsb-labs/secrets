@@ -47,7 +47,7 @@ func TestClient_ListLogins(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.ListLogins(ctx, "")
+		_, err := client.ListLogins(ctx, keeper.LoginListOptions{})
 		require.Error(t, err)
 		assert.True(t, keeper.IsUnauthorized(err))
 	})
@@ -55,7 +55,7 @@ func TestClient_ListLogins(t *testing.T) {
 	setupAccount(t, client)
 
 	t.Run("lists no logins", func(t *testing.T) {
-		logins, err := client.ListLogins(ctx, "")
+		logins, err := client.ListLogins(ctx, keeper.LoginListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, logins, 0)
 	})
@@ -70,7 +70,7 @@ func TestClient_ListLogins(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("lists logins", func(t *testing.T) {
-		logins, err := client.ListLogins(ctx, "")
+		logins, err := client.ListLogins(ctx, keeper.LoginListOptions{})
 		require.NoError(t, err)
 		if assert.Len(t, logins, 1) {
 			actual := logins[0]
@@ -82,7 +82,9 @@ func TestClient_ListLogins(t *testing.T) {
 	})
 
 	t.Run("lists logins by domain", func(t *testing.T) {
-		logins, err := client.ListLogins(ctx, "test.com")
+		logins, err := client.ListLogins(ctx, keeper.LoginListOptions{
+			Domain: "test.com",
+		})
 		require.NoError(t, err)
 		if assert.Len(t, logins, 1) {
 			actual := logins[0]
