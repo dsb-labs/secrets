@@ -119,7 +119,13 @@ func (h *LoginHandler) Reused(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	results, err := h.logins.ListReusedPasswords(tkn.ID())
+	query := r.URL.Query().Get("query")
+	filters := make([]filter.Filter[service.Login], 0)
+	if query != "" {
+		filters = append(filters, service.LoginsByDomain(query))
+	}
+
+	results, err := h.logins.ListReusedPasswords(tkn.ID(), filters...)
 	switch {
 	case errors.Is(err, service.ErrReauthenticate):
 		redirectToLogin(w, r)
@@ -143,6 +149,7 @@ func (h *LoginHandler) Reused(w http.ResponseWriter, r *http.Request) {
 	render(ctx, w, http.StatusOK, loginview.Reused, loginview.ReusedViewModel{
 		DisplayName: account.DisplayName,
 		Logins:      items,
+		Query:       query,
 	})
 }
 

@@ -15,6 +15,8 @@ type (
 		DisplayName string
 		// The list of logins that share a password with at least one other login.
 		Logins []Item
+		// The current search query, preserved in the search input between requests.
+		Query string
 	}
 )
 
@@ -32,14 +34,28 @@ templ reusedContent(model ReusedViewModel) {
 		@component.PageHeader(component.PageHeaderProps{
 			Title:    strconv.Itoa(len(model.Logins)) + " reused passwords",
 			Subtitle: "Logins sharing a password with at least one other.",
+			Search: component.SearchBar(component.SearchBarProps{
+				Action:      "/logins/reused",
+				Query:       model.Query,
+				Placeholder: "Search by domain...",
+			}),
 		})
 		<div class="px-4 sm:px-8 py-6">
 			if len(model.Logins) == 0 {
-				@component.EmptyState(component.EmptyStateProps{
-					Title:       "No reused passwords",
-					Description: "None of your logins share a password with another.",
-				}) {
-					@component.IconKey("w-6 h-6 text-gray-400 dark:text-gray-500")
+				if model.Query != "" {
+					@component.EmptyState(component.EmptyStateProps{
+						Title:       "No logins match your search",
+						Description: "Try a different domain.",
+					}) {
+						@component.IconKey("w-6 h-6 text-gray-400 dark:text-gray-500")
+					}
+				} else {
+					@component.EmptyState(component.EmptyStateProps{
+						Title:       "No reused passwords",
+						Description: "None of your logins share a password with another.",
+					}) {
+						@component.IconKey("w-6 h-6 text-gray-400 dark:text-gray-500")
+					}
 				}
 			} else {
 				<div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 shadow-sm">
