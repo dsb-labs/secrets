@@ -1,0 +1,24 @@
+name: extension
+
+on:
+  push:
+    paths:
+      - 'internal/extension/**.js'
+      - 'internal/extension/**.ts'
+      - 'internal/extension/package.json'
+      - '.github/workflows/extension.yml'
+    branches:
+      - main
+  pull_request:
+    paths:
+      - 'internal/extension/**.js'
+      - 'internal/extension/**.ts'
+      - 'internal/extension/package.json' 
+      - '.github/workflows/extension.yml'
+
+jobs:
+  ci:
+    uses: ./.github/workflows/node.yml
+    secrets: inherit
+    with:
+      app: extension

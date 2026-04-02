@@ -1,0 +1,6 @@
+packages:
+  - internal/ui
+  - extension
+
+onlyBuiltDependencies:
+  - esbuild

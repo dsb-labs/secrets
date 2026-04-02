@@ -1,45 +1,40 @@
 name: node
 
-concurrency:
-  group: ${{ github.workflow }}/${{ github.ref_name }}
-
 on:
-  push:
-    paths:
-      - '**.js'
-      - '**yarn.lock'
-      - '**package.json'
-      - '.github/workflows/node.yml'
-    branches:
-      - main
-  pull_request:
-    paths:
-      - '**.js'
-      - '**yarn.lock'
-      - '**package.json'
-      - '.github/workflows/node.yml'
+  workflow_call:
+    inputs:
+      app:
+        required: true
+        type: string
+        description: The Astro application to deploy
+
+concurrency:
+  group: ${{ inputs.app }}/${{ github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
-  ci:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
-      - name: Install node
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+
+      - name: Install NodeJS
         uses: actions/setup-node@v6
         with:
-          node-version: 24
-          cache: 'yarn'
-          cache-dependency-path: internal/ui/yarn.lock
-          
-      - name: Install dependencies
-        working-directory: internal/ui
-        run: yarn install
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Run generators
-        working-directory: internal/ui
+      - name: Install dependencies
+        run: pnpm install
+        
+      - name: Build
+        run: pnpm --filter ${{ inputs.app }} build
+        
+      - name: Check for changes
         run: |
-          yarn generate          
           git add .
           git diff --staged --exit-code

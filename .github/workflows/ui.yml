@@ -1,0 +1,22 @@
+name: ui
+
+on:
+  push:
+    paths:
+      - 'internal/ui/**.js'
+      - 'internal/ui/package.json'
+      - '.github/workflows/ui.yml'
+    branches:
+      - main
+  pull_request:
+    paths:
+      - 'internal/ui/**.js' 
+      - 'internal/ui/package.json' 
+      - '.github/workflows/ui.yml'
+
+jobs:
+  ci:
+    uses: ./.github/workflows/node.yml
+    secrets: inherit
+    with:
+      app: ui

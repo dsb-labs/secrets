@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "Keeper",
+  "version": "0.1.0",
+  "description": "A simple, self-hostable secret manager",
+  "permissions": ["storage", "activeTab", "tabs"],
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "browser_action": {
+    "default_title": "Keeper",
+    "default_popup": "popup/index.html",
+    "default_icon": "icons/icon.svg"
+  }
+}

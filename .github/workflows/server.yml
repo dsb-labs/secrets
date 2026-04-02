@@ -1,4 +1,4 @@
-name: go
+name: server
 
 concurrency:
   group: ${{ github.workflow }}/${{ github.ref_name }}
@@ -10,7 +10,7 @@ on:
       - '**.mod'
       - '**.sum'
       - '**.templ'
-      - '.github/workflows/go.yml'
+      - '.github/workflows/server.yml'
     branches:
       - main
   pull_request:
@@ -19,7 +19,7 @@ on:
       - '**.mod'
       - '**.sum'
       - '**.templ'
-      - '.github/workflows/go.yml'
+      - '.github/workflows/server.yml'
 
 jobs:
   ci:

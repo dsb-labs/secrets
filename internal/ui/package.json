@@ -1,5 +1,5 @@
 {
-  "name": "keeper",
+  "name": "@keeper/ui",
   "version": "0.1.0",
   "description": "A simple, self-hostable secret manager",
   "main": "index.js",
@@ -7,7 +7,7 @@
   "author": "David Bond",
   "private": true,
   "scripts": {
-    "generate": "tailwindcss -i global.css -o asset/styles.css -m"
+    "build": "tailwindcss -i global.css -o asset/styles.css -m"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.2",
