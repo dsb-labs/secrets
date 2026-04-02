@@ -33,6 +33,8 @@ checksum:
 
 release:
   mode: replace
+  extra_files:
+    - glob: extension/dist/extension_*.xpi
 
 changelog:
   use: github
