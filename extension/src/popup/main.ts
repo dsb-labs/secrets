@@ -1,7 +1,7 @@
-import './style.css';
+import "./style.css";
 
-document.addEventListener('DOMContentLoaded', () => {
-  const app = document.getElementById('app')!;
+document.addEventListener("DOMContentLoaded", () => {
+  const app = document.getElementById("app")!;
   app.innerHTML = `
     <div class="p-4 flex flex-col gap-2">
       <h1 class="text-base font-semibold text-gray-900 dark:text-white">Keeper</h1>

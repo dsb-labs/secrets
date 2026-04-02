@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "build": "vite build",
-    "zip": "vite build && cd dist && zip -r keeper.xpi . --exclude keeper.xpi"
+    "zip": "vite build && cd dist && zip -r keeper.xpi . --exclude keeper.xpi",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

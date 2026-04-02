@@ -7,7 +7,9 @@
   "author": "David Bond",
   "private": true,
   "scripts": {
-    "build": "tailwindcss -i global.css -o asset/styles.css -m"
+    "build": "tailwindcss -i global.css -o asset/styles.css -m",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.2",

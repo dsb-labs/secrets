@@ -33,7 +33,10 @@ jobs:
         
       - name: Build
         run: pnpm --filter ${{ inputs.app }} build
-        
+
+      - name: Check formatting
+        run: pnpm --filter ${{ inputs.app }} format
+
       - name: Check for changes
         run: |
           git add .
