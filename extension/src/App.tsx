@@ -1,5 +1,6 @@
-import { useEffect, useState } from "preact/hooks";
-import { getServerURL, getToken } from "@/lib/storage";
+import { useEffect, useMemo, useState } from "preact/hooks";
+import { getServerURL, getToken, setToken as persistToken, clearToken } from "@/lib/storage";
+import { KeeperClient } from "@/lib/client";
 import { Setup } from "@/view/Setup";
 import { Login } from "@/view/Login";
 import { Logins } from "@/view/Logins";
@@ -17,6 +18,8 @@ export function App() {
     });
   }, []);
 
+  const client = useMemo(() => new KeeperClient(serverURL ?? "", token ?? ""), [serverURL, token]);
+
   if (loading) {
     return (
       <div class="flex min-h-48 items-center justify-center">
@@ -30,8 +33,18 @@ export function App() {
   }
 
   if (!token) {
-    return <Login serverURL={serverURL} onAuthenticated={setToken} />;
+    async function handleAuthenticated() {
+      await persistToken(client.token());
+      setToken(client.token());
+    }
+
+    return <Login client={client} onAuthenticated={handleAuthenticated} />;
   }
 
-  return <Logins serverURL={serverURL} token={token} />;
+  async function handleExpired() {
+    await clearToken();
+    setToken(null);
+  }
+
+  return <Logins client={client} onExpired={handleExpired} />;
 }

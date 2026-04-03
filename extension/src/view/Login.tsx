@@ -1,16 +1,15 @@
 import { useState } from "preact/hooks";
-import { login, InvalidCredentialsError, UnreachableError } from "@/lib/client";
-import { setToken } from "@/lib/storage";
+import { KeeperClient, InvalidCredentialsError, UnreachableError } from "@/lib/client";
 
 type Props = {
-  serverURL: string;
-  onAuthenticated: (token: string) => void;
+  client: KeeperClient;
+  onAuthenticated: () => void;
 };
 
 // Login renders a form that prompts the user to sign in with their email and password. On
-// submission, it authenticates against the configured Keeper server, persists the returned token
-// to storage, and calls onAuthenticated.
-export function Login({ serverURL, onAuthenticated }: Props) {
+// submission, it authenticates against the configured Keeper server via the provided client and
+// calls onAuthenticated.
+export function Login({ client, onAuthenticated }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,9 +20,8 @@ export function Login({ serverURL, onAuthenticated }: Props) {
     setSubmitting(true);
     setError("");
     try {
-      const token = await login(serverURL, email, password);
-      await setToken(token);
-      onAuthenticated(token);
+      await client.login(email, password);
+      onAuthenticated();
     } catch (err) {
       if (err instanceof InvalidCredentialsError || err instanceof UnreachableError) {
         setError(err.message);

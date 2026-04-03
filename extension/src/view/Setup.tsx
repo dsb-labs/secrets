@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { setServerURL } from "@/lib/storage";
-import { ping, UnreachableError } from "@/lib/client";
+import { KeeperClient, UnreachableError } from "@/lib/client";
 
 type Props = {
   onConfigured: (url: string) => void;
@@ -26,7 +26,7 @@ export function Setup({ onConfigured }: Props) {
     setChecking(true);
     setError("");
     try {
-      await ping(url);
+      await new KeeperClient(url).ping();
     } catch (err) {
       setError(err instanceof UnreachableError ? err.message : "An unexpected error occurred.");
       return;
