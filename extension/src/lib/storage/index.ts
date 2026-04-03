@@ -13,14 +13,14 @@ export async function setServerURL(url: string): Promise<void> {
 }
 
 export async function getToken(): Promise<string> {
-  const result = await browser.storage.local.get(KEY_TOKEN);
+  const result = await browser.storage.session.get(KEY_TOKEN);
   return (result[KEY_TOKEN] as string) ?? "";
 }
 
 export async function setToken(token: string): Promise<void> {
-  await browser.storage.local.set({ [KEY_TOKEN]: token });
+  await browser.storage.session.set({ [KEY_TOKEN]: token });
 }
 
 export async function clearToken(): Promise<void> {
-  await browser.storage.local.remove(KEY_TOKEN);
+  await browser.storage.session.remove(KEY_TOKEN);
 }
