@@ -8,6 +8,7 @@ on:
       - 'internal/ui/package.json'
       - 'internal/ui/.prettierrc'
       - '.github/workflows/ui.yml'
+      - 'package.json'
     branches:
       - main
   pull_request:
@@ -17,6 +18,7 @@ on:
       - 'internal/ui/package.json'
       - 'internal/ui/.prettierrc'
       - '.github/workflows/ui.yml'
+      - 'package.json'
 
 jobs:
   ci:

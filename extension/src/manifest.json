@@ -3,7 +3,7 @@
   "name": "Keeper",
   "version": "0.1.0",
   "description": "A simple, self-hostable secret manager",
-  "permissions": ["storage", "activeTab", "tabs"],
+  "permissions": ["storage", "activeTab", "tabs", "<all_urls>"],
   "icons": {
     "48": "icons/icon.svg",
     "96": "icons/icon.svg"

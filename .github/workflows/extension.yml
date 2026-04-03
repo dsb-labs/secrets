@@ -8,6 +8,7 @@ on:
       - 'extension/package.json'
       - 'extension/vite.config.ts'
       - '.github/workflows/extension.yml'
+      - 'package.json'
     branches:
       - main
   pull_request:
@@ -17,6 +18,7 @@ on:
       - 'extension/package.json'
       - 'extension/vite.config.ts'
       - '.github/workflows/extension.yml'
+      - 'package.json'
 
 jobs:
   ci:

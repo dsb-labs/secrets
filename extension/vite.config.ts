@@ -26,6 +26,11 @@ export default defineConfig({
   esbuild: {
     jsxImportSource: "preact",
   },
+  resolve: {
+    alias: {
+      "@": resolve(__dirname, "src"),
+    },
+  },
   root: resolve(__dirname, "src"),
   publicDir: resolve(__dirname, "public"),
   plugins: [tailwindcss(), extensionManifest()],
