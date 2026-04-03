@@ -1,5 +1,6 @@
 const HEALTH_PATH = "/api/v1/health";
 const AUTH_PATH = "/api/v1/auth";
+const LOGIN_PATH = "/api/v1/login";
 
 export class UnreachableError extends Error {
   constructor(url: string) {
@@ -53,4 +54,33 @@ export async function login(baseURL: string, email: string, password: string): P
 
   const { token } = await response.json();
   return token as string;
+}
+
+export type Login = {
+  id: string;
+  username: string;
+  password: string;
+  domains: string[];
+  createdAt: string;
+  name: string;
+};
+
+// listLogins fetches all logins from the server for the given domain, authenticated with the
+// provided token. Returns an empty array if the server has no logins matching the domain.
+export async function listLogins(baseURL: string, token: string, domain: string): Promise<Login[]> {
+  let response: Response;
+  try {
+    response = await fetch(`${baseURL}${LOGIN_PATH}?domain=${encodeURIComponent(domain)}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch {
+    throw new UnreachableError(baseURL);
+  }
+
+  if (!response.ok) {
+    throw new UnreachableError(baseURL);
+  }
+
+  const { logins } = await response.json();
+  return (logins ?? []) as Login[];
 }
