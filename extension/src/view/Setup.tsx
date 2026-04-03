@@ -6,6 +6,9 @@ type Props = {
   onConfigured: (url: string) => void;
 };
 
+// Setup renders a form that prompts the user to enter their Keeper server URL. On submission, it
+// validates the URL format and checks reachability via the health endpoint before persisting the
+// URL to storage and calling onConfigured.
 export function Setup({ onConfigured }: Props) {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
@@ -47,7 +50,7 @@ export function Setup({ onConfigured }: Props) {
           value={url}
           onInput={(e) => setUrl((e.target as HTMLInputElement).value)}
           placeholder="https://your-keeper-server.com"
-          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
           required
         />
         {error && <p class="text-xs text-red-500">{error}</p>}

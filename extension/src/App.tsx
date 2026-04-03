@@ -1,14 +1,17 @@
 import { useEffect, useState } from "preact/hooks";
-import { getServerURL } from "@/lib/storage";
+import { getServerURL, getToken } from "@/lib/storage";
 import { Setup } from "@/view/Setup";
+import { Login } from "@/view/Login";
 
 export function App() {
   const [serverURL, setServerURL] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getServerURL().then((url) => {
+    Promise.all([getServerURL(), getToken()]).then(([url, tkn]) => {
       setServerURL(url || null);
+      setToken(tkn || null);
       setLoading(false);
     });
   }, []);
@@ -23,6 +26,10 @@ export function App() {
 
   if (!serverURL) {
     return <Setup onConfigured={setServerURL} />;
+  }
+
+  if (!token) {
+    return <Login serverURL={serverURL} onAuthenticated={setToken} />;
   }
 
   return (
