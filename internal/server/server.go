@@ -91,6 +91,7 @@ func Run(ctx context.Context, config Config) error {
 	api.NewNoteAPI(noteSvc).Register(mux)
 	api.NewToolAPI(toolSvc).Register(mux)
 	api.NewCardAPI(cardSvc).Register(mux)
+	api.NewHealthAPI().Register(mux)
 
 	// UI handlers.
 	ui.NewAuthHandler(authSvc).Register(mux)
