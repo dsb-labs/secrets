@@ -117,4 +117,10 @@ export class KeeperClient {
     const { logins } = await this.get<{ logins: Login[] }>(`${LOGIN_PATH}?domain=${encodeURIComponent(domain)}`);
     return logins ?? [];
   }
+
+  // getLogin returns the login with the given ID.
+  async getLogin(id: string): Promise<Login> {
+    const { login } = await this.get<{ login: Login }>(`${LOGIN_PATH}/${encodeURIComponent(id)}`);
+    return login;
+  }
 }

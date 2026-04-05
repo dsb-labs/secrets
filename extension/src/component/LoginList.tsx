@@ -1,11 +1,11 @@
 import { type Login } from "@/lib/client";
 
 // LoginList renders a bordered list of LoginRow items.
-export function LoginList({ logins }: { logins: Login[] }) {
+export function LoginList({ logins, onSelect }: { logins: Login[]; onSelect: (id: string) => void }) {
   return (
     <div class="divide-y divide-gray-200 rounded-xl border border-gray-200 bg-white shadow-sm dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800">
       {logins.map((login) => (
-        <LoginRow key={login.id} login={login} />
+        <LoginRow key={login.id} login={login} onSelect={onSelect} />
       ))}
     </div>
   );
@@ -13,12 +13,15 @@ export function LoginList({ logins }: { logins: Login[] }) {
 
 // LoginRow renders a single login entry with a favicon or fallback key icon, the login name and
 // username, and a trailing chevron.
-function LoginRow({ login }: { login: Login }) {
+function LoginRow({ login, onSelect }: { login: Login; onSelect: (id: string) => void }) {
   const title = login.name || login.domains[0] || login.username;
   const favicon = login.domains[0] ? `https://www.google.com/s2/favicons?domain=${login.domains[0]}&sz=32` : null;
 
   return (
-    <div class="flex items-center justify-between px-4 py-3.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50">
+    <div
+      class="flex cursor-pointer items-center justify-between px-4 py-3.5 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
+      onClick={() => onSelect(login.id)}
+    >
       <div class="flex min-w-0 items-center gap-3">
         {favicon ? (
           <img

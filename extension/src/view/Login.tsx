@@ -3,7 +3,7 @@ import { KeeperClient, InvalidCredentialsError, UnreachableError } from "@/lib/c
 
 type Props = {
   client: KeeperClient;
-  onAuthenticated: () => void;
+  onAuthenticated: () => Promise<void>;
 };
 
 // Login renders a form that prompts the user to sign in with their email and password. On
@@ -21,7 +21,7 @@ export function Login({ client, onAuthenticated }: Props) {
     setError("");
     try {
       await client.login(email, password);
-      onAuthenticated();
+      await onAuthenticated();
     } catch (err) {
       if (err instanceof InvalidCredentialsError || err instanceof UnreachableError) {
         setError(err.message);

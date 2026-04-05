@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import { useLocation } from "preact-iso";
 import browser from "webextension-polyfill";
 import { KeeperClient, UnauthorizedError, type Login } from "@/lib/client";
 import { EmptyState } from "@/component/EmptyState";
@@ -6,13 +7,14 @@ import { LoginList } from "@/component/LoginList";
 
 type Props = {
   client: KeeperClient;
-  onExpired: () => void;
+  onExpired: () => Promise<void>;
 };
 
 // Logins fetches and renders the list of logins stored for the current tab's domain. Shows a
 // loading state while fetching, an empty state when no logins are found, and a list of rows
 // otherwise.
 export function Logins({ client, onExpired }: Props) {
+  const { route } = useLocation();
   const [logins, setLogins] = useState<Login[]>([]);
   const [domain, setDomain] = useState("");
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export function Logins({ client, onExpired }: Props) {
         setLogins(await client.listLogins(hostname));
       } catch (err) {
         if (err instanceof UnauthorizedError) {
-          onExpired();
+          await onExpired();
         } else {
           setError("Failed to load logins.");
         }
@@ -62,7 +64,7 @@ export function Logins({ client, onExpired }: Props) {
         <h1 class="text-sm font-semibold text-gray-900 dark:text-white">Logins</h1>
         {domain && <p class="mt-0.5 truncate text-xs text-gray-500 dark:text-gray-400">{domain}</p>}
       </div>
-      {logins.length === 0 ? <EmptyState /> : <LoginList logins={logins} />}
+      {logins.length === 0 ? <EmptyState /> : <LoginList logins={logins} onSelect={(id) => route(`/logins/${id}`)} />}
     </div>
   );
 }
