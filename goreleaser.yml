@@ -33,8 +33,6 @@ checksum:
 
 release:
   mode: replace
-  extra_files:
-    - glob: extension/dist/extension_*.zip
 
 changelog:
   use: github
