@@ -10,7 +10,7 @@ import (
 	creditcard "github.com/durango/go-credit-card"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/database"
 )
 
 type (

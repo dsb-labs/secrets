@@ -25,4 +25,4 @@ jobs:
     uses: ./.github/workflows/node.yml
     secrets: inherit
     with:
-      app: '@keeper/extension'
+      app: '@secrets/extension'

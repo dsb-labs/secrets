@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/internal/server/database"
-	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/service"
 )
 
 func TestAccountService_Create(t *testing.T) {

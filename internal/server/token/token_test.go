@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/server/token"
 )
 
 func TestGenerator_Generate(t *testing.T) {
@@ -107,7 +107,7 @@ func TestMiddleware(t *testing.T) {
 			Name: "ignore invalid token in cookie",
 			Token: func(g *token.Generator, r *http.Request) {
 				r.AddCookie(&http.Cookie{
-					Name:  "keeper",
+					Name:  "secrets",
 					Value: "invalid",
 				})
 			},
@@ -119,7 +119,7 @@ func TestMiddleware(t *testing.T) {
 				tkn, err := g.Generate(uuid.NameSpaceDNS)
 				require.NoError(t, err)
 				r.AddCookie(&http.Cookie{
-					Name:  "keeper",
+					Name:  "secrets",
 					Value: tkn.String(),
 				})
 			},

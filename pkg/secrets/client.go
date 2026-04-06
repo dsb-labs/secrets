@@ -1,5 +1,5 @@
-// Package keeper provides the go client for the keeper api.
-package keeper
+// Package secrets provides the go client for the secrets api.
+package secrets
 
 import (
 	"bytes"
@@ -10,11 +10,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/davidsbond/keeper/internal/server/api"
+	"github.com/dsb-labs/secrets/internal/server/api"
 )
 
 type (
-	// The Client type is responsible for managing API requests made against the keeper API.
+	// The Client type is responsible for managing API requests made against the secrets API.
 	Client struct {
 		baseURL string
 		client  *http.Client

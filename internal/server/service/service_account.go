@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/database"
 )
 
 type (
@@ -185,7 +185,7 @@ func (svc *AccountService) ChangePassword(userID uuid.UUID, oldPassword string, 
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
 
-	// TODO(davidsbond): this feels a little fragile, we probably need some undo/redo mechanism here to avoid a
+	// TODO(dsb-labs): this feels a little fragile, we probably need some undo/redo mechanism here to avoid a
 	// situation where the account's password hash has been changed but the key rotation failed.
 	err = svc.accounts.Update(account)
 	switch {

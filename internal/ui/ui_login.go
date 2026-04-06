@@ -10,11 +10,11 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/password"
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	loginview "github.com/davidsbond/keeper/internal/ui/view/login"
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
+	"github.com/dsb-labs/secrets/internal/server/password"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	loginview "github.com/dsb-labs/secrets/internal/ui/view/login"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
 )
 
 type (

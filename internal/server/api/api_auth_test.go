@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/internal/server/api"
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/server/api"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
 )
 
 func TestAuthAPI_Login(t *testing.T) {

@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/internal/server/database"
-	"github.com/davidsbond/keeper/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/service"
 )
 
 type (
@@ -380,8 +380,8 @@ func TestToolService_Export(t *testing.T) {
 }
 
 var (
-	//go:embed testdata/keeper.json
-	keeperJSON string
+	//go:embed testdata/secrets.json
+	secretsJSON string
 	//go:embed testdata/bitwarden.json
 	bitwardenJSON string
 	//go:embed testdata/bitwarden_invalid_card.json
@@ -408,18 +408,18 @@ func TestToolService_Import(t *testing.T) {
 			Data:         `{}`,
 		},
 		{
-			Name:         "keeper: invalid JSON",
+			Name:         "secrets: invalid JSON",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
 			Data:         `not json`,
 		},
 		{
-			Name:         "keeper: error if login database lifetime has expired",
+			Name:         "secrets: error if login database lifetime has expired",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -427,11 +427,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error getting login database",
+			Name:         "secrets: error getting login database",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -439,11 +439,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error if note database lifetime has expired",
+			Name:         "secrets: error if note database lifetime has expired",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -454,11 +454,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error getting note database",
+			Name:         "secrets: error getting note database",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -469,11 +469,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error if card database lifetime has expired",
+			Name:         "secrets: error if card database lifetime has expired",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -487,11 +487,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error getting card database",
+			Name:         "secrets: error getting card database",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -505,11 +505,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error creating login",
+			Name:         "secrets: error creating login",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -527,11 +527,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error creating note",
+			Name:         "secrets: error creating note",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -553,11 +553,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: card database lifetime expired on create",
+			Name:         "secrets: card database lifetime expired on create",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -583,11 +583,11 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:         "keeper: error creating card",
+			Name:         "secrets: error creating card",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
 			Source:       service.ImportSourceKeeper,
-			Data:         keeperJSON,
+			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
 					For(uuid.NameSpaceDNS).
@@ -613,10 +613,10 @@ func TestToolService_Import(t *testing.T) {
 			},
 		},
 		{
-			Name:   "keeper: success",
+			Name:   "secrets: success",
 			UserID: uuid.NameSpaceDNS,
 			Source: service.ImportSourceKeeper,
-			Data:   keeperJSON,
+			Data:   secretsJSON,
 			Expected: service.ImportResult{
 				Logins: 1,
 				Notes:  1,

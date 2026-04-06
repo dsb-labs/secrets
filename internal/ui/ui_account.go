@@ -8,11 +8,11 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	accountview "github.com/davidsbond/keeper/internal/ui/view/account"
-	"github.com/davidsbond/keeper/internal/ui/view/auth"
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	accountview "github.com/dsb-labs/secrets/internal/ui/view/account"
+	"github.com/dsb-labs/secrets/internal/ui/view/auth"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
 )
 
 // The AccountHandler type is responsible for serving web interface pages regarding account management.
@@ -147,7 +147,7 @@ func (h *AccountHandler) ChangePasswordCallback(w http.ResponseWriter, r *http.R
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "keeper",
+		Name:     "secrets",
 		Value:    "",
 		MaxAge:   -1,
 		Secure:   true,
@@ -247,7 +247,7 @@ func (h *AccountHandler) DeleteCallback(w http.ResponseWriter, r *http.Request) 
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "keeper",
+		Name:     "secrets",
 		Value:    "",
 		MaxAge:   -1,
 		Secure:   true,
@@ -262,7 +262,7 @@ func (h *AccountHandler) DeleteCallback(w http.ResponseWriter, r *http.Request) 
 // Logout clears the session cookie and redirects to the login page.
 func (h *AccountHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     "keeper",
+		Name:     "secrets",
 		Value:    "",
 		MaxAge:   -1,
 		Secure:   true,

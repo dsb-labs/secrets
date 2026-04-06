@@ -5,13 +5,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
+	"github.com/dsb-labs/secrets/internal/cli"
 )
 
 func export() *cobra.Command {
 	return &cobra.Command{
 		Use:   "export",
-		Short: "Export your entire keeper database",
+		Short: "Export your entire secrets database",
 		Long:  "Outputs all data stored for the current user in JSON format.",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {

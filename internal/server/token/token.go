@@ -178,7 +178,7 @@ func ToContext(ctx context.Context, tkn Token) context.Context {
 func Middleware(p *Parser) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if cookie, _ := r.Cookie("keeper"); cookie != nil {
+			if cookie, _ := r.Cookie("secrets"); cookie != nil {
 				tkn, err := p.Parse(cookie.Value)
 				if err == nil {
 					ctx := ToContext(r.Context(), tkn)

@@ -1,4 +1,4 @@
-package keeper
+package secrets
 
 import (
 	"context"
@@ -8,7 +8,7 @@ import (
 
 	"github.com/davidsbond/x/convert"
 
-	"github.com/davidsbond/keeper/internal/server/api"
+	"github.com/dsb-labs/secrets/internal/server/api"
 )
 
 type (

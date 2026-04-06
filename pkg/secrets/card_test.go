@@ -1,4 +1,4 @@
-package keeper_test
+package secrets_test
 
 import (
 	"testing"
@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func TestClient_CreateCard(t *testing.T) {
@@ -16,15 +16,15 @@ func TestClient_CreateCard(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.CreateCard(ctx, keeper.Card{})
+		_, err := client.CreateCard(ctx, secrets.Card{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
 	t.Run("creates card", func(t *testing.T) {
-		card := keeper.Card{
+		card := secrets.Card{
 			HolderName:  "Test McTest",
 			Number:      "4111 1111 1111 1111",
 			ExpiryMonth: time.March,
@@ -39,7 +39,7 @@ func TestClient_CreateCard(t *testing.T) {
 	})
 
 	t.Run("error if card is invalid", func(t *testing.T) {
-		card := keeper.Card{
+		card := secrets.Card{
 			HolderName:  "Test McTest",
 			Number:      "not a number",
 			ExpiryMonth: time.March,
@@ -49,7 +49,7 @@ func TestClient_CreateCard(t *testing.T) {
 
 		_, err := client.CreateCard(ctx, card)
 		require.Error(t, err)
-		assert.True(t, keeper.IsBadRequest(err))
+		assert.True(t, secrets.IsBadRequest(err))
 	})
 }
 
@@ -58,20 +58,20 @@ func TestClient_ListCards(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.ListCards(ctx, keeper.CardListOptions{})
+		_, err := client.ListCards(ctx, secrets.CardListOptions{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
 	t.Run("lists no cards", func(t *testing.T) {
-		cards, err := client.ListCards(ctx, keeper.CardListOptions{})
+		cards, err := client.ListCards(ctx, secrets.CardListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, cards, 0)
 	})
 
-	expected := keeper.Card{
+	expected := secrets.Card{
 		HolderName:  "Test McTest",
 		Number:      "4111 1111 1111 1111",
 		ExpiryMonth: time.March,
@@ -84,7 +84,7 @@ func TestClient_ListCards(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("lists cards", func(t *testing.T) {
-		cards, err := client.ListCards(ctx, keeper.CardListOptions{})
+		cards, err := client.ListCards(ctx, secrets.CardListOptions{})
 		require.NoError(t, err)
 		if assert.Len(t, cards, 1) {
 			actual := cards[0]
@@ -105,12 +105,12 @@ func TestClient_DeleteCard(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		err := client.DeleteCard(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
-	cardID, err := client.CreateCard(ctx, keeper.Card{
+	cardID, err := client.CreateCard(ctx, secrets.Card{
 		HolderName:  "Test McTest",
 		Number:      "4111 1111 1111 1111",
 		ExpiryMonth: time.March,
@@ -123,7 +123,7 @@ func TestClient_DeleteCard(t *testing.T) {
 	t.Run("error if card does not exist", func(t *testing.T) {
 		err = client.DeleteCard(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
 	t.Run("deletes card", func(t *testing.T) {
@@ -134,7 +134,7 @@ func TestClient_DeleteCard(t *testing.T) {
 	t.Run("card does not exist", func(t *testing.T) {
 		_, err = client.GetCard(ctx, cardID)
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 }
 
@@ -145,12 +145,12 @@ func TestClient_GetCard(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		_, err := client.GetCard(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
-	expected := keeper.Card{
+	expected := secrets.Card{
 		HolderName:  "Test McTest",
 		Number:      "4111 1111 1111 1111",
 		ExpiryMonth: time.March,
@@ -165,7 +165,7 @@ func TestClient_GetCard(t *testing.T) {
 	t.Run("error if card does not exist", func(t *testing.T) {
 		_, err = client.GetCard(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
 	t.Run("gets card", func(t *testing.T) {

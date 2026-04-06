@@ -11,8 +11,8 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
 )
 
 type (

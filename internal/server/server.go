@@ -1,4 +1,4 @@
-// Package server provides types and functions for running the keeper server.
+// Package server provides types and functions for running the secrets server.
 package server
 
 import (
@@ -18,11 +18,11 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/davidsbond/keeper/internal/server/api"
-	"github.com/davidsbond/keeper/internal/server/database"
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui"
+	"github.com/dsb-labs/secrets/internal/server/api"
+	"github.com/dsb-labs/secrets/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/ui"
 )
 
 // Run the server using the provided configuration. This function blocks until the provided context is cancelled or

@@ -4,10 +4,10 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/view/dashboard"
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/ui/view/dashboard"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
 )
 
 // The DashboardHandler type is responsible for serving web interface pages regarding the user dashboard.

@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/server"
+	"github.com/dsb-labs/secrets/internal/server"
 )
 
 // Command returns a cobra.Command named "serve" used to start the password manager server.

@@ -7,8 +7,8 @@ import (
 	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/internal/cli"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func create() *cobra.Command {
@@ -41,7 +41,7 @@ func create() *cobra.Command {
 			ctx := cmd.Context()
 			client := cli.ClientFromContext(ctx)
 
-			account := keeper.Account{
+			account := secrets.Account{
 				Email:       args[0],
 				DisplayName: args[1],
 				Password:    password,

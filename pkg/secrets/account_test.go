@@ -1,4 +1,4 @@
-package keeper_test
+package secrets_test
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func TestClient_CreateAccount(t *testing.T) {
@@ -15,7 +15,7 @@ func TestClient_CreateAccount(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("creates new account", func(t *testing.T) {
-		restoreKey, err := client.CreateAccount(ctx, keeper.Account{
+		restoreKey, err := client.CreateAccount(ctx, secrets.Account{
 			Email:       "test@test.com",
 			DisplayName: "Test McTest",
 			Password:    "test",
@@ -26,14 +26,14 @@ func TestClient_CreateAccount(t *testing.T) {
 	})
 
 	t.Run("error if account already exists", func(t *testing.T) {
-		_, err := client.CreateAccount(ctx, keeper.Account{
+		_, err := client.CreateAccount(ctx, secrets.Account{
 			Email:       "test@test.com",
 			DisplayName: "Test McTest",
 			Password:    "test",
 		})
 
 		require.Error(t, err)
-		assert.True(t, keeper.IsConflict(err))
+		assert.True(t, secrets.IsConflict(err))
 	})
 }
 
@@ -44,7 +44,7 @@ func TestClient_GetAccount(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		_, err := client.GetAccount(ctx)
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
@@ -64,7 +64,7 @@ func TestClient_ChangePassword(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		_, err := client.ChangePassword(ctx, "test", "test2")
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
@@ -76,9 +76,9 @@ func TestClient_ChangePassword(t *testing.T) {
 	})
 
 	t.Run("is now unauthenticated", func(t *testing.T) {
-		_, err := client.ListLogins(ctx, keeper.LoginListOptions{})
+		_, err := client.ListLogins(ctx, secrets.LoginListOptions{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	t.Run("authenticates with new password", func(t *testing.T) {
@@ -94,7 +94,7 @@ func TestClient_DeleteAccount(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		err := client.DeleteAccount(ctx)
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
@@ -107,7 +107,7 @@ func TestClient_DeleteAccount(t *testing.T) {
 	t.Run("can no longer authenticate", func(t *testing.T) {
 		err := client.Login(ctx, "test@test.com", "test")
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 }
 
@@ -120,13 +120,13 @@ func TestClient_RestoreAccount(t *testing.T) {
 	t.Run("error if not account does not exist", func(t *testing.T) {
 		_, err := client.RestoreAccount(ctx, "nope@nope.com", restoreKey, "something")
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
 	t.Run("error if restore key is invalid", func(t *testing.T) {
 		_, err := client.RestoreAccount(ctx, "test@test.com", bytes.Repeat([]byte{0}, 32), "something")
 		require.Error(t, err)
-		assert.True(t, keeper.IsBadRequest(err))
+		assert.True(t, secrets.IsBadRequest(err))
 	})
 
 	t.Run("changes password", func(t *testing.T) {

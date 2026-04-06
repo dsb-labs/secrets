@@ -7,7 +7,7 @@ package status
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/davidsbond/keeper/internal/ui/layout"
+import "github.com/dsb-labs/secrets/internal/ui/layout"
 
 type (
 	// InternalServerErrorViewModel contains fields used to configure the 500 internal server error view.

@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/database"
 )
 
 func TestManager(t *testing.T) {

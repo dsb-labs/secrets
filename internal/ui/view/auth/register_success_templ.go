@@ -8,9 +8,9 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/davidsbond/keeper/internal/ui/component"
-	"github.com/davidsbond/keeper/internal/ui/layout"
-	"github.com/davidsbond/keeper/internal/ui/script"
+	"github.com/dsb-labs/secrets/internal/ui/component"
+	"github.com/dsb-labs/secrets/internal/ui/layout"
+	"github.com/dsb-labs/secrets/internal/ui/script"
 )
 
 type (

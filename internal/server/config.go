@@ -11,11 +11,11 @@ import (
 
 	"github.com/BurntSushi/toml"
 
-	"github.com/davidsbond/keeper/internal/cli/config"
+	"github.com/dsb-labs/secrets/internal/cli/config"
 )
 
 type (
-	// The Config type contains all configuration values for the keeper server.
+	// The Config type contains all configuration values for the secrets server.
 	Config struct {
 		// Configuration for serving HTTP requests.
 		HTTP HTTPConfig `toml:"http"`
@@ -137,5 +137,5 @@ func (c JWTConfig) validate() error {
 }
 
 func defaultDatabasePath() string {
-	return filepath.Join(config.Dir(), "keeper", "data")
+	return filepath.Join(config.Dir(), "secrets", "data")
 }

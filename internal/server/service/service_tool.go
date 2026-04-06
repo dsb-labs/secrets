@@ -12,8 +12,8 @@ import (
 	"github.com/davidsbond/x/convert"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/database"
-	"github.com/davidsbond/keeper/internal/server/export/bitwarden"
+	"github.com/dsb-labs/secrets/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/export/bitwarden"
 )
 
 type (
@@ -62,10 +62,10 @@ var (
 )
 
 // ParseImportSource converts a string identifier to its corresponding ImportSource constant. Recognized values
-// are "keeper" and "bitwarden". Returns ErrInvalidImportSource for any other value.
+// are "secrets" and "bitwarden". Returns ErrInvalidImportSource for any other value.
 func ParseImportSource(s string) (ImportSource, error) {
 	switch s {
-	case "keeper":
+	case "secrets":
 		return ImportSourceKeeper, nil
 	case "bitwarden":
 		return ImportSourceBitwarden, nil
@@ -165,7 +165,7 @@ func (svc *ToolService) Export(userID uuid.UUID) (Export, error) {
 }
 
 // Import data for a user, converting the data from its original source (identified by the ImportSource enum) to a
-// keeper Export type. UUIDs will not be preserved and an ImportResult is returned indicating the total number of
+// secrets Export type. UUIDs will not be preserved and an ImportResult is returned indicating the total number of
 // items imported along with any individual errors.
 func (svc *ToolService) Import(userID uuid.UUID, source ImportSource, data io.Reader) (ImportResult, error) {
 	switch source {

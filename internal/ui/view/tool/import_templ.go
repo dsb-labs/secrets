@@ -8,8 +8,8 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/davidsbond/keeper/internal/ui/component"
-	"github.com/davidsbond/keeper/internal/ui/layout"
+	"github.com/dsb-labs/secrets/internal/ui/component"
+	"github.com/dsb-labs/secrets/internal/ui/layout"
 )
 
 type (
@@ -169,7 +169,7 @@ func importBody(model ImportViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form action=\"/tools/import\" method=\"POST\" enctype=\"multipart/form-data\" class=\"space-y-4\"><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"source\">Import source</label> <select id=\"source\" name=\"source\" required class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"><option value=\"keeper\">Keeper</option> <option value=\"bitwarden\">Bitwarden</option></select></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"file\">File</label> <input id=\"file\" type=\"file\" name=\"file\" accept=\".json\" required class=\"block w-full text-sm text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50\"></div><button type=\"submit\" class=\"cursor-pointer w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Import data</button></form>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<form action=\"/tools/import\" method=\"POST\" enctype=\"multipart/form-data\" class=\"space-y-4\"><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"source\">Import source</label> <select id=\"source\" name=\"source\" required class=\"block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent\"><option value=\"secrets\">Keeper</option> <option value=\"bitwarden\">Bitwarden</option></select></div><div><label class=\"block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5\" for=\"file\">File</label> <input id=\"file\" type=\"file\" name=\"file\" accept=\".json\" required class=\"block w-full text-sm text-gray-900 dark:text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50\"></div><button type=\"submit\" class=\"cursor-pointer w-full rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-sm transition-colors\">Import data</button></form>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

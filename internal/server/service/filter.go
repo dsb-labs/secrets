@@ -6,7 +6,7 @@ import (
 
 	"github.com/davidsbond/x/filter"
 
-	"github.com/davidsbond/keeper/internal/server/urlcmp"
+	"github.com/dsb-labs/secrets/internal/server/urlcmp"
 )
 
 // LoginsByDomain returns a filter.Filter implementation that checks if a given Login contains a domain that matches

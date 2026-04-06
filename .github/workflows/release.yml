@@ -48,7 +48,7 @@ jobs:
           pnpm install --frozen-lockfile
           cd extension && pnpm version ${GITHUB_REF_NAME#v} --no-git-tag-version && cd ..
           pnpm zip:extension
-          mv extension/dist/keeper.zip extension/dist/extension_${GITHUB_REF_NAME#v}.zip
+          mv extension/dist/secrets.zip extension/dist/extension_${GITHUB_REF_NAME#v}.zip
           git reset --hard
 
       - name: Docker login

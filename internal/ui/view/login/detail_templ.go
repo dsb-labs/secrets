@@ -11,10 +11,10 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/davidsbond/keeper/internal/server/password"
-	"github.com/davidsbond/keeper/internal/ui/component"
-	"github.com/davidsbond/keeper/internal/ui/layout"
-	"github.com/davidsbond/keeper/internal/ui/script"
+	"github.com/dsb-labs/secrets/internal/server/password"
+	"github.com/dsb-labs/secrets/internal/ui/component"
+	"github.com/dsb-labs/secrets/internal/ui/layout"
+	"github.com/dsb-labs/secrets/internal/ui/script"
 )
 
 type (

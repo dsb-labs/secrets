@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
+	"github.com/dsb-labs/secrets/internal/cli"
 )
 
 func get() *cobra.Command {

@@ -2,9 +2,9 @@ filename: mocks_test.go
 log-level: error
 pkgname: '{{.SrcPackageName}}_test'
 packages:
-  github.com/davidsbond/keeper/internal/server/api:
+  github.com/dsb-labs/secrets/internal/server/api:
     config:
       all: true
-  github.com/davidsbond/keeper/internal/server/service:
+  github.com/dsb-labs/secrets/internal/server/service:
     config:
       all: true

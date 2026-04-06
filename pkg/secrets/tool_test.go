@@ -1,4 +1,4 @@
-package keeper_test
+package secrets_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func TestClient_Export(t *testing.T) {
@@ -17,7 +17,7 @@ func TestClient_Export(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		_, err := client.Export(ctx)
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
@@ -30,7 +30,7 @@ func TestClient_Export(t *testing.T) {
 		assert.Len(t, export.Notes, 0)
 	})
 
-	expectedCard := keeper.Card{
+	expectedCard := secrets.Card{
 		HolderName:  "Test McTest",
 		Number:      "4111 1111 1111 1111",
 		ExpiryMonth: time.March,
@@ -39,13 +39,13 @@ func TestClient_Export(t *testing.T) {
 		Name:        "test",
 	}
 
-	expectedLogin := keeper.Login{
+	expectedLogin := secrets.Login{
 		Username: "test",
 		Password: "test",
 		Domains:  []string{"test.com"},
 	}
 
-	expectedNote := keeper.Note{
+	expectedNote := secrets.Note{
 		Name:    "test",
 		Content: "test",
 	}

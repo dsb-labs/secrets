@@ -7,14 +7,14 @@ import (
 	"github.com/davidsbond/x/envvar"
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
-	"github.com/davidsbond/keeper/internal/cli/config"
+	"github.com/dsb-labs/secrets/internal/cli"
+	"github.com/dsb-labs/secrets/internal/cli/config"
 )
 
 func login() *cobra.Command {
 	return &cobra.Command{
 		Use:   "login [email]",
-		Short: "Unlock your keeper database",
+		Short: "Unlock your secrets database",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()

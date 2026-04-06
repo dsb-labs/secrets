@@ -6,8 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/internal/cli"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func restore() *cobra.Command {
@@ -25,7 +25,7 @@ func restore() *cobra.Command {
 				return fmt.Errorf("failed to read restore key: %w", err)
 			}
 
-			restoreKey, err := keeper.ParseRestoreKey(rawKey)
+			restoreKey, err := secrets.ParseRestoreKey(rawKey)
 			if err != nil {
 				return fmt.Errorf("failed to decode restore key: %w", err)
 			}

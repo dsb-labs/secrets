@@ -4,7 +4,7 @@ import (
 	"github.com/dgraph-io/badger/v4"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/database"
 )
 
 type (

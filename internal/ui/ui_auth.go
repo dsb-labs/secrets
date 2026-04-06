@@ -7,10 +7,10 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	"github.com/davidsbond/keeper/internal/ui/view/auth"
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/ui/view/auth"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
 )
 
 type (
@@ -106,7 +106,7 @@ func (h *AuthHandler) LoginCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "keeper",
+		Name:     "secrets",
 		Value:    tkn.String(),
 		Expires:  tkn.ExpiresAt(),
 		Secure:   true,

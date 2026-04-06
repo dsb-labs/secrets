@@ -6,14 +6,14 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
-	"github.com/davidsbond/keeper/internal/cli/config"
+	"github.com/dsb-labs/secrets/internal/cli"
+	"github.com/dsb-labs/secrets/internal/cli/config"
 )
 
 func logout() *cobra.Command {
 	return &cobra.Command{
 		Use:   "logout",
-		Short: "Lock your keeper database",
+		Short: "Lock your secrets database",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := cmd.Context()

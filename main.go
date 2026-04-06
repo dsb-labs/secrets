@@ -8,23 +8,23 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/cmd/account"
-	"github.com/davidsbond/keeper/cmd/auth"
-	"github.com/davidsbond/keeper/cmd/login"
-	"github.com/davidsbond/keeper/cmd/note"
-	"github.com/davidsbond/keeper/cmd/serve"
-	"github.com/davidsbond/keeper/cmd/tool"
+	"github.com/dsb-labs/secrets/cmd/account"
+	"github.com/dsb-labs/secrets/cmd/auth"
+	"github.com/dsb-labs/secrets/cmd/login"
+	"github.com/dsb-labs/secrets/cmd/note"
+	"github.com/dsb-labs/secrets/cmd/serve"
+	"github.com/dsb-labs/secrets/cmd/tool"
 )
 
 //go:generate go tool mockery
 //go:generate go tool templ generate -include-version=false
-//go:generate go tool go-licenses save --one_output --force --ignore "github.com/davidsbond/keeper,filippo.io/csrf" --save_path licenses .
+//go:generate go tool go-licenses save --one_output --force --ignore "github.com/dsb-labs/secrets,filippo.io/csrf" --save_path licenses .
 func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
 	defer cancel()
 
 	cmd := &cobra.Command{
-		Use:          "keeper",
+		Use:          "secrets",
 		Short:        "A simple, self-hostable secret manager",
 		SilenceUsage: true,
 		CompletionOptions: cobra.CompletionOptions{

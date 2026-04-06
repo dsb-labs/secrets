@@ -55,7 +55,7 @@ func Save(path string, config Config) error {
 
 // DefaultConfigPath returns the default path for storing a user's local configuration file.
 func DefaultConfigPath() string {
-	return filepath.Join(Dir(), "keeper", "config.toml")
+	return filepath.Join(Dir(), "secrets", "config.toml")
 }
 
 // Dir returns a directory on-disk where configuration files/data can be stored. It handles different GOOS values and

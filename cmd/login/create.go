@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/internal/cli"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func create() *cobra.Command {
@@ -28,7 +28,7 @@ func create() *cobra.Command {
 				return fmt.Errorf("failed to read password: %w", err)
 			}
 
-			login := keeper.Login{
+			login := secrets.Login{
 				Username: args[0],
 				Password: password,
 				Domains:  domains,

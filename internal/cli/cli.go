@@ -13,15 +13,15 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"github.com/davidsbond/keeper/internal/cli/config"
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/internal/cli/config"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 type (
 	ctxKey struct{}
 )
 
-// CreateClient is to be used as a PersistentPreRun function for a cobra root command that adds a keeper.Client
+// CreateClient is to be used as a PersistentPreRun function for a cobra root command that adds a secrets.Client
 // instance into the command context for child commands to use.
 func CreateClient(cmd *cobra.Command, _ []string) error {
 	ctx := cmd.Context()
@@ -46,7 +46,7 @@ func CreateClient(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed to load config: %w", err)
 	}
 
-	client := keeper.NewClient(apiURL)
+	client := secrets.NewClient(apiURL)
 	client.SetToken(cfg.Token)
 
 	cmd.SetContext(ClientToContext(ctx, client))
@@ -54,14 +54,14 @@ func CreateClient(cmd *cobra.Command, _ []string) error {
 	return nil
 }
 
-// ClientToContext adds the given keeper.Client to the context.Context.
-func ClientToContext(ctx context.Context, client *keeper.Client) context.Context {
+// ClientToContext adds the given secrets.Client to the context.Context.
+func ClientToContext(ctx context.Context, client *secrets.Client) context.Context {
 	return context.WithValue(ctx, ctxKey{}, client)
 }
 
-// ClientFromContext returns a keeper.Client from the context.Context, or nil if one is not found.
-func ClientFromContext(ctx context.Context) *keeper.Client {
-	client, ok := ctx.Value(ctxKey{}).(*keeper.Client)
+// ClientFromContext returns a secrets.Client from the context.Context, or nil if one is not found.
+func ClientFromContext(ctx context.Context) *secrets.Client {
+	client, ok := ctx.Value(ctxKey{}).(*secrets.Client)
 	if !ok {
 		return nil
 	}

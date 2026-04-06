@@ -5,9 +5,9 @@
 package api_test
 
 import (
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
 	"github.com/davidsbond/x/filter"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
 	"github.com/google/uuid"
 	mock "github.com/stretchr/testify/mock"
 )

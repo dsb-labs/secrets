@@ -7,7 +7,7 @@ package status
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/davidsbond/keeper/internal/ui/layout"
+import "github.com/dsb-labs/secrets/internal/ui/layout"
 
 type (
 	// NotFoundViewModel contains fields used to configure the 404 not found view.

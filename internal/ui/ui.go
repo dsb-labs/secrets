@@ -11,8 +11,8 @@ import (
 	"github.com/go-playground/form/v4"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
 )
 
 type (
@@ -72,7 +72,7 @@ func decode[T Validatable](r *http.Request) (T, error) {
 	if err := decoder.Decode(&body, r.PostForm); err != nil {
 		return body, err
 	}
-	
+
 	if err := body.Validate(); err != nil {
 		return body, err
 	}

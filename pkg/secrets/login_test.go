@@ -1,4 +1,4 @@
-package keeper_test
+package secrets_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func TestClient_CreateLogin(t *testing.T) {
@@ -15,15 +15,15 @@ func TestClient_CreateLogin(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.CreateLogin(ctx, keeper.Login{})
+		_, err := client.CreateLogin(ctx, secrets.Login{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
 	t.Run("creates login", func(t *testing.T) {
-		login := keeper.Login{
+		login := secrets.Login{
 			Username: "test",
 			Password: "test",
 			Domains:  []string{"test.com"},
@@ -35,10 +35,10 @@ func TestClient_CreateLogin(t *testing.T) {
 	})
 
 	t.Run("error if login is invalid", func(t *testing.T) {
-		login := keeper.Login{}
+		login := secrets.Login{}
 		_, err := client.CreateLogin(ctx, login)
 		require.Error(t, err)
-		assert.True(t, keeper.IsBadRequest(err))
+		assert.True(t, secrets.IsBadRequest(err))
 	})
 }
 
@@ -47,20 +47,20 @@ func TestClient_ListLogins(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.ListLogins(ctx, keeper.LoginListOptions{})
+		_, err := client.ListLogins(ctx, secrets.LoginListOptions{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
 	t.Run("lists no logins", func(t *testing.T) {
-		logins, err := client.ListLogins(ctx, keeper.LoginListOptions{})
+		logins, err := client.ListLogins(ctx, secrets.LoginListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, logins, 0)
 	})
 
-	expected := keeper.Login{
+	expected := secrets.Login{
 		Username: "test",
 		Password: "test",
 		Domains:  []string{"test.com"},
@@ -70,7 +70,7 @@ func TestClient_ListLogins(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("lists logins", func(t *testing.T) {
-		logins, err := client.ListLogins(ctx, keeper.LoginListOptions{})
+		logins, err := client.ListLogins(ctx, secrets.LoginListOptions{})
 		require.NoError(t, err)
 		if assert.Len(t, logins, 1) {
 			actual := logins[0]
@@ -82,7 +82,7 @@ func TestClient_ListLogins(t *testing.T) {
 	})
 
 	t.Run("lists logins by domain", func(t *testing.T) {
-		logins, err := client.ListLogins(ctx, keeper.LoginListOptions{
+		logins, err := client.ListLogins(ctx, secrets.LoginListOptions{
 			Domain: "test.com",
 		})
 		require.NoError(t, err)
@@ -103,12 +103,12 @@ func TestClient_DeleteLogin(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		err := client.DeleteLogin(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
-	loginID, err := client.CreateLogin(ctx, keeper.Login{
+	loginID, err := client.CreateLogin(ctx, secrets.Login{
 		Username: "test",
 		Password: "test",
 		Domains:  []string{"test.com"},
@@ -118,7 +118,7 @@ func TestClient_DeleteLogin(t *testing.T) {
 	t.Run("error if login does not exist", func(t *testing.T) {
 		err = client.DeleteLogin(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
 	t.Run("deletes login", func(t *testing.T) {
@@ -129,7 +129,7 @@ func TestClient_DeleteLogin(t *testing.T) {
 	t.Run("login does not exist", func(t *testing.T) {
 		_, err = client.GetLogin(ctx, loginID)
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 }
 
@@ -140,12 +140,12 @@ func TestClient_GetLogin(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		_, err := client.GetLogin(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
-	expected := keeper.Login{
+	expected := secrets.Login{
 		Username: "test",
 		Password: "test",
 		Domains:  []string{"test.com"},
@@ -157,7 +157,7 @@ func TestClient_GetLogin(t *testing.T) {
 	t.Run("error if login does not exist", func(t *testing.T) {
 		_, err = client.GetLogin(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
 	t.Run("gets login", func(t *testing.T) {

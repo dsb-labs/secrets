@@ -1,4 +1,4 @@
-package keeper_test
+package secrets_test
 
 import (
 	"bytes"
@@ -12,11 +12,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/davidsbond/keeper/internal/server"
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/internal/server"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
-func setupTest(t *testing.T) *keeper.Client {
+func setupTest(t *testing.T) *secrets.Client {
 	t.Parallel()
 
 	if testing.Short() {
@@ -44,10 +44,10 @@ func setupTest(t *testing.T) *keeper.Client {
 				MasterKey: key,
 			},
 			JWT: server.JWTConfig{
-				Issuer:     "keeper.dsb.dev/test",
+				Issuer:     "secrets.dsb.dev/test",
 				TTL:        time.Hour,
 				SigningKey: key,
-				Audience:   "keeper.dsb.dev/test",
+				Audience:   "secrets.dsb.dev/test",
 			},
 		})
 	})
@@ -57,10 +57,10 @@ func setupTest(t *testing.T) *keeper.Client {
 	})
 
 	<-time.After(time.Second / 2)
-	return keeper.NewClient(fmt.Sprintf("http://0.0.0.0:%d", port))
+	return secrets.NewClient(fmt.Sprintf("http://0.0.0.0:%d", port))
 }
 
-func setupAccount(t *testing.T, client *keeper.Client) keeper.RestoreKey {
+func setupAccount(t *testing.T, client *secrets.Client) secrets.RestoreKey {
 	t.Helper()
 
 	const (
@@ -69,7 +69,7 @@ func setupAccount(t *testing.T, client *keeper.Client) keeper.RestoreKey {
 		displayName = "Test McTest"
 	)
 
-	restoreKey, err := client.CreateAccount(t.Context(), keeper.Account{
+	restoreKey, err := client.CreateAccount(t.Context(), secrets.Account{
 		Email:       email,
 		DisplayName: displayName,
 		Password:    password,

@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/davidsbond/keeper/internal/cli"
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/internal/cli"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func list() *cobra.Command {
@@ -25,7 +25,7 @@ func list() *cobra.Command {
 			ctx := cmd.Context()
 			client := cli.ClientFromContext(ctx)
 
-			logins, err := client.ListLogins(ctx, keeper.LoginListOptions{
+			logins, err := client.ListLogins(ctx, secrets.LoginListOptions{
 				Domain: domain,
 				Name:   name,
 			})

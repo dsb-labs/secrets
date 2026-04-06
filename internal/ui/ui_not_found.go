@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
 )
 
 // The NotFoundHandler type serves a 404 page for any route not matched by a more specific handler.

@@ -12,10 +12,10 @@ import (
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	cardview "github.com/davidsbond/keeper/internal/ui/view/card"
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	cardview "github.com/dsb-labs/secrets/internal/ui/view/card"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
 )
 
 type (

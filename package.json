@@ -1,13 +1,13 @@
 {
-  "name": "keeper",
+  "name": "secrets",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build:ui": "pnpm --filter @keeper/ui run build",
-    "build:extension": "pnpm --filter @keeper/extension run build",
-    "build:extension:dev": "pnpm --filter @keeper/extension run build:dev",
-    "watch:extension": "pnpm --filter @keeper/extension run watch",
-    "zip:extension": "pnpm --filter @keeper/extension run zip",
+    "build:ui": "pnpm --filter @secrets/ui run build",
+    "build:extension": "pnpm --filter @secrets/extension run build",
+    "build:extension:dev": "pnpm --filter @secrets/extension run build:dev",
+    "watch:extension": "pnpm --filter @secrets/extension run watch",
+    "zip:extension": "pnpm --filter @secrets/extension run zip",
     "format": "pnpm -r run format"
   },
   "devDependencies": {

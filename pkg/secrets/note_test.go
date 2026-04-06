@@ -1,4 +1,4 @@
-package keeper_test
+package secrets_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func TestClient_CreateNote(t *testing.T) {
@@ -15,15 +15,15 @@ func TestClient_CreateNote(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.CreateNote(ctx, keeper.Note{})
+		_, err := client.CreateNote(ctx, secrets.Note{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
 	t.Run("creates note", func(t *testing.T) {
-		note := keeper.Note{
+		note := secrets.Note{
 			Name:    "test",
 			Content: "test",
 		}
@@ -34,10 +34,10 @@ func TestClient_CreateNote(t *testing.T) {
 	})
 
 	t.Run("error if note is invalid", func(t *testing.T) {
-		note := keeper.Note{}
+		note := secrets.Note{}
 		_, err := client.CreateNote(ctx, note)
 		require.Error(t, err)
-		assert.True(t, keeper.IsBadRequest(err))
+		assert.True(t, secrets.IsBadRequest(err))
 	})
 }
 
@@ -46,20 +46,20 @@ func TestClient_ListNotes(t *testing.T) {
 	ctx := t.Context()
 
 	t.Run("error if not authenticated", func(t *testing.T) {
-		_, err := client.ListNotes(ctx, keeper.NoteListOptions{})
+		_, err := client.ListNotes(ctx, secrets.NoteListOptions{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
 	t.Run("lists no notes", func(t *testing.T) {
-		notes, err := client.ListNotes(ctx, keeper.NoteListOptions{})
+		notes, err := client.ListNotes(ctx, secrets.NoteListOptions{})
 		require.NoError(t, err)
 		assert.Len(t, notes, 0)
 	})
 
-	expected := keeper.Note{
+	expected := secrets.Note{
 		Name:    "test",
 		Content: "test",
 	}
@@ -68,7 +68,7 @@ func TestClient_ListNotes(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("lists notes", func(t *testing.T) {
-		notes, err := client.ListNotes(ctx, keeper.NoteListOptions{})
+		notes, err := client.ListNotes(ctx, secrets.NoteListOptions{})
 		require.NoError(t, err)
 		if assert.Len(t, notes, 1) {
 			actual := notes[0]
@@ -79,7 +79,7 @@ func TestClient_ListNotes(t *testing.T) {
 	})
 
 	t.Run("lists notes by query", func(t *testing.T) {
-		notes, err := client.ListNotes(ctx, keeper.NoteListOptions{Query: "test"})
+		notes, err := client.ListNotes(ctx, secrets.NoteListOptions{Query: "test"})
 		require.NoError(t, err)
 		if assert.Len(t, notes, 1) {
 			actual := notes[0]
@@ -97,12 +97,12 @@ func TestClient_DeleteNote(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		err := client.DeleteNote(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
-	noteID, err := client.CreateNote(ctx, keeper.Note{
+	noteID, err := client.CreateNote(ctx, secrets.Note{
 		Name:    "test",
 		Content: "test",
 	})
@@ -111,7 +111,7 @@ func TestClient_DeleteNote(t *testing.T) {
 	t.Run("error if note does not exist", func(t *testing.T) {
 		err = client.DeleteNote(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
 	t.Run("deletes note", func(t *testing.T) {
@@ -122,7 +122,7 @@ func TestClient_DeleteNote(t *testing.T) {
 	t.Run("note does not exist", func(t *testing.T) {
 		_, err = client.GetNote(ctx, noteID)
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 }
 
@@ -133,12 +133,12 @@ func TestClient_GetNote(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		_, err := client.GetNote(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
 
-	expected := keeper.Note{
+	expected := secrets.Note{
 		Name:    "test",
 		Content: "test",
 	}
@@ -149,7 +149,7 @@ func TestClient_GetNote(t *testing.T) {
 	t.Run("error if note does not exist", func(t *testing.T) {
 		_, err = client.GetNote(ctx, uuid.NameSpaceDNS.String())
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
 	t.Run("gets note", func(t *testing.T) {

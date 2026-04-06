@@ -1,9 +1,9 @@
 {
-  "name": "@keeper/ui",
+  "name": "@secrets/ui",
   "version": "0.1.0",
   "description": "A simple, self-hostable secret manager",
   "main": "index.js",
-  "repository": "https://github.com/davidsbond/keeper",
+  "repository": "https://github.com/dsb-labs/secrets",
   "author": "David Bond",
   "private": true,
   "scripts": {

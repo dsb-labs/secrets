@@ -1,8 +1,8 @@
-project_name: "keeper"
+project_name: "secrets"
 version: 2
 builds:
-  - id: keeper
-    binary: keeper
+  - id: secrets
+    binary: secrets
     mod_timestamp: "{{ .CommitTimestamp }}"
     goos:
       - linux
@@ -45,9 +45,9 @@ upx:
     lzma: false
 
 dockers_v2:
-  - id: keeper
+  - id: secrets
     images:
-      - "ghcr.io/davidsbond/keeper"
+      - "ghcr.io/dsb-labs/secrets"
     tags:
       - "{{ .Tag }}"
       - "v{{ .Major }}.{{ .Minor }}"
@@ -56,7 +56,7 @@ dockers_v2:
       - linux/amd64
       - linux/arm64
     ids:
-      - keeper
+      - secrets
     extra_files:
       - LICENSE.md
       - README.md

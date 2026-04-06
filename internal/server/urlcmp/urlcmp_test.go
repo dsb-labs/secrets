@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/davidsbond/keeper/internal/server/urlcmp"
+	"github.com/dsb-labs/secrets/internal/server/urlcmp"
 )
 
 func TestHostKey(t *testing.T) {

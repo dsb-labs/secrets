@@ -9,10 +9,10 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	noteview "github.com/davidsbond/keeper/internal/ui/view/note"
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	noteview "github.com/dsb-labs/secrets/internal/ui/view/note"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
 )
 
 type (

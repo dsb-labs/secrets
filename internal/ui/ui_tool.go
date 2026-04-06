@@ -11,11 +11,11 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/password"
-	"github.com/davidsbond/keeper/internal/server/service"
-	"github.com/davidsbond/keeper/internal/server/token"
-	statusview "github.com/davidsbond/keeper/internal/ui/view/status"
-	toolview "github.com/davidsbond/keeper/internal/ui/view/tool"
+	"github.com/dsb-labs/secrets/internal/server/password"
+	"github.com/dsb-labs/secrets/internal/server/service"
+	"github.com/dsb-labs/secrets/internal/server/token"
+	statusview "github.com/dsb-labs/secrets/internal/ui/view/status"
+	toolview "github.com/dsb-labs/secrets/internal/ui/view/tool"
 )
 
 type (
@@ -168,7 +168,7 @@ func (h *ToolHandler) ExportCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="keeper_%d.json"`, time.Now().Unix()))
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="secrets_%d.json"`, time.Now().Unix()))
 	w.WriteHeader(http.StatusOK)
 	_, _ = w.Write(data)
 }

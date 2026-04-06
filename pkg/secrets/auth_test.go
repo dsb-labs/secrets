@@ -1,4 +1,4 @@
-package keeper_test
+package secrets_test
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/davidsbond/keeper/pkg/keeper"
+	"github.com/dsb-labs/secrets/pkg/secrets"
 )
 
 func TestClient_Login(t *testing.T) {
@@ -26,10 +26,10 @@ func TestClient_Login(t *testing.T) {
 	t.Run("error if account does not exist", func(t *testing.T) {
 		err := client.Login(ctx, email, password)
 		require.Error(t, err)
-		assert.True(t, keeper.IsNotFound(err))
+		assert.True(t, secrets.IsNotFound(err))
 	})
 
-	_, err := client.CreateAccount(ctx, keeper.Account{
+	_, err := client.CreateAccount(ctx, secrets.Account{
 		Email:       email,
 		DisplayName: displayName,
 		Password:    password,
@@ -39,7 +39,7 @@ func TestClient_Login(t *testing.T) {
 	t.Run("error if password is incorrect", func(t *testing.T) {
 		err = client.Login(ctx, email, "nope")
 		require.Error(t, err)
-		assert.True(t, keeper.IsBadRequest(err))
+		assert.True(t, secrets.IsBadRequest(err))
 	})
 
 	t.Run("sets token on success", func(t *testing.T) {
@@ -56,7 +56,7 @@ func TestClient_Logout(t *testing.T) {
 	t.Run("error if not authenticated", func(t *testing.T) {
 		err := client.Logout(ctx)
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 
 	setupAccount(t, client)
@@ -68,8 +68,8 @@ func TestClient_Logout(t *testing.T) {
 	})
 
 	t.Run("is deauthenticated", func(t *testing.T) {
-		_, err := client.ListLogins(ctx, keeper.LoginListOptions{})
+		_, err := client.ListLogins(ctx, secrets.LoginListOptions{})
 		require.Error(t, err)
-		assert.True(t, keeper.IsUnauthorized(err))
+		assert.True(t, secrets.IsUnauthorized(err))
 	})
 }

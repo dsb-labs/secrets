@@ -1,4 +1,4 @@
-package keeper
+package secrets
 
 import (
 	"context"
@@ -6,11 +6,11 @@ import (
 
 	"github.com/davidsbond/x/convert"
 
-	"github.com/davidsbond/keeper/internal/server/api"
+	"github.com/dsb-labs/secrets/internal/server/api"
 )
 
 type (
-	// The Export type represents the entire contents of a user's keeper database.
+	// The Export type represents the entire contents of a user's secrets database.
 	Export struct {
 		// The user's logins.
 		Logins []Login
@@ -21,7 +21,7 @@ type (
 	}
 )
 
-// Export the caller's entire keeper database.
+// Export the caller's entire secrets database.
 func (c *Client) Export(ctx context.Context) (Export, error) {
 	request, err := c.buildRequest(ctx, http.MethodGet, "/api/v1/export", nil)
 	if err != nil {

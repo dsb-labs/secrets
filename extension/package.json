@@ -1,10 +1,10 @@
 {
-  "name": "@keeper/extension",
+  "name": "@secrets/extension",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "build": "vite build",
-    "zip": "vite build && cd dist && zip -r keeper.zip . --exclude keeper.zip",
+    "zip": "vite build && cd dist && zip -r secrets.zip . --exclude secrets.zip",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

@@ -7,7 +7,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/davidsbond/keeper/internal/server/token"
+	"github.com/dsb-labs/secrets/internal/server/token"
 )
 
 type (
@@ -54,7 +54,7 @@ func write(w http.ResponseWriter, code int, body any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(code)
 	if err := json.NewEncoder(w).Encode(body); err != nil {
-		// TODO(davidsbond): something
+		// TODO(dsb-labs): something
 		fmt.Println(err)
 	}
 }

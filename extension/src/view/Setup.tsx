@@ -49,7 +49,7 @@ export function Setup({ onConfigured }: Props) {
           type="url"
           value={url}
           onInput={(e) => setUrl((e.target as HTMLInputElement).value)}
-          placeholder="https://your-keeper-server.com"
+          placeholder="https://your-secrets-server.com"
           class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
           required
         />

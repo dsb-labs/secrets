@@ -9,8 +9,8 @@ import (
 	"github.com/davidsbond/x/filter"
 	"github.com/google/uuid"
 
-	"github.com/davidsbond/keeper/internal/server/database"
-	"github.com/davidsbond/keeper/internal/server/password"
+	"github.com/dsb-labs/secrets/internal/server/database"
+	"github.com/dsb-labs/secrets/internal/server/password"
 )
 
 type (

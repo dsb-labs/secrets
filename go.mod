@@ -1,4 +1,4 @@
-module github.com/davidsbond/keeper
+module github.com/dsb-labs/secrets
 
 go 1.26
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/davidsbond/keeper/internal/server/password"
+	"github.com/dsb-labs/secrets/internal/server/password"
 )
 
 func TestGenerate(t *testing.T) {
