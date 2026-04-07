@@ -1,8 +1,8 @@
 import { useState } from "preact/hooks";
-import { KeeperClient, InvalidCredentialsError, UnreachableError } from "@/lib/client";
+import { Client, InvalidCredentialsError, UnreachableError } from "@/lib/client";
 
 type Props = {
-  client: KeeperClient;
+  client: Client;
   onAuthenticated: () => Promise<void>;
 };
 
@@ -36,7 +36,7 @@ export function Login({ client, onAuthenticated }: Props) {
   return (
     <form onSubmit={handleSubmit} class="flex flex-col gap-4 p-4">
       <div>
-        <h1 class="text-sm font-semibold text-gray-900 dark:text-white">Sign in to Keeper</h1>
+        <h1 class="text-sm font-semibold text-gray-900 dark:text-white">Sign in to Secrets</h1>
         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter your account credentials.</p>
       </div>
       <div class="flex flex-col gap-3">

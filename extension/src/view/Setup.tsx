@@ -1,6 +1,6 @@
 import { useState } from "preact/hooks";
 import { setServerURL } from "@/lib/storage";
-import { KeeperClient, UnreachableError } from "@/lib/client";
+import { Client, UnreachableError } from "@/lib/client";
 
 type Props = {
   onConfigured: (url: string) => void;
@@ -26,7 +26,7 @@ export function Setup({ onConfigured }: Props) {
     setChecking(true);
     setError("");
     try {
-      await new KeeperClient(url).ping();
+      await new Client(url).ping();
     } catch (err) {
       setError(err instanceof UnreachableError ? err.message : "An unexpected error occurred.");
       return;
@@ -41,8 +41,8 @@ export function Setup({ onConfigured }: Props) {
   return (
     <form onSubmit={handleSubmit} class="flex flex-col gap-4 p-4">
       <div>
-        <h1 class="text-sm font-semibold text-gray-900 dark:text-white">Connect to Keeper</h1>
-        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter the URL of your Keeper server.</p>
+        <h1 class="text-sm font-semibold text-gray-900 dark:text-white">Connect to server</h1>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter the URL of your server.</p>
       </div>
       <div class="flex flex-col gap-1">
         <input

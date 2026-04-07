@@ -4,7 +4,7 @@ const LOGIN_PATH = "/api/v1/login";
 
 export class UnreachableError extends Error {
   constructor(url: string) {
-    super(`Could not reach Keeper server at ${url}`);
+    super(`Could not reach server at ${url}`);
   }
 }
 
@@ -29,10 +29,17 @@ export type Login = {
   name: string;
 };
 
-// KeeperClient is a client for the Keeper API. It encapsulates the server URL and session token,
+export type CreateLoginRequest = {
+  name: string;
+  username: string;
+  password: string;
+  domains: string[];
+};
+
+// Client is a client for the Secrets API. It encapsulates the server URL and session token,
 // centralising error handling for all requests. The token may be set at construction time (when
 // restoring from storage) or populated later via login().
-export class KeeperClient {
+export class Client {
   private _token: string;
 
   constructor(
@@ -89,14 +96,18 @@ export class KeeperClient {
     this._token = token as string;
   }
 
-  // get sends an authenticated GET request to the given path and returns the parsed response body.
+  // call sends an authenticated request and returns the parsed response body.
   // Throws UnauthorizedError on 401, or UnreachableError on network failure or any other non-OK response.
-  private async get<T>(path: string): Promise<T> {
+  private async call<T>(path: string, init: RequestInit = {}): Promise<T> {
+    const headers = new Headers(init.headers);
+    headers.set("Authorization", `Bearer ${this._token}`);
+    if (init.body !== undefined) {
+      headers.set("Content-Type", "application/json");
+    }
+
     let response: Response;
     try {
-      response = await fetch(`${this.baseURL}${path}`, {
-        headers: { Authorization: `Bearer ${this._token}` },
-      });
+      response = await fetch(`${this.baseURL}${path}`, { ...init, headers });
     } catch {
       throw new UnreachableError(this.baseURL);
     }
@@ -112,6 +123,14 @@ export class KeeperClient {
     return response.json() as Promise<T>;
   }
 
+  private get<T>(path: string): Promise<T> {
+    return this.call<T>(path);
+  }
+
+  private post<T>(path: string, body: unknown): Promise<T> {
+    return this.call<T>(path, { method: "POST", body: JSON.stringify(body) });
+  }
+
   // listLogins returns all logins stored for the given domain.
   async listLogins(domain: string): Promise<Login[]> {
     const { logins } = await this.get<{ logins: Login[] }>(`${LOGIN_PATH}?domain=${encodeURIComponent(domain)}`);
@@ -122,5 +141,11 @@ export class KeeperClient {
   async getLogin(id: string): Promise<Login> {
     const { login } = await this.get<{ login: Login }>(`${LOGIN_PATH}/${encodeURIComponent(id)}`);
     return login;
+  }
+
+  // createLogin creates a new login and returns its ID.
+  async createLogin(req: CreateLoginRequest): Promise<string> {
+    const { id } = await this.post<{ id: string }>(LOGIN_PATH, req);
+    return id;
   }
 }

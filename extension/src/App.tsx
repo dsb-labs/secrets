@@ -2,17 +2,18 @@ import { type ComponentChildren } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { LocationProvider, Router, Route, useLocation } from "preact-iso";
 import { getServerURL, getToken, setToken as persistToken, clearToken } from "@/lib/storage";
-import { KeeperClient } from "@/lib/client";
+import { Client } from "@/lib/client";
 import { Setup } from "@/view/Setup";
 import { Login } from "@/view/Login";
 import { Logins } from "@/view/Logins";
 import { LoginDetail } from "@/view/LoginDetail";
+import { CreateLogin } from "@/view/CreateLogin";
 
 type Status = "loading" | "setup" | "login" | "authenticated";
 
 export function App() {
   const [status, setStatus] = useState<Status>("loading");
-  const clientRef = useRef(new KeeperClient(""));
+  const clientRef = useRef(new Client(""));
 
   useEffect(() => {
     async function init() {
@@ -21,7 +22,7 @@ export function App() {
         setStatus("setup");
         return;
       }
-      clientRef.current = new KeeperClient(url, token ?? "");
+      clientRef.current = new Client(url, token ?? "");
       setStatus(token ? "authenticated" : "login");
     }
 
@@ -29,7 +30,7 @@ export function App() {
   }, []);
 
   async function handleConfigured(url: string) {
-    clientRef.current = new KeeperClient(url);
+    clientRef.current = new Client(url);
     setStatus("login");
   }
 
@@ -52,6 +53,7 @@ export function App() {
           <Route path="/setup" component={() => <Setup onConfigured={handleConfigured} />} />
           <Route path="/login" component={() => <Login client={client} onAuthenticated={handleAuthenticated} />} />
           <Route path="/logins" component={() => <Logins client={client} onExpired={handleExpired} />} />
+          <Route path="/logins/new" component={() => <CreateLogin client={client} onExpired={handleExpired} />} />
           <Route
             path="/logins/:id"
             component={({ id }: { id: string }) => <LoginDetail id={id} client={client} onExpired={handleExpired} />}

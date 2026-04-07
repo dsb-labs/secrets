@@ -1,14 +1,14 @@
 import { useEffect, useState } from "preact/hooks";
 import { useLocation } from "preact-iso";
 import { type ComponentChildren } from "preact";
-import { KeeperClient, UnauthorizedError, type Login } from "@/lib/client";
+import { Client, UnauthorizedError, type Login } from "@/lib/client";
 import { CopyButton } from "@/component/CopyButton";
 import { PasswordField } from "@/component/PasswordField";
 import { autofill } from "@/lib/autofill";
 
 type Props = {
   id: string;
-  client: KeeperClient;
+  client: Client;
   onExpired: () => Promise<void>;
 };
 
