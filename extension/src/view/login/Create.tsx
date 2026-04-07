@@ -8,9 +8,9 @@ type Props = {
   onExpired: () => Promise<void>;
 };
 
-// CreateLogin renders a form to create a new login entry. The domains field is pre-populated with
+// Create renders a form to create a new login entry. The domains field is pre-populated with
 // the current tab's hostname.
-export function CreateLogin({ client, onExpired }: Props) {
+export function Create({ client, onExpired }: Props) {
   const { route } = useLocation();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");

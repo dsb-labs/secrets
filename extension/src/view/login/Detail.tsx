@@ -12,9 +12,9 @@ type Props = {
   onExpired: () => Promise<void>;
 };
 
-// LoginDetail fetches and renders the full details of a single login, including username, password
+// Detail fetches and renders the full details of a single login, including username, password
 // (with show/hide and copy controls), domains, and creation date.
-export function LoginDetail({ id, client, onExpired }: Props) {
+export function Detail({ id, client, onExpired }: Props) {
   const { route } = useLocation();
   const [login, setLogin] = useState<Login | null>(null);
   const [loading, setLoading] = useState(true);

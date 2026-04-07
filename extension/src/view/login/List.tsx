@@ -10,10 +10,10 @@ type Props = {
   onExpired: () => Promise<void>;
 };
 
-// Logins fetches and renders the list of logins stored for the current tab's domain. Shows a
+// List fetches and renders the list of logins stored for the current tab's domain. Shows a
 // loading state while fetching, an empty state when no logins are found, and a list of rows
 // otherwise.
-export function Logins({ client, onExpired }: Props) {
+export function List({ client, onExpired }: Props) {
   const { route } = useLocation();
   const [logins, setLogins] = useState<Login[]>([]);
   const [domain, setDomain] = useState("");

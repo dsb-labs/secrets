@@ -3,11 +3,11 @@ import { useEffect, useRef, useState } from "preact/hooks";
 import { LocationProvider, Router, Route, useLocation } from "preact-iso";
 import { getServerURL, getToken, setToken as persistToken, clearToken } from "@/lib/storage";
 import { Client } from "@/lib/client";
-import { Setup } from "@/view/Setup";
-import { Login } from "@/view/Login";
-import { Logins } from "@/view/Logins";
-import { LoginDetail } from "@/view/LoginDetail";
-import { CreateLogin } from "@/view/CreateLogin";
+import { Setup } from "@/view/auth/Setup";
+import { Login } from "@/view/auth/Login";
+import { List } from "@/view/login/List";
+import { Detail } from "@/view/login/Detail";
+import { Create } from "@/view/login/Create";
 
 type Status = "loading" | "setup" | "login" | "authenticated";
 
@@ -52,11 +52,11 @@ export function App() {
         <Router>
           <Route path="/setup" component={() => <Setup onConfigured={handleConfigured} />} />
           <Route path="/login" component={() => <Login client={client} onAuthenticated={handleAuthenticated} />} />
-          <Route path="/logins" component={() => <Logins client={client} onExpired={handleExpired} />} />
-          <Route path="/logins/new" component={() => <CreateLogin client={client} onExpired={handleExpired} />} />
+          <Route path="/logins" component={() => <List client={client} onExpired={handleExpired} />} />
+          <Route path="/logins/new" component={() => <Create client={client} onExpired={handleExpired} />} />
           <Route
             path="/logins/:id"
-            component={({ id }: { id: string }) => <LoginDetail id={id} client={client} onExpired={handleExpired} />}
+            component={({ id }: { id: string }) => <Detail id={id} client={client} onExpired={handleExpired} />}
           />
         </Router>
       </AuthGuard>
