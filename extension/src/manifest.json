@@ -1,16 +1,21 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Secrets",
   "version": "0.1.0",
   "description": "A simple, self-hostable secret manager",
-  "permissions": ["storage", "activeTab", "tabs", "<all_urls>"],
+  "permissions": ["storage", "activeTab", "tabs", "scripting"],
+  "host_permissions": ["<all_urls>"],
   "icons": {
     "48": "icons/icon.svg",
     "96": "icons/icon.svg"
   },
-  "browser_action": {
+  "action": {
     "default_title": "Secrets",
     "default_popup": "index.html",
     "default_icon": "icons/icon.svg"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
   }
 }

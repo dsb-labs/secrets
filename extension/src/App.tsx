@@ -54,10 +54,7 @@ export function App() {
           <Route path="/login" component={() => <Login client={client} onAuthenticated={handleAuthenticated} />} />
           <Route path="/logins" component={() => <List client={client} onExpired={handleExpired} />} />
           <Route path="/logins/new" component={() => <Create client={client} onExpired={handleExpired} />} />
-          <Route
-            path="/logins/:id"
-            component={({ id }: { id: string }) => <Detail id={id} client={client} onExpired={handleExpired} />}
-          />
+          <Route path="/logins/:id" component={({ id }: { id: string }) => <Detail id={id} client={client} onExpired={handleExpired} />} />
         </Router>
       </AuthGuard>
     </LocationProvider>

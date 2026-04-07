@@ -1,7 +1,8 @@
 import browser from "webextension-polyfill";
 
-// fillCredentials is injected into the active tab via executeScript. It must be self-contained:
-// no imports, no references to module-scope variables. Only built-in DOM APIs are used.
+// fillCredentials is injected into the active tab via scripting.executeScript. It must be
+// self-contained: no imports, no references to module-scope variables. Only built-in DOM APIs
+// are used. The args array is passed as individual function arguments by the scripting API.
 function fillCredentials(username: string, password: string): boolean {
   function fill(el: HTMLInputElement, value: string) {
     const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value")?.set;
@@ -30,9 +31,10 @@ export async function autofill(username: string, password: string): Promise<bool
   const tabId = tabs[0]?.id;
   if (tabId === undefined) return false;
 
-  // Serialize the typed function and invoke it immediately with the credentials.
-  // JSON.stringify safely escapes quotes, backslashes, and other special characters in passwords.
-  const code = `(${fillCredentials.toString()})(${JSON.stringify(username)}, ${JSON.stringify(password)})`;
-  const results = await browser.tabs.executeScript(tabId, { code });
-  return results?.[0] === true;
+  const results = await browser.scripting.executeScript({
+    target: { tabId },
+    func: fillCredentials,
+    args: [username, password],
+  });
+  return results?.[0]?.result === true;
 }
