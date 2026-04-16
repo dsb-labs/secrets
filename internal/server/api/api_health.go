@@ -2,16 +2,29 @@ package api
 
 import (
 	"net/http"
+	"runtime/debug"
+	"time"
 )
 
 type (
 	// The HealthAPI exposes HTTP endpoints for checking the health and readiness of the server.
-	HealthAPI struct{}
+	HealthAPI struct {
+		version string
+		start   time.Time
+	}
 )
 
 // NewHealthAPI returns a new instance of the HealthAPI type.
 func NewHealthAPI() *HealthAPI {
-	return &HealthAPI{}
+	api := &HealthAPI{
+		start: time.Now(),
+	}
+
+	if info, ok := debug.ReadBuildInfo(); ok {
+		api.version = info.Main.Version
+	}
+
+	return api
 }
 
 // Register the HTTP endpoints onto the given http.ServeMux.
@@ -22,13 +35,21 @@ func (api *HealthAPI) Register(mux *http.ServeMux) {
 
 type (
 	// The HealthResponse type represents the response body returned when calling HealthAPI.Health.
-	HealthResponse struct{}
+	HealthResponse struct {
+		// The server version.
+		Version string `json:"version"`
+		// How long the server has been active for, is the string representation of a time.Duration.
+		Uptime  string `json:"uptime"`
+	}
 )
 
 // Health handles an inbound HTTP request to check the health of the server. On success, it responds with
 // an http.StatusOK code and a JSON-encoded HealthResponse.
 func (api *HealthAPI) Health(w http.ResponseWriter, r *http.Request) {
-	write(w, http.StatusOK, HealthResponse{})
+	write(w, http.StatusOK, HealthResponse{
+		Version: api.version,
+		Uptime:  time.Since(api.start).String(),
+	})
 }
 
 type (
