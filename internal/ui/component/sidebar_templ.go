@@ -47,7 +47,7 @@ func Sidebar(props SidebarProps) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-sm font-semibold text-gray-900 dark:text-white\">Keeper</span></div><nav class=\"flex-1 px-3 pt-16 pb-4 md:py-4 space-y-0.5\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-sm font-semibold text-gray-900 dark:text-white\">Secrets</span></div><nav class=\"flex-1 px-3 pt-16 pb-4 md:py-4 space-y-0.5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

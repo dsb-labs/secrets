@@ -93,7 +93,7 @@ func authenticatedShell(model AuthenticatedViewModel, view templ.Component) temp
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><span class=\"text-sm font-semibold text-gray-900 dark:text-white\">Keeper</span></div></div><div id=\"sidebar-backdrop\" class=\"hidden fixed inset-0 z-30 bg-black/50 md:hidden\" onclick=\"closeMobileNav()\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><span class=\"text-sm font-semibold text-gray-900 dark:text-white\">Secrets</span></div></div><div id=\"sidebar-backdrop\" class=\"hidden fixed inset-0 z-30 bg-black/50 md:hidden\" onclick=\"closeMobileNav()\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

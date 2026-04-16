@@ -85,7 +85,7 @@ func register(model RegisterViewModel) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><h1 class=\"text-2xl font-bold text-gray-900 dark:text-white\">Keeper</h1><p class=\"text-sm text-gray-500 dark:text-gray-400 mt-1\">Create your account</p></div><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><h1 class=\"text-2xl font-bold text-gray-900 dark:text-white\">Secrets</h1><p class=\"text-sm text-gray-500 dark:text-gray-400 mt-1\">Create your account</p></div><div class=\"bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

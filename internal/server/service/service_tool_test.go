@@ -411,14 +411,14 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: invalid JSON",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         `not json`,
 		},
 		{
 			Name:         "secrets: error if login database lifetime has expired",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -430,7 +430,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error getting login database",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -442,7 +442,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error if note database lifetime has expired",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -457,7 +457,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error getting note database",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -472,7 +472,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error if card database lifetime has expired",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -490,7 +490,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error getting card database",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -508,7 +508,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error creating login",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -530,7 +530,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error creating note",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -556,7 +556,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: card database lifetime expired on create",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -586,7 +586,7 @@ func TestToolService_Import(t *testing.T) {
 			Name:         "secrets: error creating card",
 			ExpectsError: true,
 			UserID:       uuid.NameSpaceDNS,
-			Source:       service.ImportSourceKeeper,
+			Source:       service.ImportSourceSecrets,
 			Data:         secretsJSON,
 			Setup: func(mocks *ImportMocks) {
 				mocks.loginProvider.EXPECT().
@@ -615,7 +615,7 @@ func TestToolService_Import(t *testing.T) {
 		{
 			Name:   "secrets: success",
 			UserID: uuid.NameSpaceDNS,
-			Source: service.ImportSourceKeeper,
+			Source: service.ImportSourceSecrets,
 			Data:   secretsJSON,
 			Expected: service.ImportResult{
 				Logins: 1,

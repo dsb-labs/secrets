@@ -42,7 +42,7 @@ func Main(title string, view templ.Component, scripts ...templ.Component) templ.
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Keeper</title><link href=\"/asset/styles.css\" rel=\"stylesheet\"><link href=\"/asset/favicon.svg\" rel=\"icon\" type=\"image/svg+xml\"></head><body class=\"h-full bg-gray-50 dark:bg-gray-900 antialiased\"><main class=\"h-full\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " - Secrets</title><link href=\"/asset/styles.css\" rel=\"stylesheet\"><link href=\"/asset/favicon.svg\" rel=\"icon\" type=\"image/svg+xml\"></head><body class=\"h-full bg-gray-50 dark:bg-gray-900 antialiased\"><main class=\"h-full\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -26,7 +26,7 @@ func login() *cobra.Command {
 				err      error
 			)
 
-			if password = envvar.String("KEEPER_PASSWORD", ""); password == "" {
+			if password = envvar.String("SECRETS_PASSWORD", ""); password == "" {
 				password, err = cli.PromptPassword("Enter password")
 				if err != nil {
 					return fmt.Errorf("failed to read password: %w", err)

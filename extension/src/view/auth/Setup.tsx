@@ -6,7 +6,7 @@ type Props = {
   onConfigured: (url: string) => void;
 };
 
-// Setup renders a form that prompts the user to enter their Keeper server URL. On submission, it
+// Setup renders a form that prompts the user to enter their server URL. On submission, it
 // validates the URL format and checks reachability via the health endpoint before persisting the
 // URL to storage and calling onConfigured.
 export function Setup({ onConfigured }: Props) {

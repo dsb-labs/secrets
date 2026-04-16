@@ -52,7 +52,7 @@ type (
 
 // Constants for import sources.
 const (
-	ImportSourceKeeper ImportSource = iota
+	ImportSourceSecrets ImportSource = iota
 	ImportSourceBitwarden
 )
 
@@ -66,7 +66,7 @@ var (
 func ParseImportSource(s string) (ImportSource, error) {
 	switch s {
 	case "secrets":
-		return ImportSourceKeeper, nil
+		return ImportSourceSecrets, nil
 	case "bitwarden":
 		return ImportSourceBitwarden, nil
 	default:
@@ -169,8 +169,8 @@ func (svc *ToolService) Export(userID uuid.UUID) (Export, error) {
 // items imported along with any individual errors.
 func (svc *ToolService) Import(userID uuid.UUID, source ImportSource, data io.Reader) (ImportResult, error) {
 	switch source {
-	case ImportSourceKeeper:
-		return svc.importKeeper(userID, data)
+	case ImportSourceSecrets:
+		return svc.importSecrets(userID, data)
 	case ImportSourceBitwarden:
 		return svc.importBitwarden(userID, data)
 	default:
@@ -178,7 +178,7 @@ func (svc *ToolService) Import(userID uuid.UUID, source ImportSource, data io.Re
 	}
 }
 
-func (svc *ToolService) importKeeper(userID uuid.UUID, data io.Reader) (ImportResult, error) {
+func (svc *ToolService) importSecrets(userID uuid.UUID, data io.Reader) (ImportResult, error) {
 	var export Export
 	if err := json.NewDecoder(data).Decode(&export); err != nil {
 		return ImportResult{}, fmt.Errorf("failed to decode export data: %w", err)

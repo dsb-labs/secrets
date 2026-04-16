@@ -7,7 +7,7 @@ type Props = {
 };
 
 // Login renders a form that prompts the user to sign in with their email and password. On
-// submission, it authenticates against the configured Keeper server via the provided client and
+// submission, it authenticates against the configured server via the provided client and
 // calls onAuthenticated.
 export function Login({ client, onAuthenticated }: Props) {
   const [email, setEmail] = useState("");
