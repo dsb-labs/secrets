@@ -8,9 +8,19 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
+	"runtime/debug"
+
 	"github.com/dsb-labs/secrets/internal/ui/component"
 	"github.com/dsb-labs/secrets/internal/ui/script"
 )
+
+var serverVersion = "dev"
+
+func init() {
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" {
+		serverVersion = info.Main.Version
+	}
+}
 
 type (
 	// The AuthenticatedViewModel type contains fields used to configure the authenticated page layout.
@@ -98,8 +108,9 @@ func authenticatedShell(model AuthenticatedViewModel, view templ.Component) temp
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = component.Sidebar(component.SidebarProps{
-			CurrentPage: model.CurrentPage,
-			DisplayName: model.DisplayName,
+			CurrentPage:   model.CurrentPage,
+			DisplayName:   model.DisplayName,
+			ServerVersion: serverVersion,
 		}).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

@@ -1,9 +1,19 @@
 package layout
 
 import (
+	"runtime/debug"
+
 	"github.com/dsb-labs/secrets/internal/ui/component"
 	"github.com/dsb-labs/secrets/internal/ui/script"
 )
+
+var serverVersion = "dev"
+
+func init() {
+	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" {
+		serverVersion = info.Main.Version
+	}
+}
 
 type (
 	// The AuthenticatedViewModel type contains fields used to configure the authenticated page layout.
@@ -44,8 +54,9 @@ templ authenticatedShell(model AuthenticatedViewModel, view templ.Component) {
 		</div>
 		<div id="sidebar-backdrop" class="hidden fixed inset-0 z-30 bg-black/50 md:hidden" onclick="closeMobileNav()"></div>
 		@component.Sidebar(component.SidebarProps{
-			CurrentPage: model.CurrentPage,
-			DisplayName: model.DisplayName,
+			CurrentPage:   model.CurrentPage,
+			DisplayName:   model.DisplayName,
+			ServerVersion: serverVersion,
 		})
 		<div class="flex-1 min-w-0 overflow-auto pt-14 md:pt-0">
 			@view
