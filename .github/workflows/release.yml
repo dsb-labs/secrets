@@ -50,6 +50,9 @@ jobs:
 
   extension:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        browser: [chrome, firefox, safari]
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
@@ -63,14 +66,21 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set version
+        working-directory: extension
+        run: pnpm version ${GITHUB_REF_NAME#v} --no-git-tag-version
+
       - name: Build extension
-        run: |
-          pnpm install --frozen-lockfile
-          cd extension && pnpm version ${GITHUB_REF_NAME#v} --no-git-tag-version && cd ..
-          pnpm zip:extension
-          mv extension/dist/secrets.zip extension/dist/extension_${GITHUB_REF_NAME#v}.zip
+        working-directory: extension
+        run: pnpm zip:${{ matrix.browser }}
 
       - name: Upload extension to release
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: gh release upload ${{ github.ref_name }} extension/dist/extension_${GITHUB_REF_NAME#v}.zip
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          mv extension/secrets-${{ matrix.browser }}.zip extension/extension_${{ matrix.browser }}_${VERSION}.zip
+          gh release upload ${{ github.ref_name }} extension/extension_${{ matrix.browser }}_${VERSION}.zip

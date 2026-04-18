@@ -5,9 +5,10 @@
   "scripts": {
     "build:ui": "pnpm --filter @secrets/ui run build",
     "build:extension": "pnpm --filter @secrets/extension run build",
-    "build:extension:dev": "pnpm --filter @secrets/extension run build:dev",
-    "watch:extension": "pnpm --filter @secrets/extension run watch",
-    "zip:extension": "pnpm --filter @secrets/extension run zip",
+    "zip:extension": "pnpm --filter @secrets/extension run zip:chrome && pnpm --filter @secrets/extension run zip:firefox && pnpm --filter @secrets/extension run zip:safari",
+    "zip:extension:chrome": "pnpm --filter @secrets/extension run zip:chrome",
+    "zip:extension:firefox": "pnpm --filter @secrets/extension run zip:firefox",
+    "zip:extension:safari": "pnpm --filter @secrets/extension run zip:safari",
     "format": "pnpm -r run format"
   },
   "devDependencies": {

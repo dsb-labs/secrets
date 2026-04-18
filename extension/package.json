@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "vite build",
-    "zip": "vite build && cd dist && zip -r secrets.zip . --exclude secrets.zip",
+    "build": "pnpm build:chrome && pnpm build:firefox && pnpm build:safari",
+    "build:chrome": "BROWSER=chrome vite build",
+    "build:firefox": "BROWSER=firefox vite build",
+    "build:safari": "BROWSER=safari vite build",
+    "zip:chrome": "pnpm build:chrome && cd dist/chrome && zip -r ../../secrets-chrome.zip . --exclude '*.zip'",
+    "zip:firefox": "pnpm build:firefox && cd dist/firefox && zip -r ../../secrets-firefox.zip . --exclude '*.zip'",
+    "zip:safari": "pnpm build:safari && cd dist/safari && zip -r ../../secrets-safari.zip . --exclude '*.zip'",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -14,6 +19,7 @@
     "webextension-polyfill": "^0.12.0"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.0.0",
     "tailwindcss": "^4.0.0",
     "typescript": "^6.0.2",
