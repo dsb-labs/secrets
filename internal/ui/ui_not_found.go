@@ -22,6 +22,11 @@ func (h *NotFoundHandler) Register(mux *http.ServeMux) {
 }
 
 func (h *NotFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/" {
+		http.Redirect(w, r, "/dashboard", http.StatusFound)
+		return
+	}
+
 	if strings.HasPrefix(r.URL.Path, "/api") || strings.HasPrefix(r.URL.Path, "/asset") {
 		http.NotFound(w, r)
 		return
