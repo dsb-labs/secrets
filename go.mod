@@ -7,7 +7,7 @@ require (
 	github.com/BurntSushi/toml v1.6.0
 	github.com/a-h/templ v0.3.1020
 	github.com/davidsbond/x v0.0.0-20260303171052-54ba0077d494
-	github.com/dgraph-io/badger/v4 v4.9.2
+	github.com/dgraph-io/badger/v4 v4.9.4
 	github.com/durango/go-credit-card v0.0.0-20220404131259-a9e175ba4082
 	github.com/go-ozzo/ozzo-validation v3.6.0+incompatible
 	github.com/go-playground/form/v4 v4.3.0
